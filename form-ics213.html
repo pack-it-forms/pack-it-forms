@@ -1,0 +1,197 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/form-ics213.css"/>
+    <script language="javascript" src="resources/js/pack-it-forms.js"></script>
+    <script language="javascript" src="resources/js/form-ics213.js"></script>
+  </head>
+
+  <body>
+    <div id="form-data">
+!PACF! 001_O/I_ICS213_TEST
+# EOC MESSAGE FORM 
+# JS-ver. PR-3.9-2.6, 08/11/13,
+# FORMFILENAME: Message.html
+MsgNo: [001]
+1a.: [02/27/2014]
+1b.: [1552]
+4.: [OTHER]
+5.: [IMMEDIATE]
+6a.: [No]
+6b.: [No]
+7.: [Logistics]
+9a.: [HOME]
+8.: [Logistics]
+9b.: [HOME]
+10.: [TEST]
+12.: [\nTHIS IS A TEST MESSAGE FORM.  THIS ILLUSTRATES THE COMPLEXITY
+ OF PACFORMS.]
+Rec-Sent: [Sent]
+Method: [Other]
+Other: [Packet]
+OpDate: [02/27/2014]
+OpTime: [1555]
+#EOF
+    </div>
+    <form name="form">
+      <table id="form">
+        <col id="field-label"/>
+        <col id="field-widget"/>
+        <tr>
+          <td>Date [ 1a]:</td>
+          <td><input name="1a.date" class="init-default" type="text" size="10"/ value="[date]"></td>
+        </tr><tr>
+          <td>Time: [ 1b]:</td>
+          <td><input name="1b.time" class="init-default" type="text" size="10"/ value="[time]"></td>
+        </tr><tr>
+          <td>Sender's Msg # [  2]:</td>
+          <td><input name="2.txmsgno" class="" type="text" size="15"/></td>
+        </tr><tr>
+          <td>My Msg #:</td>
+          <td><input name="msgno" class="init-default" type="text" size="15" value="[msgno]"/></td>
+        </tr><tr>
+          <td>Receiver's Msg # [  3]:</td>
+          <td><input name="3.rxmsgno" class="" type="text" size="15"/></td>
+        </tr><tr>
+          <td>Severity [  4]:</td>
+          <td>
+            <input name="4.severity" type="radio" value="EMERGENCY"/> Emergency
+            <input name="4.severity" type="radio" value="URGENT"/> Urgent
+            <input name="4.severity" type="radio" value="OTHER"/> Other
+          </td>
+        </tr><tr>
+          <td>Message Handling Order [  5]:</td>
+          <td>
+            <input name="5.handling" type="radio" value="IMMEDIATE"/> Immediate
+            <input name="5.handling" type="radio" value="PRIORITY"/> Priority
+            <input name="5.handling" type="radio" value="ROUTINE"/> Routine
+          </td>
+        </tr><tr>
+          <td>Message Requests You To [  6]:</td>
+          <td>
+            Take action<br/>
+            <input name="6a.take-action" type="radio" value="Yes"/> Yes
+            <input name="6a.take-action" type="radio" value="No"/> No
+            <br/>Reply<br/>
+            <input name="6b.reply" type="radio" value="Yes"/> Yes
+            by: <input name="6c.reply-by" type="text" size="12"/>
+            <input name="6b.reply" type="radio" value="No"/> No
+            <br/>
+            <input name="6d.fyi" type="checkbox"/>For your information (no action)
+          </td>
+        </tr><tr>
+          <td>To</td><td></td>
+        </tr><tr>
+          <td>ICS Position [  7]:</td>
+          <td>
+            <select name="7.to-ics-position">
+              <option value="">Select one...</option>
+              <option value="Incident Commander">Incident Commander</option>
+              <option value="Operations">Operations</option>
+              <option value="Planning">Planning</option>
+              <option value="Logistics">Logistics</option>
+              <option value="Finance/Admin.">Finance/Admin.</option>
+              <option value="Public Info. Officer">Public Info. Officer</option>
+              <option value="Liaison Officer">Liaison Officer</option>
+              <option value="Safety Officer">Safety Officer</option>
+              <option value="Other">Other:</option>
+            </select>
+            <input name="7.to-ics-position-other" type="text" size="20"/>
+          </td>
+        </tr><tr>
+          <td>Location [ 9a]:</td>
+          <td><input name="9a.to-location" type="text" size="20"/></td>
+        </tr><tr>
+          <td>Name:</td>
+          <td><input name="to-name" type="text" size="20"/></td>
+        </tr><tr>
+          <td>Telephone #:</td>
+          <td><input name="to-telephone" type="text" size="20"/></td>
+        </tr><tr>
+          <td>From</td><td></td>
+        </tr><tr>
+          <td>ICS Position [  8]:</td>
+          <td>
+            <select name="from-ics-position">
+              <option value="">Select one...</option>
+              <option value="Incident Commander">Incident Commander</option>
+              <option value="Operations">Operations</option>
+              <option value="Planning">Planning</option>
+              <option value="Logistics">Logistics</option>
+              <option value="Finance/Admin.">Finance/Admin.</option>
+              <option value="Public Info. Officer">Public Info. Officer</option>
+              <option value="Liaison Officer">Liaison Officer</option>
+              <option value="Safety Officer">Safety Officer</option>
+              <option value="Other">Other:</option>
+            </select>
+            <input name="8.from-ics-position-text" type="text" size="20"/>
+          </td>
+        </tr><tr>
+          <td>Location [ 9b]:</td>
+          <td><input name="9b.from-location" type="text" size="20"/></td>
+        </tr><tr>
+          <td>Name:</td>
+          <td><input name="from-name" type="text" size="20"/></td>
+        </tr><tr>
+          <td>Telephone #:</td>
+          <td><input name="from-telephone" type="text" size="20"/></td>
+        </tr><tr>
+          <td>Body</td><td></td>
+        </tr><tr>
+          <td>Subject [ 10]:</td>
+          <td><input name="10.subject" type="text" size="40"/></td>
+        </tr><tr>
+          <td>Reference [ 11]:</td>
+          <td><input name="11.reference" type="text" size="40"/></td>
+        </tr><tr>
+          <td>Message [ 12]:</td>
+          <td>
+            <textarea name="12.messsage" rows="6" cols="80" wrap="hard"></textarea>
+          </td>
+        </tr><tr>
+         <td>Action Taken [ 13]:</td>
+         <td>
+           <textarea name="13.action-taken" rows="3" cols="80" wrap="hard"></textarea>
+         </td>
+        </tr><tr>
+         <td>cc:</td>
+         <td>
+           <input name="cc-management" type="checkbox" value="Yes"> Management
+           <input name="cc-operations" type="checkbox" value="Yes"> Operations
+           <input name="cc-planning" type="checkbox" value="Yes"> Planning
+           <input name="cc-logistics" type="checkbox" value="Yes"> Logistics
+           <input name="cc-finance" type="checkbox" value="Yes"> Finance
+        </tr><tr>
+          <td>Operator Use</td><td></td>
+        </tr><tr>
+          <td>How:</td>
+          <td>
+            Received <input name="msgdir" type="radio" value="Received"/>
+            or Sent <input name="msgdir" type="radio" value="Sent"/>
+            <br/>
+            <input name="mode" type="radio" value="Telephone"/> Telephone
+            <input name="mode" type="radio" value="Dispatch Center"/> Dispatch Center
+            <input name="mode" type="radio" value="EOC Radio"/> EOC Radio
+            <input name="mode" type="radio" value="FAX"/> FAX
+            <input name="mode" type="radio" value="Courier"/> Courier
+            <input name="mode" type="radio" value="Amateur Radio"/> Amateur Radio
+            <input name="mode" type="radio" value="Other"/> Other:
+            <input name="mode-txt" type="text" value="Packet"/>
+          <td/>
+        </tr><tr>
+          <td>Operator Call Sign:</td>
+          <td><input name="operator-callsign" type="text" size="12"/></td>
+        </tr><tr>
+          <td>Operator Name:</td>
+          <td><input name="operator-name" type="text" size="24"/></td>
+        </tr><tr>
+          <td>Submit:</td>
+          <td>
+            Date: <input name="date-submit" type="text" size="12"/>
+            Time: <input name="date-submit" type="text" size="12"/>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>
