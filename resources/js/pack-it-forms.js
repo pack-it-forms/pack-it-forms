@@ -50,13 +50,68 @@ function init_empty_form() {
     init_text_fields();
 }
 
+function get_form_data_from_div() {
+    return document.querySelector("#form-data").textContent;
+}
+
+function set_form_data_div(text) {
+    document.querySelector("#form-data").textContent = text;
+}
+
 /* Parse form field data from packet message and initialize fields.
 
 This function sets up a form with the contents of an already existing
 form data message, which is stored in a div in the document with the
 ID "formdata". */
-function init_form_from_msg_data() {
+function init_form_from_msg_data(text) {
+    console.log("init_form_from_msg_data not yet implemented");
 }
 
-startup_functions.push(init_text_fields)
+/* Initialize a form
 
+The form field values will either be set from the form data message
+contents found in one of these locations in order of preference:
+
+1. the textContent of the div with ID "form-data"
+2. a file at the location "msgs/<fragment-id>", where <fragment-id>
+   is the fragment identifier from the URL of the document.
+
+If no form data exists in any of these locations a new form will be
+filled with default contents. */
+function init_form() {
+    var text = get_form_data_from_div();
+    if (text.trim().length != 0) {
+        init_form_from_msg_data(text);
+    } else {
+        msgno = document.location.hash.slice(1);
+        if (msgno.length > 0) {
+            msg_url = "msgs/" + msgno;
+            console.log("requesting form data message url:", msg_url);
+            var msg_request = new XMLHttpRequest();
+            msg_request.open("GET", msg_url, true);
+            msg_request.responseType = "text";
+            msg_request.onreadystatechange = function (e) {
+                console.log("msg_request state: ", msg_request.readyState);
+                if (msg_request.readyState == msg_request.DONE) {
+                    var text = msg_request.response;
+                    if (text.trim().length > 0) {
+                        set_form_data_div(text);
+                        init_form_from_msg_data(text);
+                    } else {
+                        init_empty_form();
+                    }
+                }
+            };
+            try {
+                msg_request.send(null);
+            } catch (e) {
+                console.log("Error in form_data_msg_url request: ", e);
+                init_empty_form();x
+            }
+        } else {
+            init_empty_form();
+        }
+    }
+}
+
+startup_functions.push(init_form);
