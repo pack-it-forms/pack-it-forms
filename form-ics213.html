@@ -14,32 +14,47 @@
         <col id="field-widget"/>
         <tr>
           <td>Date [ 1a]:</td>
-          <td><input name="1a.date" class="init-default" type="text" size="10"/ value="[date]"></td>
+          <td>
+            <input name="1a.date" class="init-default" type="text" size="10"
+                   required pattern="\d{1,2}/\d{1,2}/\d{4}"
+                   value="[date]"/>
+          </td>
         </tr><tr>
           <td>Time: [ 1b]:</td>
-          <td><input name="1b.time" class="init-default" type="text" size="10"/ value="[time]"></td>
+          <td>
+            <input name="1b.time" class="init-default" type="text" size="10"
+.                   required pattern="\d{1,2}:\d{2}(:\d{2})?"
+                   value="[time]"/>
+          </td>
         </tr><tr>
           <td>Sender's Msg # [  2]:</td>
           <td><input name="2.txmsgno" class="" type="text" size="15"/></td>
         </tr><tr>
           <td>My Msg #:</td>
-          <td><input name="msgno" class="init-default" type="text" size="15" value="[msgno]"/></td>
+          <td><input name="msgno" class="init-default" type="text" size="15"
+                     required value="[msgno]"/></td>
         </tr><tr>
           <td>Receiver's Msg # [  3]:</td>
           <td><input name="3.rxmsgno" class="" type="text" size="15"/></td>
         </tr><tr>
           <td>Severity [  4]:</td>
           <td>
-            <input name="4.severity" type="radio" value="EMERGENCY"/> Emergency
-            <input name="4.severity" type="radio" value="URGENT"/> Urgent
-            <input name="4.severity" type="radio" value="OTHER"/> Other
+            <input name="4.severity" type="radio"
+                   required value="EMERGENCY"/> Emergency
+            <input name="4.severity" type="radio"
+                   required value="URGENT"/> Urgent
+            <input name="4.severity" type="radio"
+                   required value="OTHER"/> Other
           </td>
         </tr><tr>
           <td>Message Handling Order [  5]:</td>
           <td>
-            <input name="5.handling" type="radio" value="IMMEDIATE"/> Immediate
-            <input name="5.handling" type="radio" value="PRIORITY"/> Priority
-            <input name="5.handling" type="radio" value="ROUTINE"/> Routine
+            <input name="5.handling" type="radio"
+                   required value="IMMEDIATE"/> Immediate
+            <input name="5.handling" type="radio"
+                   required value="PRIORITY"/> Priority
+            <input name="5.handling" type="radio"
+                   required value="ROUTINE"/> Routine
           </td>
         </tr><tr>
           <td>Message Requests You To [  6]:</td>
@@ -59,8 +74,8 @@
         </tr><tr>
           <td>ICS Position [  7]:</td>
           <td>
-            <select name="7.to-ics-position">
-              <option value="">Select one...</option>
+            <select name="7.to-ics-position" required>
+              <option value="" disabled selected>Select one...</option>
               <option value="Incident Commander">Incident Commander</option>
               <option value="Operations">Operations</option>
               <option value="Planning">Planning</option>
@@ -75,7 +90,7 @@
           </td>
         </tr><tr>
           <td>Location [ 9a]:</td>
-          <td><input name="9a.to-location" type="text" size="20"/></td>
+          <td><input name="9a.to-location" type="text" size="20" required/></td>
         </tr><tr>
           <td>Name:</td>
           <td><input name="to-name" type="text" size="20"/></td>
@@ -87,8 +102,8 @@
         </tr><tr>
           <td>ICS Position [  8]:</td>
           <td>
-            <select name="from-ics-position">
-              <option value="">Select one...</option>
+            <select name="from-ics-position" required>
+              <option value="" disabled selected>Select one...</option>
               <option value="Incident Commander">Incident Commander</option>
               <option value="Operations">Operations</option>
               <option value="Planning">Planning</option>
@@ -103,7 +118,7 @@
           </td>
         </tr><tr>
           <td>Location [ 9b]:</td>
-          <td><input name="9b.from-location" type="text" size="20"/></td>
+          <td><input name="9b.from-location" type="text" size="20" required/></td>
         </tr><tr>
           <td>Name:</td>
           <td><input name="from-name" type="text" size="20"/></td>
@@ -114,7 +129,7 @@
           <td>Body</td><td></td>
         </tr><tr>
           <td>Subject [ 10]:</td>
-          <td><input name="10.subject" type="text" size="40"/></td>
+          <td><input name="10.subject" type="text" size="40" required/></td>
         </tr><tr>
           <td>Reference [ 11]:</td>
           <td><input name="11.reference" type="text" size="40"/></td>
