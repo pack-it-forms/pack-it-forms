@@ -114,4 +114,13 @@ function init_form() {
     }
 }
 
+/* Clear the form to original contents */
+function clear_form() {
+    document.querySelector("#the-form").reset();
+}
+
+window.onhashchange = function () {
+    clear_form();
+    init_form();
+};
 startup_functions.push(init_form);
