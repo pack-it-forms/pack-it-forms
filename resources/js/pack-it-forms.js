@@ -114,9 +114,35 @@ function init_form() {
     }
 }
 
+/* Handle form data message visibility */
+function show_form_data(e) {
+    var data_div = document.querySelector("#form-data");
+    data_div.style.display = "block";
+    data_div.tabIndex = "-1";
+    data_div.focus();
+    e.value = "Hide Data Message";
+}
+
+function hide_form_data(e) {
+    document.querySelector("#form-data").style.display = "none";
+    e.value = "Show Data Message";
+}
+
+function toggle_form_data_visibility(e) {
+    var data_div = document.querySelector("#form-data");
+    console.log(data_div.style.display);
+    if (data_div.style.display == "none"
+        || data_div.style.display == "") {
+        show_form_data(e);
+    } else {
+        hide_form_data(e);
+    }
+}
+
 /* Clear the form to original contents */
 function clear_form() {
     document.querySelector("#the-form").reset();
+    set_form_data_div("");
 }
 
 window.onhashchange = function () {

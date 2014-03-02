@@ -3,6 +3,7 @@
     display: none;
     font-family: monospace;
     white-space: pre;
+    border: 2px solid black;
 }
 
 input:invalid {
