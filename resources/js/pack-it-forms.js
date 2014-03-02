@@ -4,7 +4,7 @@
 var startup_functions = new Array();
 
 function startup() {
-    startup_functions.forEach(function(f) { f(); });
+    startup_functions.forEach(function (f) { f(); });
 }
 
 window.onload=startup;
@@ -18,16 +18,16 @@ text_field_init_funcs.  By convention, for easy of recognition in the
 form HTML source, the initialization name is wrapped in square
 brackets. */
 var text_field_init_func = {
-    "[date]" : function(field) {
+    "[date]" : function (field) {
         var now = new Date();
         field.value = now.toLocaleDateString();
     },
 
-    "[time]" : function(field) {
+    "[time]" : function (field) {
         var now = new Date();
         field.value = now.toLocaleTimeString();
     },
-    "[msgno]" : function(field) {
+    "[msgno]" : function (field) {
         field.value = document.location.hash.slice(1);
     }
 }
