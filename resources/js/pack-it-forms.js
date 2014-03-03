@@ -9,6 +9,15 @@ function startup() {
 
 window.onload=startup;
 
+/* Simple padded number output string */
+function padded_int_str(num, cnt) {
+    var s = Number.toInteger(num).toString();
+    var pad = cnt - s.length
+    for (var i = 0; i < pad; i++) {
+        s = "0" + s;
+    }
+    return s;
+}
 
 /* Functions for initializing text fields with class 'init-default'.
 
