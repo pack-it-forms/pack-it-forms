@@ -19,6 +19,25 @@ function padded_int_str(num, cnt) {
     return s;
 }
 
+/* Execute a statement on each line of a string
+
+The supplied function will be called with two arguments, the line
+number of the line being processed and a string with the text of the
+line. */
+function for_each_line(str, func) {
+    var linenum = 1;
+    var last_idx = 0
+    var idx = str.indexOf("\n", last_idx);
+    while (idx >= 0) {
+        func(linenum++, str.substring(last_idx, idx));
+        last_idx = idx + 1;
+        idx = str.indexOf("\n", last_idx);
+    }
+    if (last_idx < str.length) {
+        func(linenum, str.substring(last_idx));
+    }
+}
+
 /* Functions for initializing text fields with class 'init-default'.
 
 The initialization function is selected using the contents of the
