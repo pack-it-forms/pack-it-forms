@@ -98,12 +98,10 @@ function init_form() {
         msgno = document.location.hash.slice(1);
         if (msgno.length > 0) {
             msg_url = "msgs/" + msgno;
-            console.log("requesting form data message url:", msg_url);
             var msg_request = new XMLHttpRequest();
             msg_request.open("GET", msg_url, true);
             msg_request.responseType = "text";
             msg_request.onreadystatechange = function (e) {
-                console.log("msg_request state: ", msg_request.readyState);
                 if (msg_request.readyState == msg_request.DONE) {
                     var text = msg_request.response;
                     if (text.trim().length > 0) {
@@ -117,7 +115,6 @@ function init_form() {
             try {
                 msg_request.send(null);
             } catch (e) {
-                console.log("Error in form_data_msg_url request: ", e);
                 init_empty_form();x
             }
         } else {
@@ -142,7 +139,6 @@ function hide_form_data(e) {
 
 function toggle_form_data_visibility(e) {
     var data_div = document.querySelector("#form-data");
-    console.log(data_div.style.display);
     if (data_div.style.display == "none"
         || data_div.style.display == "") {
         show_form_data(e);
