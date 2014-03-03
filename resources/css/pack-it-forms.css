@@ -6,10 +6,10 @@
     border: 2px solid black;
 }
 
-input:invalid {
+form :invalid {
   box-shadow: 0 0 5px 1px red;
 }
 
-input:focus:invalid {
+form :focus:invalid {
   outline: none;
 }
