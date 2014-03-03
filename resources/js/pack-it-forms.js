@@ -48,7 +48,10 @@ brackets. */
 var text_field_init_func = {
     "[date]" : function (field) {
         var now = new Date();
-        field.value = now.toLocaleDateString();
+        field.value =
+            padded_int_str(now.getMonth()+1, 2) + "/" +
+            padded_int_str(now.getDate(), 2) + "/" +
+            padded_int_str(now.getFullYear(), 4);
     },
 
     "[time]" : function (field) {
