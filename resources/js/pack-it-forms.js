@@ -11,7 +11,7 @@ window.onload=startup;
 
 /* Simple padded number output string */
 function padded_int_str(num, cnt) {
-    var s = Number.toInteger(num).toString();
+    var s = Math.floor(num).toString();
     var pad = cnt - s.length
     for (var i = 0; i < pad; i++) {
         s = "0" + s;
