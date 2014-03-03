@@ -34,7 +34,10 @@ var text_field_init_func = {
 
     "[time]" : function (field) {
         var now = new Date();
-        field.value = now.toLocaleTimeString();
+        field.value =
+            padded_int_str(now.getHours(), 2) + ":" +
+            padded_int_str(now.getMinutes(), 2) + ":" +
+            padded_int_str(now.getSeconds(), 2);
     },
     "[msgno]" : function (field) {
         field.value = document.location.hash.slice(1);
