@@ -95,7 +95,60 @@ This function sets up a form with the contents of an already existing
 form data message, which is stored in a div in the document with the
 ID "formdata". */
 function init_form_from_msg_data(text) {
-    console.log("init_form_from_msg_data not yet implemented");
+    var fields = parse_form_data_text(text);
+    console.log(fields);
+}
+
+function parse_form_data_text(text) {
+    var fields = {};
+    var field_name = "";
+    var field_value = "";
+    for_each_line(text, function (linenum, line) {
+        if (line.charAt(0) == "!" || line.charAt(0) == "#") {
+            return;  // Ignore header and directives
+        }
+        var idx = 0;
+        if (field_name == "") {
+            idx = index_of_field_name_sep(linenum, line, idx);
+            field_name = line.substring(0, idx);
+            idx = index_of_field_value_start(linenum, line, idx) + 1;
+        }
+        end_idx = line.indexOf("]", idx);
+        if (end_idx == -1) {
+            // Field continues on next line
+            field_value += line.substring(idx)
+        } else {
+            // Field is complete on this line
+            field_value += line.substring(idx, end_idx);
+            fields[field_name] = field_value;
+            field_name = ""
+            field_value = ""
+        }
+    });
+    return fields;
+}
+
+function FormDataParseException(linenum, desc) {
+    this.linenum = linenum;
+    this.value = "FormDataParseException";
+    this.message = "Form data parse error on line "
+        + linenum.toString() + ": " + desc;
+}
+
+function index_of_field_name_sep(linenum, line, startAt) {
+    var idx = line.indexOf(":", startAt)
+    if (idx == -1) {
+        throw new FormDataParseException(linenum, "no field name/value separator on line");
+    }
+    return idx;
+}
+
+function index_of_field_value_start(linenum, line, startAt) {
+    var idx = line.indexOf("[", startAt);
+    if (idx == -1) {
+        throw new FormDataParseException(linenum, "no field value open bracket");
+    }
+    return idx;
 }
 
 /* Initialize a form
