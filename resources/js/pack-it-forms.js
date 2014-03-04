@@ -166,6 +166,55 @@ function write_pacforms_representation() {
     set_form_data_div(msg);
 }
 
+/* Functions to set form fields to values
+
+These functions are used when reading the values from a PacForms-type
+text back into the form.  In general, they might be called multiple
+times with the same value argument, as some things require setting
+multiple elements, like radiobuttons.  A return value of true means
+that the caller should stop processing; any other return means that
+the caller should continue. */
+var init_from_msg_funcs = {
+    "text": function(element, value) {
+        element.value = value;
+        return true;
+    },
+    "textarea": function(element, value) {
+        element.value = value.trim();
+        return true;
+    },
+    "radio": function(element, value) {
+        if (element.value == value) {
+            element.checked = true;
+            return true;
+        } else {
+            element.checked = false;
+            return false;
+        }
+    },
+    "select-one": function (element, value) {
+        var options = element.options;
+        var member = false;
+        element.value = "Other";
+        Array.prototype.forEach.call(options, function (option) {
+            if (option.text == value) {
+                element.value = value;
+                member = true;
+            }
+        });
+        /* If it is one of the standard options and has been set, then
+        there is no need for further processing.  However, if it is
+        not a standard option, that we must continue processing and
+        set it as the "other" field's value. */
+        return member;
+    },
+    "checkbox": function (element, value) {
+        /* PacForms will only send a checkbox if it is checked */
+        element.checked = true;
+        return true;
+    }
+}
+
 /* Parse form field data from packet message and initialize fields.
 
 This function sets up a form with the contents of an already existing
@@ -173,7 +222,15 @@ form data message, which is stored in a div in the document with the
 ID "formdata". */
 function init_form_from_msg_data(text) {
     var fields = parse_form_data_text(text);
-    console.log(fields);
+    for (var field in fields) {
+        elements = document.querySelectorAll("[name^=\""+field+"\"]");
+        Array.prototype.some.call(elements, function (element) {
+            if (init_from_msg_funcs.hasOwnProperty(element.type)) {
+                return init_from_msg_funcs[element.type](element, fields[field]);
+            }
+        });
+    }
+//    console.log(fields);
 }
 
 function parse_form_data_text(text) {
