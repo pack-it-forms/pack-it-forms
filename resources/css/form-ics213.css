@@ -1,1 +1,93 @@
 #form tr td:first-child { text-align: right; }
+body {
+    background-color: #f8f8f8;
+    font-family: sans-serif;
+}
+
+h1 {
+    vertical-align: top;
+    margin-top: 0
+}
+table {
+    border-collapse: collapse;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+td {
+    vertical-align: top;
+    border: 1px solid #aaaaaa;
+    padding-left: 1em;
+    padding-top: 0.5ex;
+    padding-bottom: 0.5ex;
+}
+
+.noborder td {
+    border: none;
+}
+.noborder {
+    border: 1px solid #aaaaaa;
+}
+.border td {
+    border: 1px solid #aaaaaa;
+}
+td.border {
+    border: 1px solid #aaaaaa;
+}
+td.border-left {
+    border-left: 1px solid #aaaaaa;
+}
+
+
+label {
+    font-weight: bold;
+}
+fieldset > legend {
+    font-weight: bold;
+}
+.bold {
+    font-weight: bold;
+}
+
+label.intext {
+    margin-right: 0.5em;
+}
+
+form input, textarea {
+    display: block;
+    background-color: #ffffff;
+}
+form label.label-sameline input {
+    display: inline;
+    margin-left: 1.5em;
+}
+form fieldset input {
+    display: inline;
+}
+form fieldset label {
+    display: block;
+    font-weight: normal;
+}
+form fieldset {
+    border: none;
+    padding: 0;
+}
+form .horizontal label {
+    display: inline;
+}
+form .horizontal input {
+    display: inline;
+}
+
+
+.block-caption {
+    background-color: #cccccc;
+    vertical-align: middle;
+    font-weight: bold;
+}
+.field-number {
+    vertical-align: super;
+    font-weight: normal;
+    font-size: 0.83em;
+    padding-left: 0.5em;
+}

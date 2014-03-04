@@ -13,3 +13,7 @@ form :invalid {
 form :focus:invalid {
   outline: none;
 }
+
+form fieldset:invalid {
+    box-shadow: none;
+}
