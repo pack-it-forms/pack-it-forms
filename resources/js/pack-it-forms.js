@@ -66,9 +66,13 @@ var text_field_init_func = {
     }
 }
 
-function init_text_fields() {
+/* This function initializes a set of text fields to their default
+   values.  The selection of text fields to use is determined by the
+   "selector" argument, which is a selector suitable to be passed to
+   document.querySelectorAll. */
+function init_text_fields(selector) {
     // TODO: replace with forEach somehow?  NodeLists don't support by default.
-    var fields = document.querySelectorAll("input.init-default");
+    var fields = document.querySelectorAll(selector);
     for (var i = 0; i < fields.length; i++) {
         var init_type = fields[i].value;
         if (text_field_init_func.hasOwnProperty(init_type)) {
@@ -81,7 +85,7 @@ function init_text_fields() {
 
 This function sets up a new empty form. */
 function init_empty_form() {
-    init_text_fields();
+    init_text_fields("input.init-default");
 }
 
 function get_form_data_from_div() {
@@ -141,8 +145,8 @@ the textContent of the div with ID "form-data". */
 
 function write_pacforms_representation() {
     var form = document.querySelector("#the-form");
-    //    var msg = "!PACF! SCC001_O/R_ICS213_Testing\n# EOC MESSAGE FORM\n# JS-ver. PR-3.9-2.6, 08/11/13,\n# FORMFILENAME: Message.html"
     var msg = pacforms_header();
+    init_text_fields("input.init-on-submit");
     Array.prototype.forEach.call(form.elements, function(element, index, array) {
         var result;
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
@@ -164,6 +168,13 @@ function write_pacforms_representation() {
     });
     msg += "\n#EOF";
     set_form_data_div(msg);
+    /* The init-on-submit fields should be reset to their default
+    values so that they will be inited again next time the form is
+    submitted. */
+    var to_be_reset = document.querySelectorAll("input.init-on-submit");
+    Array.prototype.forEach.call(to_be_reset, function(element, index, array) {
+        element.value = element.defaultValue;
+    });
 }
 
 /* Functions to set form fields to values
