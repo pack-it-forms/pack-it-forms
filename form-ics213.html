@@ -115,7 +115,7 @@
           </td><td>
             <fieldset>
               <legend>ICS Position:<span class="field-number">7</span></legend>
-              <select name="7.to-ics-position" required>
+              <select name="7.to-ics-position" onchange="combobox_other_manager(this);" required>
                 <option value="" disabled selected>Select one...</option>
                 <option value="Incident Commander">Incident Commander</option>
                 <option value="Operations">Operations</option>
@@ -127,14 +127,14 @@
                 <option value="Safety Officer">Safety Officer</option>
                 <option value="Other">Other:</option>
               </select>
-              <input name="7.to-ics-position-other" type="text" size="20"/>
+              <input name="7.to-ics-position-other" type="text" size="20" disabled/>
             </fieldset>
           </td><td rowspan="4" class="block-caption">
             From:
           </td><td>
             <fieldset>
               <legend>ICS Position<span class="field-number">8</span></legend>
-              <select name="8.from-ics-position" required>
+              <select name="8.from-ics-position" onchange="combobox_other_manager(this);" required>
                 <option value="" disabled selected>Select one...</option>
                 <option value="Incident Commander">Incident Commander</option>
                 <option value="Operations">Operations</option>
@@ -146,7 +146,7 @@
                 <option value="Safety Officer">Safety Officer</option>
                 <option value="Other">Other:</option>
               </select>
-              <input name="8.from-ics-position-other" type="text" size="20"/>
+              <input name="8.from-ics-position-other" type="text" size="20" disabled/>
             </fieldset>
           </td>
         </tr><tr>

@@ -364,3 +364,18 @@ window.onhashchange = function () {
     init_form();
 };
 startup_functions.push(init_form);
+
+/* Disable "other" controls when not in use
+
+This is a callback function to be used in the onChange handler of a
+combobox; it will enable the relevant -other field if and only if the
+combobox is set to "Other". */
+function combobox_other_manager(e) {
+    var other = document.querySelector("[name=\""+e.name+"-other\"]");
+    if (e.value == "Other") {
+        other.disabled = false;
+    } else {
+        other.disabled = true;
+        other.value = "";
+    }
+}

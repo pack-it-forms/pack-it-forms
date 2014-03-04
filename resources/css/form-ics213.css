@@ -55,6 +55,8 @@ label.intext {
 
 form input, textarea {
     display: block;
+}
+form input:enabled,textarea:enabled {
     background-color: #ffffff;
 }
 form label.label-sameline input {
