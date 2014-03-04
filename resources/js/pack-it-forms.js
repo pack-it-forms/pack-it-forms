@@ -92,6 +92,80 @@ function set_form_data_div(text) {
     document.querySelector("#form-data").textContent = text;
 }
 
+function field_value(field_name) {
+    result = ""
+    Array.prototype.forEach.call(
+        document.querySelectorAll("[name=\""+field_name+"\"]"), function (element) {
+            if (pacform_representation_funcs.hasOwnProperty(element.type)) {
+                var rep = pacform_representation_funcs[element.type](element);
+                result += rep ? rep : "";
+            }
+        }
+    );
+    return result;
+}
+
+var pacform_representation_funcs = {
+    "text": function(element) {
+        return element.value ? element.value : null;
+    },
+    "textarea": function(element) {
+        return element.value ? "\\n"+element.value : null;
+    },
+    "radio": function(element) {
+        return element.checked ? element.value : null;
+    },
+    "select-one": function(element) {
+        return element.value != "Other" ? element.value : null;
+    },
+    "checkbox": function(element) {
+        return element.checked ? "checked" : null;
+    }
+}
+
+function bracket_data(data) {
+    if (data) {
+        data = data.trim();
+        data = data.replace("`]", "``]");
+        data = data.replace(/([^`])]/, "$1`]");
+        return "[" + data + "]";
+    } else {
+        return null
+    }
+}
+
+/* Generate PacForms-compatible representation of the form data
+
+A PacForm-like description of the for mfield values is written into
+the textContent of the div with ID "form-data". */
+
+function write_pacforms_representation() {
+    var form = document.querySelector("#the-form");
+    //    var msg = "!PACF! SCC001_O/R_ICS213_Testing\n# EOC MESSAGE FORM\n# JS-ver. PR-3.9-2.6, 08/11/13,\n# FORMFILENAME: Message.html"
+    var msg = pacforms_header();
+    Array.prototype.forEach.call(form.elements, function(element, index, array) {
+        var result;
+        if (pacform_representation_funcs.hasOwnProperty(element.type)) {
+            result = bracket_data(
+                pacform_representation_funcs[element.type](element));
+        } else {
+            result = null;
+        }
+        if (result) {
+            numberMatch = /([0-9]+[a-z]?\.).*/.exec(element.name);
+            var resultText;
+            if (numberMatch) {
+                resultText = numberMatch[1]+": "+result;
+            } else {
+                resultText = element.name+": "+result;
+            }
+            msg += "\n"+resultText;
+        }
+    });
+    msg += "\n#EOF";
+    set_form_data_div(msg);
+}
+
 /* Parse form field data from packet message and initialize fields.
 
 This function sets up a form with the contents of an already existing

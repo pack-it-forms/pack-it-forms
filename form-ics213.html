@@ -20,7 +20,7 @@
             </label>
           </td><td>
             <label>My Msg #:
-              <input name="msgno" class="init-default" type="text" size="15"
+              <input name="MsgNo" class="init-default" type="text" size="15"
                      required value="[msgno]"/>
             </label>
           </td><td>
@@ -89,13 +89,13 @@
                 <!--   by: <input name="6c.reply-by" type="text" size="12"/> -->
                 <!-- </label> -->
                 <label><input name="6b.reply" type="radio" value="Yes"/>Yes,</label>
-                <label>by: <input name="6c.reply-by" type="text" size="12"/></label>
+                <label>by: <input name="6d.reply-by" type="text" size="12"/></label>
                 <label>
                   <input name="6b.reply" type="radio" value="No"/> No
                 </label>
               </fieldset>
               <label>
-                <input name="6d.fyi" type="checkbox"/>For your information (no action)
+                <input name="6c.fyi" type="checkbox"/>For your information (no action)
               </label>
             </fieldset>
           </td>
@@ -162,21 +162,21 @@
         </tr><tr>
           <td>
             <label>Name:
-              <input name="to-name" type="text" size="20"/>
+              <input name="ToName" type="text" size="20"/>
             </label>
           </td><td>
             <label>Name:
-              <input name="from-name" type="text" size="20"/>
+              <input name="FmName" type="text" size="20"/>
             </label>
           </td>
         </tr><tr>
           <td>
             <label>Telephone #:
-              <input name="to-telephone" type="text" size="20"/>
+              <input name="ToTel" type="text" size="20"/>
             </label>
           </td><td>
             <label>Telephone #:
-              <input name="from-telephone" type="text" size="20"/>
+              <input name="FmTel" type="text" size="20"/>
             </label>
           </td>
         </tr>
@@ -193,7 +193,7 @@
             <label class="label-sameline">
               Reference (e.g. Number of earlier msg.)
               <span class="field-number">11</span>
-              <input name="10.subject" type="text" size="40"/>
+              <input name="11.reference" type="text" size="40"/>
             </label>
           </td>
         </tr><tr>
@@ -218,15 +218,15 @@
             <fieldset class="horizontal">
               <legend>CC:</legend>
               <label>
-                <input name="cc-management" type="checkbox" value="Yes">Management
+                <input name="CCMgt" type="checkbox" value="Yes">Management
               </label><label>
-                <input name="cc-operations" type="checkbox" value="Yes"> Operations
+                <input name="CCOps" type="checkbox" value="Yes"> Operations
               </label><label>
-                <input name="cc-planning" type="checkbox" value="Yes"> Planning
+                <input name="CCPlan" type="checkbox" value="Yes"> Planning
               </label><label>
-                <input name="cc-logistics" type="checkbox" value="Yes"> Logistics
+                <input name="CCLog" type="checkbox" value="Yes"> Logistics
               </label><label>
-                <input name="cc-finance" type="checkbox" value="Yes"> Finance
+                <input name="CCFin" type="checkbox" value="Yes"> Finance
               </label>
             </fieldset>
           </td>
@@ -241,67 +241,67 @@
             <span class="bold">
               How
               <label class="intext">
-                Received <input name="msgdir" type="radio" value="Received"/>
+                Received <input name="Rec-Sent" type="radio" value="Received"/>
               </label>
               or
               <label class="intext">
-                Sent <input name="msgdir" type="radio" value="Sent"/>
+                Sent <input name="Rec-Sent" type="radio" value="Sent"/>
               </label>
             </span>
           </td><td colspan="2" class="border-left">
             <label class="label-sameline">Operator Call Sign:
-              <input name="operator-callsign" type="text" size="12"/>
+              <input name="OpCall" type="text" size="12"/>
             </label>
           </td>
         </tr><tr class="horizontal">
           <td>
             <label>
-              <input name="mode" type="radio" value="Telephone"/> Telephone
+              <input name="Method" type="radio" value="Telephone"/> Telephone
             </label>
           </td>
           <td colspan="2">
             <label>
-              <input name="mode" type="radio" value="Dispatch Center"/> Dispatch Center
+              <input name="Method" type="radio" value="Dispatch Center"/> Dispatch Center
             </label>
           </td>
           <td colspan="2" class="border-left">
             <label class="label-sameline">Operator Name:
-              <input name="operator-name" type="text" size="24"/>
+              <input name="OpName" type="text" size="24"/>
             </label>
           </td>
         </tr><tr class="horizontal">
           <td>
             <label>
-              <input name="mode" type="radio" value="EOC Radio"/> EOC Radio
+              <input name="Method" type="radio" value="EOC Radio"/> EOC Radio
             </label>
           </td><td>
             <label>
-              <input name="mode" type="radio" value="FAX"/> FAX
+              <input name="Method" type="radio" value="FAX"/> FAX
             </label>
           </td><td>
             <label>
-              <input name="mode" type="radio" value="Courier"/> Courier<br/>
+              <input name="Method" type="radio" value="Courier"/> Courier<br/>
             </label>
           </td><td class="border-left">
             <label class="label-sameline">Date:
-              <input name="date-submit" type="text" size="12"/>
+              <input name="OpDate" type="text" size="12"/>
             </label>
           </td><td>
             <label class="label-sameline">Time:
-              <input name="time-submit" type="text" size="12"/>
+              <input name="OpTime" type="text" size="12"/>
             </label>
           </td>
         </tr><tr class="horizontal">
           <td>
             <label>
-              <input name="mode" type="radio" value="Amateur Radio"/> Amateur Radio
+              <input name="Method" type="radio" value="Amateur Radio"/> Amateur Radio
             </label>
           </td><td colspan="2">
             <label>
-              <input name="mode" type="radio" value="Other"/> Other:
+              <input name="Method" type="radio" value="Other"/> Other:
             </label>
             <label>
-              <input name="mode-txt" type="text" value="Packet"/>
+              <input name="Other" type="text" value="Packet"/>
             </label>
           </td><td colspan="2" class="border-left"></td>
         </tr>
