@@ -253,37 +253,32 @@ function process_html_includes(next) {
         var parent = element.parentNode;
         var msg_url = "resources/html/"+element.dataset.includeHtml+".html";
         var msg_request = new XMLHttpRequest();
-        msg_request.open("GET", msg_url, true)
-        msg_request.responseType = "document";
-        msg_request.onreadystatechange = function (e) {
-            if (msg_request.readyState == msg_request.DONE) {
-                // We have to modify the innerHTML after appending for
-                // Firefox to recognize the new elements.
-                var child_index = Array.prototype.indexOf.call(parent.children, element);
-                // For some reason, getElementById/querySelector do
-                // not work in Firefox; the HTML spec says that this
-                // should work, because the elements are collected
-                // through a pre-order traversal.
-                var to_add = msg_request.response.getElementsByTagName("div")[0].children;
-                // Since there can be multiple elements, this iterates
-                // through them and forces their display
-                while(to_add.length > 0) {
-                    parent.insertBefore(to_add[0], element);
-                    parent.children[child_index++].innerHTML += "";
-                }
-                // For styles to be applied correctly in Firefox the
-                // parent element has to be force-redisplayed as well.
-                parent.innerHTML += "";
-                // Finally, remove the dummy element and check if
-                // complete.
-                parent.removeChild(parent.children[child_index]);
-                numberComplete += 1;
-                if (numberComplete == number) {
-                    next();
-                }
+        open_async_request("GET", msg_url, "document", function (response) {
+            // We have to modify the innerHTML after appending for
+            // Firefox to recognize the new elements.
+            var child_index = Array.prototype.indexOf.call(parent.children, element);
+            // For some reason, getElementById/querySelector do
+            // not work in Firefox; the HTML spec says that this
+            // should work, because the elements are collected
+            // through a pre-order traversal.
+            var to_add = response.getElementsByTagName("div")[0].children;
+            // Since there can be multiple elements, this iterates
+            // through them and forces their display
+            while(to_add.length > 0) {
+                parent.insertBefore(to_add[0], element);
+                parent.children[child_index++].innerHTML += "";
             }
-        };
-        msg_request.send();
+            // For styles to be applied correctly in Firefox the
+            // parent element has to be force-redisplayed as well.
+            parent.innerHTML += "";
+            // Finally, remove the dummy element and check if
+            // complete.
+            parent.removeChild(parent.children[child_index]);
+            numberComplete += 1;
+            if (numberComplete == number) {
+                next();
+            }
+        });
     });
 }
 
@@ -524,20 +519,15 @@ function init_form(next) {
         msgno = query_object['msgno'];
         if (msgno) {
             msg_url = "msgs/" + msgno;
-            var msg_request = new XMLHttpRequest();
-            msg_request.open("GET", msg_url, true);
-            msg_request.responseType = "text";
-            msg_request.onreadystatechange = function (e) {
-                if (msg_request.readyState == msg_request.DONE) {
-                    var text = msg_request.response;
-                    if (text.trim().length > 0) {
-                        set_form_data_div(text);
-                        init_form_from_msg_data(text);
-                    } else {
-                        init_empty_form();
-                    }
+            //            var msg_request = open_async_request("GET", msg_url, true);
+            open_async_request("GET", msg_url, "text", function (text) {
+                if (text.trim().length > 0) {
+                    set_form_data_div(text);
+                    init_form_from_msg_data(text);
+                } else {
+                    init_empty_form();
                 }
-            };
+            });
             try {
                 msg_request.send(null);
             } catch (e) {
@@ -626,4 +616,51 @@ function opdirect_submit(e) {
 
 function stringify_possible_null(argument) {
     return argument ? argument : "";
+}
+
+
+/* Since Msxml2.XMLHTTP doesn't support proper response types, we use
+   these functions in Internet Explorer to convert text into the
+   correct types.  Currently, only text and document types are
+   supported. */
+var ActiveXObject_responseType_funcs = {
+    "text": function(result) {
+        return result;
+    },
+    "document": function(result) {
+        return new DOMParser().parseFromString(result, "text/html");
+    }
+}
+
+/* This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
+   Explorer and a regular XMLHttpRequest in other places because using
+   the ActiveXObject in Internet Explorer allows a file loaded through
+   a file:// uri to access other resources through a file:// uri. */
+function open_async_request(method, url, responseType, cb) {
+    var request;
+    if (window.ActiveXObject !== undefined) {
+        request = new ActiveXObject("Msxml2.XMLHTTP");
+        request.open(method, url, false);
+        request.onreadystatechange = function(e) {
+            if (request.readyState == 4) {
+                var text = request.responseText;
+                if (ActiveXObject_responseType_funcs.hasOwnProperty(responseType)) {
+                    cb(ActiveXObject_responseType_funcs[responseType](text));
+                } else {
+                    return null;
+                }
+            }
+        }
+        request.send();
+    } else {
+        request = new XMLHttpRequest();
+        request.open(method, url, true);
+        request.responseType = responseType;
+        request.onreadystatechange = function(e) {
+            if (e.target.readyState == e.target.DONE) {
+                cb(e.target.response);
+            }
+        };
+        request.send();
+    }
 }
