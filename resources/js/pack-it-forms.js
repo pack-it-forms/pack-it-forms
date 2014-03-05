@@ -363,26 +363,26 @@ function init_form() {
 }
 
 /* Handle form data message visibility */
-function show_form_data(e) {
+function show_form_data() {
     var data_div = document.querySelector("#form-data");
     data_div.style.display = "block";
     data_div.tabIndex = "-1";
     data_div.focus();
-    e.value = "Hide Data Message";
+    document.querySelector("#show-hide-data").value = "Hide Data Message";
 }
 
-function hide_form_data(e) {
+function hide_form_data() {
     document.querySelector("#form-data").style.display = "none";
-    e.value = "Show Data Message";
+    document.querySelector("#show-hide-data").value = "Show Data Message";
 }
 
-function toggle_form_data_visibility(e) {
+function toggle_form_data_visibility() {
     var data_div = document.querySelector("#form-data");
     if (data_div.style.display == "none"
         || data_div.style.display == "") {
-        show_form_data(e);
+        show_form_data();
     } else {
-        hide_form_data(e);
+        hide_form_data();
     }
 }
 
