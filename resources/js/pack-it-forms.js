@@ -241,7 +241,6 @@ function init_form_from_msg_data(text) {
             }
         });
     }
-//    console.log(fields);
 }
 
 function parse_form_data_text(text) {
@@ -332,7 +331,7 @@ function init_form() {
             try {
                 msg_request.send(null);
             } catch (e) {
-                init_empty_form();x
+                init_empty_form();
             }
         } else {
             init_empty_form();
