@@ -1,5 +1,8 @@
 /* Common code for handling PacFORMS forms */
 
+/* Cached query string parameters */
+var query_object;
+
 /* Registry for functions to execute when the form is loaded. */
 var startup_functions = new Array();
 
@@ -80,7 +83,7 @@ var template_repl_func = {
     },
 
     "msgno" : function (arg) {
-        return document.location.hash.slice(1);
+        return stringify_possible_null(query_object['msgno']);
     },
 
     "field" : field_value
@@ -162,8 +165,7 @@ function TemplateException(desc) {
    string parameters passed in by Outpost.
 */
 function outpost_init() {
-    fields = query_string_to_object();
-    init_form_from_fields(fields, "data-outpost-name");
+    init_form_from_fields(query_object, "data-outpost-name");
 }
 
 /* This function initializes a set of text fields to their default
@@ -407,8 +409,8 @@ function init_form() {
     if (text.trim().length != 0) {
         init_form_from_msg_data(text);
     } else {
-        msgno = document.location.hash.slice(1);
-        if (msgno.length > 0) {
+        msgno = query_object['msgno'];
+        if (msgno) {
             msg_url = "msgs/" + msgno;
             var msg_request = new XMLHttpRequest();
             msg_request.open("GET", msg_url, true);
@@ -467,10 +469,20 @@ function clear_form() {
     set_form_data_div("");
 }
 
-window.onhashchange = function () {
-    clear_form();
-    init_form();
-};
+/* Utility: generate an object from the query string.  This should be
+   called as an init function; it will store the result in the global
+   variable query_object */
+function query_string_to_object() {
+    var query = {};
+    string = window.location.search.substring(1);
+    list = string ? string.split("&") : [];
+    list.forEach(function(element, index, array) {
+        list = element.split("=");
+        query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
+    });
+    query_object = query;
+}
+startup_functions.push(query_string_to_object);
 startup_functions.push(init_form);
 
 /* Disable "other" controls when not in use
@@ -488,19 +500,11 @@ function combobox_other_manager(e) {
     }
 }
 
-/* Utility: generate an object from the query string */
-function query_string_to_object() {
-    var query = {};
-    string = window.location.search.substring(1);
-    list = string ? string.split("&") : [];
-    list.forEach(function(element, index, array) {
-        list = element.split("=");
-        query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
-    });
-    return query;
-}
-
 function opdirect_prepare_submit() {
     write_pacforms_representation();
     hide_form_data();
+}
+
+function stringify_possible_null(argument) {
+    return argument ? argument : "";
 }
