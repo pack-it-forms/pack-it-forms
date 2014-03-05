@@ -48,6 +48,18 @@ function for_each_line(str, func) {
     }
 }
 
+function field_value(field_name) {
+    var result = ""
+    var elem = document.querySelectorAll("[name=\""+field_name+"\"]");
+    array_for_each(elem, function (element) {
+        if (pacform_representation_funcs.hasOwnProperty(element.type)) {
+            var rep = pacform_representation_funcs[element.type](element);
+            result += rep ? rep : "";
+        }
+    });
+    return result;
+}
+
 var template_repl_func = {
     "[" : function (arg) {
         return "[";
@@ -69,7 +81,9 @@ var template_repl_func = {
 
     "msgno" : function (arg) {
         return document.location.hash.slice(1);
-    }
+    },
+
+    "field" : field_value
 };
 
 var template_filter_func = {
@@ -177,18 +191,6 @@ function get_form_data_from_div() {
 
 function set_form_data_div(text) {
     document.querySelector("#form-data").value = text;
-}
-
-function field_value(field_name) {
-    var result = ""
-    var elem = document.querySelectorAll("[name=\""+field_name+"\"]");
-    array_for_each(elem, function (element) {
-        if (pacform_representation_funcs.hasOwnProperty(element.type)) {
-            var rep = pacform_representation_funcs[element.type](element);
-            result += rep ? rep : "";
-        }
-    });
-    return result;
 }
 
 var pacform_representation_funcs = {
