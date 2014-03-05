@@ -66,6 +66,14 @@ var text_field_init_func = {
     }
 }
 
+/* This function attempts to initialize form fields based on the query
+   string parameters passed in by Outpost.
+*/
+function outpost_init() {
+    fields = query_string_to_object();
+    init_form_from_fields(fields, "data-outpost-name");
+}
+
 /* This function initializes a set of text fields to their default
    values.  The selection of text fields to use is determined by the
    "selector" argument, which is a selector suitable to be passed to
@@ -86,6 +94,7 @@ function init_text_fields(selector) {
 This function sets up a new empty form. */
 function init_empty_form() {
     init_text_fields("input.init-default");
+    outpost_init();
 }
 
 function get_form_data_from_div() {
@@ -226,15 +235,15 @@ var init_from_msg_funcs = {
     }
 }
 
-/* Parse form field data from packet message and initialize fields.
 
-This function sets up a form with the contents of an already existing
-form data message, which is stored in a div in the document with the
-ID "formdata". */
-function init_form_from_msg_data(text) {
-    var fields = parse_form_data_text(text);
+/* Initialize form from dictionary of settings
+
+This function sets up a form with the contents of a fields object; it
+determines which fields should be initialized by matching the
+beginning of attribute againt the name of each field. */
+function init_form_from_fields(fields, attribute) {
     for (var field in fields) {
-        elements = document.querySelectorAll("[name^=\""+field+"\"]");
+        elements = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
         Array.prototype.some.call(elements, function (element) {
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
                 return init_from_msg_funcs[element.type](element, fields[field]);
@@ -242,6 +251,18 @@ function init_form_from_msg_data(text) {
         });
     }
 }
+
+/* Parse form field data from packet message
+and initialize fields.
+
+This function sets up a form with the contents of an already existing
+form data message, which is passed in as text.  It is implemented as a
+wrapper around init_form_from_fields. */
+function init_form_from_msg_data(text) {
+    var fields = parse_form_data_text(text);
+    init_form_from_fields(fields, "name");
+}
+
 
 function parse_form_data_text(text) {
     var fields = {};
@@ -305,7 +326,9 @@ contents found in one of these locations in order of preference:
    is the fragment identifier from the URL of the document.
 
 If no form data exists in any of these locations a new form will be
-filled with default contents. */
+filled with default contents.  The default data filling includes
+reading the Outpost query string parameters, which should allow for
+good Outpost integration. */
 function init_form() {
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
