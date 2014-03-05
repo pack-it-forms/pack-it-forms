@@ -294,10 +294,9 @@ function parse_form_data_text(text) {
 }
 
 function FormDataParseException(linenum, desc) {
+    this.name = "FormDataParseException";
     this.linenum = linenum;
-    this.value = "FormDataParseException";
-    this.message = "Form data parse error on line "
-        + linenum.toString() + ": " + desc;
+    this.message = "Parse error on line " + linenum.toString() + ": " + desc;
 }
 
 function index_of_field_name_sep(linenum, line, startAt) {
