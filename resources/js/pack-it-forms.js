@@ -188,10 +188,7 @@ function outpost_init() {
 function init_text_fields(selector) {
     var fields = document.querySelectorAll(selector);
     array_for_each(fields, function (field) {
-        var init_type = field.value;
-        if (text_field_init_func.hasOwnProperty(init_type)) {
-            text_field_init_func[init_type](field);
-        }
+        field.value = template_expand(field.value);
     });
 }
 
