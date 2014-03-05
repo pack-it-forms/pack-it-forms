@@ -5,8 +5,8 @@ function pacforms_header() {
     header += "/" + field_value("5.handling")[0];
     header += "_ICS213_"
     header += field_value("10.subject");
-    header += "\n# EOC Message Form";
-    header += "\n# JS-ver. PR-3.9-2.6, 08/11/13,";
-    header += "\n# FORMFILENAME: Message.html";
+    header += "\r\n# EOC Message Form";
+    header += "\r\n# JS-ver. PR-3.9-2.6, 08/11/13,";
+    header += "\r\n# FORMFILENAME: Message.html";
     return header;
 }

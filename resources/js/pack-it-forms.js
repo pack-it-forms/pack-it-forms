@@ -172,10 +172,10 @@ function write_pacforms_representation() {
             } else {
                 resultText = element.name+": "+result;
             }
-            msg += "\n"+resultText;
+            msg += "\r\n"+resultText;
         }
     });
-    msg += "\n#EOF";
+    msg += "\r\n#EOF\r\n";
     set_form_data_div(msg);
     /* The init-on-submit fields should be reset to their default
     values so that they will be inited again next time the form is
