@@ -390,3 +390,14 @@ function combobox_other_manager(e) {
         other.value = "";
     }
 }
+
+/* Utility: generate an object from the query string */
+function query_string_to_object() {
+    var query = {};
+    string = window.location.search.substring(1).split("&");
+    string.forEach(function(element, index, array) {
+        list = element.split("=");
+        query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
+    });
+    return query
+}
