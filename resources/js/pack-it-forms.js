@@ -119,15 +119,29 @@ function expand_template(tmpl_str) {
     var match = repl_re.exec(tmpl_str);
     while (match) {
         final_str += tmpl_str.substring(0, match.index);
-        var value = template_repl_func[match[1]](match[2]);
-        if (match[3])
-            value = template_filter_func[match[3]](match[4], value);
+        if (template_repl_func.hasOwnProperty(match[1])) {
+            var value = template_repl_func[match[1]](match[2]);
+            if (match[3]) {
+                if (template_filter_func.hasOwnProperty(match[3])) {
+                    value = template_filter_func[match[3]](match[4], value);
+                } else {
+                    throw new TemplateException("Unknown filter function");
+                }
+            }
+        } else {
+            throw new TemplateException("Unknown replacement function");
+        }
         final_str += value;
         tmpl_str = tmpl_str.substr(match.index + match[0].length);
         match = repl_re.exec(tmpl_str);
     }
     final_str += tmpl_str;
     return final_str;
+}
+
+function TemplateException(desc) {
+    this.name = "TemplateException";
+    this.message = desc;
 }
 
 
