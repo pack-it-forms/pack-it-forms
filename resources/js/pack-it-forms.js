@@ -57,7 +57,7 @@ function field_value(field_name) {
     array_for_each(elem, function (element) {
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
             var rep = pacform_representation_funcs[element.type](element);
-            result += rep ? rep : "";
+            result += stringify_possible_null(rep);
         }
     });
     return result;
