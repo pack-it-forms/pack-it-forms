@@ -4,6 +4,7 @@
     font-family: monospace;
     white-space: pre;
     border: 2px solid black;
+    width: 100%;
 }
 
 form :invalid {

@@ -98,11 +98,11 @@ function init_empty_form() {
 }
 
 function get_form_data_from_div() {
-    return document.querySelector("#form-data").textContent;
+    return document.querySelector("#form-data").value;
 }
 
 function set_form_data_div(text) {
-    document.querySelector("#form-data").textContent = text;
+    document.querySelector("#form-data").value = text;
 }
 
 function field_value(field_name) {
@@ -369,11 +369,13 @@ function show_form_data() {
     data_div.tabIndex = "-1";
     data_div.focus();
     document.querySelector("#show-hide-data").value = "Hide Data Message";
+    document.querySelector("#form-data").disabled = true;
 }
 
 function hide_form_data() {
     document.querySelector("#form-data").style.display = "none";
     document.querySelector("#show-hide-data").value = "Show Data Message";
+    document.querySelector("#form-data").disabled = false;
 }
 
 function toggle_form_data_visibility() {
@@ -422,4 +424,9 @@ function query_string_to_object() {
         query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
     });
     return query;
+}
+
+function opdirect_prepare_submit() {
+    write_pacforms_representation();
+    hide_form_data();
 }
