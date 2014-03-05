@@ -38,6 +38,89 @@ function for_each_line(str, func) {
     }
 }
 
+var template_repl_func = {
+    "[" : function (arg) {
+        return "[";
+    },
+
+    "date" : function (arg) {
+        var now = new Date();
+        return (padded_int_str(now.getMonth()+1, 2) + "/"
+                + padded_int_str(now.getDate(), 2) + "/"
+                + padded_int_str(now.getFullYear(), 4));
+    },
+
+    "time" : function (arg) {
+        var now = new Date();
+        return (padded_int_str(now.getHours(), 2) + ":"
+                + padded_int_str(now.getMinutes(), 2) + ":"
+                + padded_int_str(now.getSeconds(), 2));
+    },
+
+    "msgno" : function (arg) {
+        return document.location.hash.slice(1);
+    }
+};
+
+var template_filter_func = {
+    "truncate" : function (arg, orig_text) {
+        return orig_text.substr(0, arg);
+    }
+};
+
+/* Expand template string by replacing placeholders
+
+Plain text included in the template is copied to the expanded output.
+Placeholders are enclosed in square brackets.  There are six possible
+forms of the placeholders:
+
+   1. [<type_name>]
+   2. [<type_name>|<filter_name>]
+   3. [<type_name>|<filter_name>:<filter_arg>]
+   4. [<type_name>:<type_arg>]
+   5. [<type_name>:<type_arg>|<filter_name>]
+   6. [<type_name>:<type_arg>|<filter_name>:<filter_arg>]
+
+In form #1, the placeholder function named by <type_name> is called
+and the result it returns is substituted.  There is a type_name if "["
+to allow inserting an right square bracket.
+
+In form #2, the placeholder function named by <type_name> is called
+and the result it returns is passed to the filter function named by
+<filter_name>.  The result returned from the filter function is
+substituted.
+
+Form #3 is like form #2 except the <filter_arg> text is passed to the
+filter function as well.  The interpretation of the <filter_arg> text
+is determined by the filter function and the argument may be complete
+ignored.
+
+Form #4 is like form #1 except the <type_arg> text passed to the
+placeholder function as well.  The interpretation of the <type_arg>
+text is determined by the placeholder function and the arguement may
+be complete ignored.
+
+Form #5 is the combination of #2 and #4.
+
+Form #6 is the combination of #3 and #5. */
+function expand_template(tmpl_str) {
+    var final_str = ""
+    var repl_re = /\[([^:|\]]+)(?::([^|\]]+))?(?:\|([^:\]]+)(?::([^\]]+))?)?]/
+    var match = repl_re.exec(tmpl_str);
+    while (match) {
+        final_str += tmpl_str.substring(0, match.index);
+        var value = template_repl_func[match[1]](match[2]);
+        if (match[3])
+            value = template_filter_func[match[3]](match[4], value);
+        final_str += value;
+        tmpl_str = tmpl_str.substr(match.index + match[0].length);
+        match = repl_re.exec(tmpl_str);
+    }
+    final_str += tmpl_str;
+    return final_str;
+}
+
+
 /* Functions for initializing text fields with class 'init-default'.
 
 The initialization function is selected using the contents of the
