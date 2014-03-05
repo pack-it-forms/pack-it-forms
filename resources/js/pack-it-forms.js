@@ -144,35 +144,6 @@ function TemplateException(desc) {
     this.message = desc;
 }
 
-
-/* Functions for initializing text fields with class 'init-default'.
-
-The initialization function is selected using the contents of the
-value attribute of the field's input DOM object looked up in the
-text_field_init_funcs.  By convention, for easy of recognition in the
-form HTML source, the initialization name is wrapped in square
-brackets. */
-var text_field_init_func = {
-    "[date]" : function (field) {
-        var now = new Date();
-        field.value =
-            padded_int_str(now.getMonth()+1, 2) + "/" +
-            padded_int_str(now.getDate(), 2) + "/" +
-            padded_int_str(now.getFullYear(), 4);
-    },
-
-    "[time]" : function (field) {
-        var now = new Date();
-        field.value =
-            padded_int_str(now.getHours(), 2) + ":" +
-            padded_int_str(now.getMinutes(), 2) + ":" +
-            padded_int_str(now.getSeconds(), 2);
-    },
-    "[msgno]" : function (field) {
-        field.value = document.location.hash.slice(1);
-    }
-}
-
 /* This function attempts to initialize form fields based on the query
    string parameters passed in by Outpost.
 */
