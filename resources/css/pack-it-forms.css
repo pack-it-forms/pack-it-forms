@@ -1,3 +1,7 @@
+#message-header {
+    display: none;
+}
+
 #form-data {
     /*display : block;*/
     display: none;

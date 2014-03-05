@@ -231,7 +231,8 @@ the textContent of the div with ID "form-data". */
 
 function write_pacforms_representation() {
     var form = document.querySelector("#the-form");
-    var msg = pacforms_header();
+    var msg = expand_template(
+        document.querySelector("#message-header").textContent).trim()
     init_text_fields("input.init-on-submit");
     array_for_each(form.elements, function(element, index, array) {
         var result;
