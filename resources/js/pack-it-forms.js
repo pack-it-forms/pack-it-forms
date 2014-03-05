@@ -421,5 +421,5 @@ function query_string_to_object() {
         list = element.split("=");
         query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
     });
-    return query
+    return query;
 }
