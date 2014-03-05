@@ -497,9 +497,14 @@ function combobox_other_manager(e) {
     }
 }
 
-function opdirect_prepare_submit() {
+function opdirect_submit(e) {
     write_pacforms_representation();
     hide_form_data();
+    if (document.querySelector("#the-form").checkValidity()) {
+        e.preventDefault();
+        document.querySelector("#form-data-form").submit();
+        return false;
+    }
 }
 
 function stringify_possible_null(argument) {

@@ -318,11 +318,11 @@
       </table>
       <input id="show-hide-data" type="button" value="Show Data Message"
              onclick="toggle_form_data_visibility();"/>
+      <input onclick="opdirect_submit(event)" type="submit"
+             value="Submit to Outpost"/>
     </form>
     <form id="form-data-form" method="post" action="http://127.0.0.1:9334/send">
       <textarea id="form-data" name="formtext"></textarea>
-      <input onclick="opdirect_prepare_submit()" type="submit"
-             value="Submit to Outpost"/>
     </form>
   </body>
 </html>
