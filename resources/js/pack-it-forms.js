@@ -86,7 +86,11 @@ var template_repl_func = {
         return stringify_possible_null(query_object['msgno']);
     },
 
-    "field" : field_value
+    "field" : field_value,
+
+    "query-string" : function(arg) {
+        return stringify_possible_null(query_object[arg]);
+    }
 };
 
 var template_filter_func = {
@@ -161,13 +165,6 @@ function TemplateException(desc) {
     this.message = desc;
 }
 
-/* This function attempts to initialize form fields based on the query
-   string parameters passed in by Outpost.
-*/
-function outpost_init() {
-    init_form_from_fields(query_object, "data-outpost-name");
-}
-
 /* This function initializes a set of text fields to their default
    values.  The selection of text fields to use is determined by the
    "selector" argument, which is a selector suitable to be passed to
@@ -184,7 +181,6 @@ function init_text_fields(selector) {
 This function sets up a new empty form. */
 function init_empty_form() {
     init_text_fields("input.init-default");
-    outpost_init();
 }
 
 function get_form_data_from_div() {

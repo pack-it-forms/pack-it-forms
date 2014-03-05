@@ -26,9 +26,8 @@
             </label>
           </td><td>
             <label>My Msg #:
-              <input data-outpost-name="msgno" name="MsgNo"
-                     class="init-default" type="text" size="15"
-                     required value="[msgno]"/>
+              <input name="MsgNo" class="init-default" type="text"
+                     size="15" required value="[query-string:msgno]"/>
             </label>
           </td><td>
             <label>Receiver's Msg #<span class="field-number">3</span>
@@ -257,8 +256,8 @@
             </span>
           </td><td colspan="2" class="border-left">
             <label class="label-sameline">Operator Call Sign:
-              <input data-outpost-name="ocall" name="OpCall"
-                     type="text" size="12"/>
+              <input class="init-default" name="OpCall" type="text"
+                     size="12" value="[query-string:ocall]"/>
             </label>
           </td>
         </tr><tr class="horizontal">
@@ -274,8 +273,8 @@
           </td>
           <td colspan="2" class="border-left">
             <label class="label-sameline">Operator Name:
-              <input data-outpost-name="oname" name="OpName"
-              type="text" size="24"/>
+              <input class="init-default" name="OpName" type="text"
+                     size="24" value="[query-string:oname]"/>
             </label>
           </td>
         </tr><tr class="horizontal">
