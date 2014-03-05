@@ -19,6 +19,16 @@ function padded_int_str(num, cnt) {
     return s;
 }
 
+/* Make forEach() easier to use on Array-like objects
+
+This is handy for iterating over NodeSets, etc. from the DOM which
+don't provide a forEach method.  In theory we could inject the forEach
+method into those object's prototypes but that can on occasion cause
+problems. */
+function array_for_each(array, func) {
+    return Array.prototype.forEach.call(array, func);
+}
+
 /* Execute a statement on each line of a string
 
 The supplied function will be called with two arguments, the line
@@ -162,14 +172,13 @@ function outpost_init() {
    "selector" argument, which is a selector suitable to be passed to
    document.querySelectorAll. */
 function init_text_fields(selector) {
-    // TODO: replace with forEach somehow?  NodeLists don't support by default.
     var fields = document.querySelectorAll(selector);
-    for (var i = 0; i < fields.length; i++) {
-        var init_type = fields[i].value;
+    array_for_each(fields, function (field) {
+        var init_type = field.value;
         if (text_field_init_func.hasOwnProperty(init_type)) {
-            text_field_init_func[init_type](fields[i]);
+            text_field_init_func[init_type](field);
         }
-    }
+    });
 }
 
 /* Initialize an empty form
@@ -189,15 +198,14 @@ function set_form_data_div(text) {
 }
 
 function field_value(field_name) {
-    result = ""
-    Array.prototype.forEach.call(
-        document.querySelectorAll("[name=\""+field_name+"\"]"), function (element) {
-            if (pacform_representation_funcs.hasOwnProperty(element.type)) {
-                var rep = pacform_representation_funcs[element.type](element);
-                result += rep ? rep : "";
-            }
+    var result = ""
+    var elem = document.querySelectorAll("[name=\""+field_name+"\"]");
+    array_for_each(elem, function (element) {
+        if (pacform_representation_funcs.hasOwnProperty(element.type)) {
+            var rep = pacform_representation_funcs[element.type](element);
+            result += rep ? rep : "";
         }
-    );
+    });
     return result;
 }
 
@@ -239,7 +247,7 @@ function write_pacforms_representation() {
     var form = document.querySelector("#the-form");
     var msg = pacforms_header();
     init_text_fields("input.init-on-submit");
-    Array.prototype.forEach.call(form.elements, function(element, index, array) {
+    array_for_each(form.elements, function(element, index, array) {
         var result;
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
             result = bracket_data(
@@ -263,8 +271,8 @@ function write_pacforms_representation() {
     /* The init-on-submit fields should be reset to their default
     values so that they will be inited again next time the form is
     submitted. */
-    var to_be_reset = document.querySelectorAll("input.init-on-submit");
-    Array.prototype.forEach.call(to_be_reset, function(element, index, array) {
+    var elem = document.querySelectorAll("input.init-on-submit");
+    array_for_each(elem, function(element, index, array) {
         element.value = element.defaultValue;
     });
 }
@@ -296,10 +304,9 @@ var init_from_msg_funcs = {
         }
     },
     "select-one": function (element, value) {
-        var options = element.options;
         var member = false;
         element.value = "Other";
-        Array.prototype.forEach.call(options, function (option) {
+        array_for_each(element.options, function (option) {
             if (option.text == value) {
                 element.value = value;
                 member = true;
@@ -326,8 +333,8 @@ determines which fields should be initialized by matching the
 beginning of attribute againt the name of each field. */
 function init_form_from_fields(fields, attribute) {
     for (var field in fields) {
-        elements = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
-        Array.prototype.some.call(elements, function (element) {
+        var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
+        array_for_each(elem, function (element) {
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
                 return init_from_msg_funcs[element.type](element, fields[field]);
             }
