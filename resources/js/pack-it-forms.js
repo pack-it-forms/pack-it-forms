@@ -187,6 +187,42 @@ function init_text_fields(selector) {
     });
 }
 
+/* This function process all of the HTML elements with
+   "data-include-html" attributes to include the html files that they
+   are pointing at. */
+function process_html_includes(next) {
+    var includes = document.querySelectorAll("[data-include-html]");
+    /* Each time that a request finishes, it increments
+    numberComplete; when numberComplete == number it calls the
+    continuation to go to the next function. */
+    var number = includes.length;
+    var numberComplete = 0;
+    array_for_each(includes, function (element, index, array) {
+        var msg_url = "resources/html/"+element.dataset.includeHtml+".html";
+        var msg_request = new XMLHttpRequest();
+        msg_request.open("GET", msg_url, true)
+        msg_request.responseType = "document";
+        msg_request.onreadystatechange = function (e) {
+            if (msg_request.readyState == msg_request.DONE) {
+                // We have to modify the innerHTML after appending for
+                // Firefox to recognize the new elements.
+                var parent = element.parentNode;
+                var index = Array.prototype.indexOf.call(parent.children, element);
+                parent.replaceChild(msg_request.response.documentElement,
+                                    element);
+                parent.children[index].innerHTML += "";
+                numberComplete += 1;
+                if (numberComplete == number) {
+                    next();
+                }
+            }
+        };
+        msg_request.send();
+    });
+}
+
+startup_functions.push(process_html_includes);
+
 /* Initialize an empty form
 
 This function sets up a new empty form. */
