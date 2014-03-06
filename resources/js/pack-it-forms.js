@@ -105,8 +105,26 @@ var template_repl_func = {
 };
 
 var template_filter_func = {
-    "truncate" : function (arg, orig_text) {
-        return orig_text.substr(0, arg);
+    "truncate" : function (arg, orig_value) {
+        return orig_value.substr(0, arg);
+    },
+
+    "split" : function (arg, orig_value) {
+        return orig_value.split(arg);
+    },
+
+    "re_search" : function (arg, orig_value) {
+        re = new RegExp(arg);
+        match = re.exec(orig_value);
+        if (match.length == 1) {
+            return match[0];
+        } else {
+            return match;
+        }
+    },
+
+    "nth" : function (arg, orig_value) {
+        return orig_value[arg];
     }
 };
 
