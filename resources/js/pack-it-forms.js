@@ -144,21 +144,28 @@ be complete ignored.
 
 Form #5 is the combination of #2 and #4.
 
-Form #6 is the combination of #3 and #5. */
+Form #6 is the combination of #3 and #5.
+
+Additionally, multiple filters can be chained one after another in the
+manner of unix pipelines.  Each filter may take an optional argument,
+which may be ignored. */
 function expand_template(tmpl_str) {
     var final_str = ""
-    var repl_re = /\[([^:|\]]+)(?::([^|\]]+))?(?:\|([^:\]]+)(?::([^\]]+))?)?]/
+    var repl_re = /\[([^:|\]]+)(?::([^|\]]+))?(?:\|([^\]]+))?]/
     var match = repl_re.exec(tmpl_str);
     while (match) {
         final_str += tmpl_str.substring(0, match.index);
         if (template_repl_func.hasOwnProperty(match[1])) {
             var value = template_repl_func[match[1]](match[2]);
             if (match[3]) {
-                if (template_filter_func.hasOwnProperty(match[3])) {
-                    value = template_filter_func[match[3]](match[4], value);
-                } else {
-                    throw new TemplateException("Unknown filter function");
-                }
+                split_with_escape(match[3], "|").forEach(function (f) {
+                    var a = f.split(":",2);
+                    if (template_filter_func.hasOwnProperty(a[0])) {
+                        value = template_filter_func[a[0]](a[1], value);
+                    } else {
+                        throw new TemplateException("Unknown filter function");
+                    }
+                });
             }
         } else {
             throw new TemplateException("Unknown replacement function");
@@ -169,6 +176,27 @@ function expand_template(tmpl_str) {
     }
     final_str += tmpl_str;
     return final_str;
+}
+
+function split_with_escape(str, sep) {
+    var a = Array();
+    str.split(sep).forEach(function (c) {
+        if (a.length == 0) {
+            a.push(c);
+        } else {
+            var v = a.pop();
+            if (v.endsWith("\\\\")) {
+                a.push(v.substring(0, v.length-1));
+                a.push(c);
+            } else if (v.endsWith("\\")) {
+                a.push(v + c);
+            } else {
+                a.push(v);
+                a.push(c);
+            }
+        }
+    });
+    return a;
 }
 
 function TemplateException(desc) {
