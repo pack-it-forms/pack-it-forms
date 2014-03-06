@@ -101,6 +101,10 @@ var template_repl_func = {
 
     "query-string" : function(arg) {
         return stringify_possible_null(query_object[arg]);
+    },
+
+    "div-id" : function(arg) {
+        return document.querySelector("#"+arg).textContent;
     }
 };
 
