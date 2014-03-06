@@ -515,6 +515,8 @@ filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    // Some fields always need to be initialized
+    init_text_fields("span.init-always", "textContent");
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
         init_form_from_msg_data(text);

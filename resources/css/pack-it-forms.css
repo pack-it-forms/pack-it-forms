@@ -1,10 +1,13 @@
+.hidden {
+    display: none;
+}
+
 #message-header {
     display: none;
 }
 
 #form-data {
     /*display : block;*/
-    display: none;
     font-family: monospace;
     white-space: pre;
     border: 2px solid black;
