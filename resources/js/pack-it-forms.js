@@ -225,11 +225,13 @@ function TemplateException(desc) {
 /* This function initializes a set of text fields to their default
    values.  The selection of text fields to use is determined by the
    "selector" argument, which is a selector suitable to be passed to
-   document.querySelectorAll. */
-function init_text_fields(selector) {
+   document.querySelectorAll.  This does not have to be used on input
+   elements; attribute determines what attribute will be read and
+   expanded. */
+function init_text_fields(selector, attribute) {
     var fields = document.querySelectorAll(selector);
     array_for_each(fields, function (field) {
-        field.value = expand_template(field.value);
+        field[attribute] = expand_template(field[attribute]);
     });
 }
 
@@ -273,7 +275,7 @@ startup_functions.push(process_html_includes);
 
 This function sets up a new empty form. */
 function init_empty_form() {
-    init_text_fields("input.init-default");
+    init_text_fields("input.init-default", "value");
 }
 
 function get_form_data_from_div() {
