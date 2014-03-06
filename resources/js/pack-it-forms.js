@@ -7,7 +7,18 @@ var query_object;
 var startup_functions = new Array();
 
 function startup() {
-    startup_functions.forEach(function (f) { f(); });
+    /* The startup functions are called in continuation-passing style,
+    so that they can contain asynchronous code that moves to the next
+    function when it is complete. */
+    startup_functions.shift()(callclist(startup_functions));
+
+    function callclist(functions) {
+        return function() {
+            if (functions.length > 0) {
+                functions.shift()(callclist(functions))
+            }
+        }
+    }
 }
 
 window.onload=startup;
@@ -401,7 +412,7 @@ If no form data exists in any of these locations a new form will be
 filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
-function init_form() {
+function init_form(next) {
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
         init_form_from_msg_data(text);
@@ -432,6 +443,7 @@ function init_form() {
             init_empty_form();
         }
     }
+    next();
 }
 
 /* Handle form data message visibility */
@@ -469,7 +481,7 @@ function clear_form() {
 /* Utility: generate an object from the query string.  This should be
    called as an init function; it will store the result in the global
    variable query_object */
-function query_string_to_object() {
+function query_string_to_object(next) {
     var query = {};
     string = window.location.search.substring(1);
     list = string ? string.split("&") : [];
@@ -478,6 +490,7 @@ function query_string_to_object() {
         query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
     });
     query_object = query;
+    next();
 }
 startup_functions.push(query_string_to_object);
 startup_functions.push(init_form);
