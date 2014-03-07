@@ -296,7 +296,9 @@ function get_form_data_from_div() {
 }
 
 function set_form_data_div(text) {
-    document.querySelector("#form-data").value = text;
+    form_data = document.querySelector("#form-data")
+    form_data.value = text;
+    form_data.rows = text.trim().split("\n").length;
 }
 
 var pacform_representation_funcs = {
