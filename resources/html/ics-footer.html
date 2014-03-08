@@ -1,0 +1,109 @@
+<div>
+  <table id="form-row-5" class="noborder">
+    <tr>
+      <td class="block-caption">Action Taken
+        <span class="field-number">13</span>
+      </td>
+    </tr><tr>
+      <td>
+        <textarea name="13.action-taken" rows="3" cols="80" wrap="hard"></textarea>
+      </td>
+    </tr><tr>
+      <td>
+        <fieldset class="horizontal">
+          <legend>CC:</legend>
+          <label>
+            <input name="CCMgt" type="checkbox" value="Yes"/>Management
+          </label><label>
+            <input name="CCOps" type="checkbox" value="Yes"/> Operations
+          </label><label>
+            <input name="CCPlan" type="checkbox" value="Yes"/> Planning
+          </label><label>
+            <input name="CCLog" type="checkbox" value="Yes"/> Logistics
+          </label><label>
+            <input name="CCFin" type="checkbox" value="Yes"/> Finance
+          </label>
+        </fieldset>
+      </td>
+    </tr>
+  </table>
+  <table id="form-row-six" class="noborder">
+    <tr>
+      <td colspan="5" class="block-caption">Operator Use Only
+        <span class="field-number">14</span>
+      </td>
+    </tr><tr class="horizontal">
+      <td colspan="3">
+        <span class="bold">
+          How
+          <label class="intext">
+            Received <input name="Rec-Sent" type="radio" value="Received"/>
+          </label>
+          or
+          <label class="intext">
+            Sent <input name="Rec-Sent" type="radio" value="Sent"/>
+          </label>
+        </span>
+      </td><td colspan="2" class="border-left">
+        <label class="label-sameline">Operator Call Sign:
+          <input class="init-default" name="OpCall" type="text"
+                 size="12" value="[query-string:ocall]"/>
+        </label>
+      </td>
+    </tr><tr class="horizontal">
+      <td>
+        <label>
+          <input name="Method" type="radio" value="Telephone"/> Telephone
+        </label>
+      </td>
+      <td colspan="2">
+        <label>
+          <input name="Method" type="radio" value="Dispatch Center"/> Dispatch Center
+        </label>
+      </td>
+      <td colspan="2" class="border-left">
+        <label class="label-sameline">Operator Name:
+          <input class="init-default" name="OpName" type="text"
+                 size="24" value="[query-string:oname]"/>
+        </label>
+      </td>
+    </tr><tr class="horizontal">
+      <td>
+        <label>
+          <input name="Method" type="radio" value="EOC Radio"/> EOC Radio
+        </label>
+      </td><td>
+        <label>
+          <input name="Method" type="radio" value="FAX"/> FAX
+        </label>
+      </td><td>
+        <label>
+          <input name="Method" type="radio" value="Courier"/> Courier<br/>
+        </label>
+      </td><td class="border-left">
+        <label class="label-sameline">Date:
+          <input name="OpDate" class="init-on-submit" type="text"
+                 size="12" value="[date]" disabled="true"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">Time:
+          <input name="OpTime" class="init-on-submit" type="text"
+                 size="12" value="[time]" disabled="true"/>
+        </label>
+      </td>
+    </tr><tr class="horizontal">
+      <td>
+        <label>
+          <input name="Method" type="radio" value="Amateur Radio"/> Amateur Radio
+        </label>
+      </td><td colspan="2">
+        <label>
+          <input name="Method" type="radio" value="Other" checked="checked"/> Other:
+        </label>
+        <label>
+          <input name="Other" type="text" value="Packet"/>
+        </label>
+      </td><td colspan="2" class="border-left"></td>
+    </tr>
+  </table>
+</div>
