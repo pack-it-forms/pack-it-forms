@@ -233,7 +233,7 @@ function split_with_escape(str, sep) {
             a.push(c);
         } else {
             var v = a.pop();
-            if (v.endsWith("\\\\")) {
+            if (string_ends_with(v, "\\\\")) {
                 a.push(v.substring(0, v.length-1));
                 a.push(c);
             } else if (string_ends_with(v, "\\")) {
