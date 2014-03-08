@@ -243,20 +243,18 @@ function init_text_fields(selector, attribute) {
    "data-include-html" attributes to include the html files that they
    are pointing at. */
 function process_html_includes(next) {
-    var includes = document.querySelectorAll("[data-include-html]");
-    /* Each time that a request finishes, it increments
-    numberComplete; when numberComplete == number it calls the
-    continuation to go to the next function. */
-    var number = includes.length;
-    var numberComplete = 0;
-    array_for_each(includes, function (element, index, array) {
-        var parent = element.parentNode;
-        var msg_url = "resources/html/"+element.dataset.includeHtml+".html";
+    /* This has to find and do a node, then find the next one, then do
+    it, etc. because if two nodes are under one parent then inserting
+    the replacement for the first node invalidates the second node. */
+    var include = document.querySelector("[data-include-html]");
+    if (include) {
+        var msg_url = "resources/html/"+include.dataset.includeHtml+".html";
         var msg_request = new XMLHttpRequest();
         open_async_request("GET", msg_url, "document", function (response) {
+            var parent = include.parentNode;
             // We have to modify the innerHTML after appending for
             // Firefox to recognize the new elements.
-            var child_index = Array.prototype.indexOf.call(parent.children, element);
+            var child_index = Array.prototype.indexOf.call(parent.children, include);
             // For some reason, getElementById/querySelector do
             // not work in Firefox; the HTML spec says that this
             // should work, because the elements are collected
@@ -265,7 +263,7 @@ function process_html_includes(next) {
             // Since there can be multiple elements, this iterates
             // through them and forces their display
             while(to_add.length > 0) {
-                parent.insertBefore(to_add[0], element);
+                parent.insertBefore(to_add[0], include);
                 parent.children[child_index++].innerHTML += "";
             }
             // For styles to be applied correctly in Firefox the
@@ -274,12 +272,13 @@ function process_html_includes(next) {
             // Finally, remove the dummy element and check if
             // complete.
             parent.removeChild(parent.children[child_index]);
-            numberComplete += 1;
-            if (numberComplete == number) {
-                next();
-            }
+            // Process the next include
+            process_html_includes(next);
         });
-    });
+    } else {
+        // If all includes have been processed, then continue;
+        next();
+    }
 }
 
 startup_functions.push(process_html_includes);
