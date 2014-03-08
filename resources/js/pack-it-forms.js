@@ -557,6 +557,7 @@ function init_form(next) {
     the_form.addEventListener("focus", function (ev) {
         last_active_form_element = ev.target;
     }, true);
+    the_form.addEventListener("input", formChanged);
 
     // Some fields always need to be initialized
     init_empty_form();
@@ -578,6 +579,7 @@ function init_form(next) {
             }
         }
     }
+    write_pacforms_representation();
     next();
 }
 
@@ -736,5 +738,19 @@ function open_async_request(method, url, responseType, cb) {
             }
         };
         request.send();
+    }
+}
+
+function formChanged(event) {
+    write_pacforms_representation();
+
+    var submit_button = document.querySelector("#opdirect-submit");
+    var button_header = document.querySelector("#button-header");
+    if (document.querySelector("#the-form").checkValidity()) {
+        button_header.classList.add("valid");
+        submit_button.disabled = false;
+    } else {
+        button_header.classList.remove("valid");
+        submit_button.disabled = true;
     }
 }

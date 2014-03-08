@@ -50,3 +50,6 @@ form fieldset:invalid {
     box-shadow: none;
 }
 
+#button-header.valid {
+    background-color: #a8e8a8;
+}
