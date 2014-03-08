@@ -151,7 +151,8 @@ var template_filter_func = {
     },
 
     "msgno2name" : function(arg, orig_value) {
-        return callprefixes[orig_value.split('-')[0]];
+        var name = callprefixes[orig_value.split('-')[0]];
+        return name ? name : "";
     }
 };
 
