@@ -250,6 +250,7 @@ function process_html_includes(next) {
     var number = includes.length;
     var numberComplete = 0;
     array_for_each(includes, function (element, index, array) {
+        var parent = element.parentNode;
         var msg_url = "resources/html/"+element.dataset.includeHtml+".html";
         var msg_request = new XMLHttpRequest();
         msg_request.open("GET", msg_url, true)
@@ -258,11 +259,24 @@ function process_html_includes(next) {
             if (msg_request.readyState == msg_request.DONE) {
                 // We have to modify the innerHTML after appending for
                 // Firefox to recognize the new elements.
-                var parent = element.parentNode;
-                var index = Array.prototype.indexOf.call(parent.children, element);
-                parent.replaceChild(msg_request.response.documentElement,
-                                    element);
-                parent.children[index].innerHTML += "";
+                var child_index = Array.prototype.indexOf.call(parent.children, element);
+                // For some reason, getElementById/querySelector do
+                // not work in Firefox; the HTML spec says that this
+                // should work, because the elements are collected
+                // through a pre-order traversal.
+                var to_add = msg_request.response.getElementsByTagName("div")[0].children;
+                // Since there can be multiple elements, this iterates
+                // through them and forces their display
+                while(to_add.length > 0) {
+                    parent.insertBefore(to_add[0], element);
+                    parent.children[child_index++].innerHTML += "";
+                }
+                // For styles to be applied correctly in Firefox the
+                // parent element has to be force-redisplayed as well.
+                parent.innerHTML += "";
+                // Finally, remove the dummy element and check if
+                // complete.
+                parent.removeChild(parent.children[child_index]);
                 numberComplete += 1;
                 if (numberComplete == number) {
                     next();
