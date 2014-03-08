@@ -314,8 +314,8 @@ startup_functions.push(process_html_includes);
 
 This function sets up a new empty form. */
 function init_empty_form() {
-    init_text_fields("span.init-default", "textContent");
-    init_text_fields("input.init-default", "value");
+    init_text_fields("span:not(.init-on-submit)", "textContent");
+    init_text_fields("input:not(.init-on-submit)", "value");
 }
 
 function get_form_data_from_div() {
