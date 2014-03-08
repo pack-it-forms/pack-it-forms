@@ -545,6 +545,13 @@ filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    // Setup focus tracking within the form
+    var the_form = document.querySelector("#the-form");
+    last_active_form_element = document.activeElement;
+    the_form.addEventListener("focus", function (ev) {
+        last_active_form_element = ev.target;
+    }, true);
+
     // Some fields always need to be initialized
     init_empty_form();
     var text = get_form_data_from_div();
@@ -569,19 +576,22 @@ function init_form(next) {
 }
 
 /* Handle form data message visibility */
+var last_active_form_element;
+
 function show_form_data() {
     var data_div = document.querySelector("#form-data");
     data_div.style.display = "block";
     data_div.tabIndex = "-1";
     data_div.focus();
     document.querySelector("#show-hide-data").value = "Hide Data Message";
-    document.querySelector("#form-data").disabled = true;
+    document.querySelector("#form-data").readOnly = true;
 }
 
 function hide_form_data() {
     document.querySelector("#form-data").style.display = "none";
     document.querySelector("#show-hide-data").value = "Show Data Message";
-    document.querySelector("#form-data").disabled = false;
+    document.querySelector("#form-data").readOnly = false;
+    last_active_form_element.focus();
 }
 
 function toggle_form_data_visibility() {
