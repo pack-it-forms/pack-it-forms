@@ -524,17 +524,15 @@ function init_form(next) {
         msgno = query_object['msgno'];
         if (msgno) {
             msg_url = "msgs/" + msgno;
-            //            var msg_request = open_async_request("GET", msg_url, true);
-            open_async_request("GET", msg_url, "text", function (text) {
-                if (text.trim().length > 0) {
-                    set_form_data_div(text);
-                    init_form_from_msg_data(text);
-                } else {
-                    init_empty_form();
-                }
-            });
             try {
-                msg_request.send(null);
+                open_async_request("GET", msg_url, "text", function (text) {
+                    if (text.trim().length > 0) {
+                        set_form_data_div(text);
+                        init_form_from_msg_data(text);
+                    } else {
+                        init_empty_form();
+                    }
+                });
             } catch (e) {
                 init_empty_form();
             }
