@@ -81,8 +81,8 @@ function field_value(field_name) {
 }
 
 var template_repl_func = {
-    "[" : function (arg) {
-        return "[";
+    "{" : function (arg) {
+        return "{";
     },
 
     "date" : function (arg) {
@@ -162,16 +162,16 @@ Plain text included in the template is copied to the expanded output.
 Placeholders are enclosed in square brackets.  There are six possible
 forms of the placeholders:
 
-   1. [<type_name>]
-   2. [<type_name>|<filter_name>]
-   3. [<type_name>|<filter_name>:<filter_arg>]
-   4. [<type_name>:<type_arg>]
-   5. [<type_name>:<type_arg>|<filter_name>]
-   6. [<type_name>:<type_arg>|<filter_name>:<filter_arg>]
+   1. {{<type_name>}}
+   2. {{<type_name>|<filter_name>}}
+   3. {{<type_name>|<filter_name>:<filter_arg>}}
+   4. {{<type_name>:<type_arg>}}
+   5. {{<type_name>:<type_arg>|<filter_name>}}
+   6. {{<type_name>:<type_arg>|<filter_name>:<filter_arg>}}
 
 In form #1, the placeholder function named by <type_name> is called
-and the result it returns is substituted.  There is a type_name if "["
-to allow inserting an right square bracket.
+and the result it returns is substituted.  There is a type_name if "{"
+to allow inserting consecutive open braces is required.
 
 In form #2, the placeholder function named by <type_name> is called
 and the result it returns is passed to the filter function named by
@@ -197,7 +197,7 @@ manner of unix pipelines.  Each filter may take an optional argument,
 which may be ignored. */
 function expand_template(tmpl_str) {
     var final_str = ""
-    var repl_re = /\[([^:|\]]+)(?::([^|\]]+))?(?:\|([^\]]+))?]/
+    var repl_re = /\{\{([^:|\]]+)(?::([^|\]]+))?(?:\|([^\]]+))?}}/
     var match = repl_re.exec(tmpl_str);
     while (match) {
         final_str += tmpl_str.substring(0, match.index);

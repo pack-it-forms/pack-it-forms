@@ -1,7 +1,7 @@
 <div>
   <table id="form-row-1">
     <tr>
-      <td><h1 class="templated">[title]</h1></td>
+      <td><h1 class="templated">{{title}}</h1></td>
       <td>
         <label>Sender's Msg #<span class="field-number">2</span>
           <input name="2.txmsgno" class="" type="text" size="15"/>
@@ -9,7 +9,7 @@
       </td><td>
         <label>My Msg #:
           <input name="MsgNo" class="init-default" type="text"
-                 size="15" required="true" value="[query-string:msgno]"/>
+                 size="15" required="true" value="{{query-string:msgno}}"/>
         </label>
       </td><td>
         <label>Receiver's Msg #<span class="field-number">3</span>
@@ -23,7 +23,7 @@
         <label>Date<span class="field-number">1a</span>
           <input name="1a.date" class="init-default" type="text" size="10"
                  required="true" pattern="\d{1,2}/\d{1,2}/\d{4}"
-                 value="[date]"/>
+                 value="{{date}}"/>
         </label>
       </td><td rowspan="2">
         <fieldset>
@@ -92,7 +92,7 @@
         <label>Time:<span class="field-number">1b</span>
           <input name="1b.time" class="init-default" type="text" size="10"
                  required="true" pattern="\d{1,2}:\d{2}(:\d{2})?"
-                 value="[time]"/>
+                 value="{{time}}"/>
         </label>
       </td>
     </tr>

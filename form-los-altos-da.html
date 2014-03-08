@@ -24,7 +24,7 @@
             "7.": "Planning",
             "8.": "Planning",
             "9a.": "Los Altos EOC",
-            "9b.": "[msgno|msgno2name]"
+            "9b.": "{{msgno|msgno2name}}"
         }
       </div>
       <table id="form-body" class="noborder border">
@@ -33,7 +33,8 @@
             <label class="label-sameline">Subject:
               <span class="field-number">10</span>
               <input name="10.subject" type="text" size="80"
-                     value="Damage Summary for [msgno|msgno2name]" required="true"
+                     value="Damage Summary for {{msgno|msgno2name}}"
+                     required="true"
                      pattern="Damage Summary for .*"
                      title="This field must have a prefix of
                             &quot;Damage Summary for&quot;"/>
