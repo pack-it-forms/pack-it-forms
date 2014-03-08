@@ -109,6 +109,15 @@ var template_repl_func = {
 
     "div-id" : function(arg) {
         return document.querySelector("#"+arg).textContent;
+    },
+
+    "filename" : function (arg) {
+        var i = document.location.pathname.lastIndexOf("/")+1;
+        return document.location.pathname.substring(i);
+    },
+
+    "title" : function (arg) {
+        return document.title;
     }
 };
 
