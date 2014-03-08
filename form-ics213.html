@@ -10,12 +10,6 @@
   </head>
 
   <body>
-    <div class="hidden" id="message-header">
-!PACF! [field:MsgNo]_[field:4.severity|truncate:1]/[field:5.handling|truncate:1]_ICS213_[field:10.subject]
-# EOC Message Form
-# JS-ver. PR-3.9-2.6, 08/11/13,
-# FORMFILENAME: Message.html
-    </div>
     <form id="the-form" name="the-form">
       <div data-include-html="head"></div>
       <table id="form-body" class="noborder border">
@@ -44,6 +38,7 @@
       </table>
       <div data-include-html="ics-footer"></div>
     </form>
+    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="footer"></div>
   </body>
 </html>
