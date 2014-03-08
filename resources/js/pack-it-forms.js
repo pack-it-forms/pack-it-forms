@@ -314,6 +314,7 @@ startup_functions.push(process_html_includes);
 
 This function sets up a new empty form. */
 function init_empty_form() {
+    init_text_fields("span.init-default", "textContent");
     init_text_fields("input.init-default", "value");
 }
 
@@ -539,7 +540,7 @@ reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
     // Some fields always need to be initialized
-    init_text_fields("span.init-always", "textContent");
+    init_empty_form();
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
         init_form_from_msg_data(text);
@@ -552,15 +553,10 @@ function init_form(next) {
                     if (text.trim().length > 0) {
                         set_form_data_div(text);
                         init_form_from_msg_data(text);
-                    } else {
-                        init_empty_form();
                     }
                 });
             } catch (e) {
-                init_empty_form();
             }
-        } else {
-            init_empty_form();
         }
     }
     next();
