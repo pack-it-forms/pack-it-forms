@@ -635,7 +635,6 @@ function query_string_to_object(next) {
    originates from. */
 function load_callprefix(next) {
     open_async_request("GET", "cfgs/msgno-prefixes.json", "text", function (data) {
-        console.log(data)
         callprefixes = JSON.parse(data);
         next();
     });
