@@ -321,7 +321,7 @@ startup_functions.push(process_html_includes);
 
 This function sets up a new empty form. */
 function init_empty_form() {
-    init_text_fields("span:not(.init-on-submit)", "textContent");
+    init_text_fields(".templated", "textContent");
     init_text_fields("input:not(.init-on-submit)", "value");
 }
 
