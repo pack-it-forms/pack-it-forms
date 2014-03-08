@@ -133,6 +133,10 @@ var template_filter_func = {
 
     "nth" : function (arg, orig_value) {
         return orig_value[arg];
+    },
+
+    "trim" : function (arg, orig_value) {
+        return orig_value.trim();
     }
 };
 
