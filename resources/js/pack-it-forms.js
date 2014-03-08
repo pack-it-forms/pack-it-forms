@@ -288,11 +288,19 @@ function process_html_includes(next) {
             // For styles to be applied correctly in Firefox the
             // parent element has to be force-redisplayed as well.
             parent.innerHTML += "";
-            // Finally, remove the dummy element and check if
-            // complete.
+            // Remove the dummy element
             parent.removeChild(parent.children[child_index]);
-            // Process the next include
-            process_html_includes(next);
+            // The continuation passed to the next instance of
+            // processing includes a statement that initializes the
+            // form with the contents of a JSON object that was inside
+            // the <div> including the content.  This means that all
+            // of the objects that need to be initialized are
+            // accumulated and initialized at the end.
+            var defaults = include.textContent;
+            process_html_includes(function() {
+                defaults ? init_form_from_fields(JSON.parse(defaults), 'name') : null;
+                next();
+            });
         });
     } else {
         // If all includes have been processed, then continue;
