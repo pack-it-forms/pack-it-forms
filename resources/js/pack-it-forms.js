@@ -656,9 +656,22 @@ function open_async_request(method, url, responseType, cb) {
         request = new XMLHttpRequest();
         request.open(method, url, true);
         request.responseType = responseType;
-        request.onreadystatechange = function(e) {
+        // Opera won't load HTML documents unless the MIME type is
+        // set to text/xml
+        var overriden = false;
+        request.onreadystatechange = function callcb(e) {
             if (e.target.readyState == e.target.DONE) {
-                cb(e.target.response);
+                if (e.target.response) {
+                    cb(e.target.response);
+                } else if (responseType == "document" && !overriden) {
+                    request = new XMLHttpRequest();
+                    request.open(method, url, true);
+                    request.responseType = responseType;
+                    request.overrideMimeType("text/xml");
+                    overriden = true;
+                    request.onreadystatechange = callcb;
+                    request.send();
+                }
             }
         };
         request.send();
