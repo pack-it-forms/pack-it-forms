@@ -378,7 +378,7 @@ function write_pacforms_representation() {
     var form = document.querySelector("#the-form");
     var msg = expand_template(
         document.querySelector("#message-header").textContent).trim()
-    init_text_fields("input.init-on-submit");
+    init_text_fields("input.init-on-submit", "value");
     array_for_each(form.elements, function(element, index, array) {
         var result;
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
