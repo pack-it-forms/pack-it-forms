@@ -348,7 +348,7 @@ function write_pacforms_representation() {
             result = null;
         }
         if (result) {
-            numberMatch = /([0-9]+[a-z]?\.).*/.exec(element.name);
+            numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(element.name);
             var resultText;
             if (numberMatch) {
                 resultText = numberMatch[1]+": "+result;
