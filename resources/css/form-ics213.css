@@ -93,3 +93,8 @@ form .horizontal input {
     font-size: 0.83em;
     padding-left: 0.5em;
 }
+
+
+table ~ table :first-child:first-child > td {
+    border-top: none;
+}
