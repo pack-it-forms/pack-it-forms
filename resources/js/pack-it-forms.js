@@ -236,7 +236,7 @@ function split_with_escape(str, sep) {
             if (v.endsWith("\\\\")) {
                 a.push(v.substring(0, v.length-1));
                 a.push(c);
-            } else if (v.endsWith("\\")) {
+            } else if (string_ends_with(v, "\\")) {
                 a.push(v + c);
             } else {
                 a.push(v);
@@ -245,6 +245,11 @@ function split_with_escape(str, sep) {
         }
     });
     return a;
+}
+
+function string_ends_with(str, val) {
+    end = str.substring(str.length - val.length);
+    return end == val;
 }
 
 function TemplateException(desc) {
