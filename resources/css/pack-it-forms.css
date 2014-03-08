@@ -35,7 +35,7 @@ body {
     border: 2px solid black;
     overflow: hidden;
     height: auto;
-    background-color: #eeeeeee;
+    background-color: #eeeeee;
 }
 
 form :invalid {
