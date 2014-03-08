@@ -33,7 +33,7 @@ function padded_int_str(num, cnt) {
     return s;
 }
 
-/* Make forEach() easier to use on Array-like objects
+/* Make forEach() & friends easier to use on Array-like objects
 
 This is handy for iterating over NodeSets, etc. from the DOM which
 don't provide a forEach method.  In theory we could inject the forEach
@@ -41,6 +41,10 @@ method into those object's prototypes but that can on occasion cause
 problems. */
 function array_for_each(array, func) {
     return Array.prototype.forEach.call(array, func);
+}
+
+function array_some(array, funct) {
+    return Array.prototype.some.call(array, funct);
 }
 
 /* Execute a statement on each line of a string
@@ -426,7 +430,7 @@ beginning of attribute againt the name of each field. */
 function init_form_from_fields(fields, attribute) {
     for (var field in fields) {
         var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
-        array_for_each(elem, function (element) {
+        array_some(elem, function (element) {
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
                 return init_from_msg_funcs[element.type](element, fields[field]);
             }
