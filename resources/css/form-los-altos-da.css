@@ -1,0 +1,72 @@
+/* Inspiration: http://kizu.ru/en/fun/rotated-text/ */
+.rotated td:not(.not-rotated), .rotated th:not(.not-rotated) {
+    vertical-align: bottom;
+    text-align: center;
+}
+.rotated td:not(.not-rotated) > div, .rotated th:not(.not-rotated) > div {
+    display: inline-block;
+    width: 1.5em;
+}
+.rotated td:not(.not-rotated) > div > div, .rotated th:not(.not-rotated) > div > div {
+    font-size: 75%;
+    display: inline-block;
+    white-space: nowrap;
+    transform: translate(0, 100%) rotate(-90deg);
+    transform-origin: 0 0;
+    -webkit-transform: translate(0, 100%) rotate(-90deg);
+    -webkit-transform-origin: 0 0;
+}
+.rotated td:not(.not-rotated) > div > div::after, .rotated th:not(.not-rotated) > div > div::after {
+    content: "";
+    float: left;
+    margin-top: 100%;
+}
+
+td.rotated:not(.not-rotated), th.rotated:not(.not-rotated) {
+    vertical-align: bottom;
+    text-align: center;
+}
+td.rotated:not(.not-rotated) > div, th.rotated:not(.not-rotated) > div {
+    display: inline-block;
+    width: 1.5em;
+}
+td.rotated:not(.not-rotated) > div > div, th.rotated:not(.not-rotated) > div > div {
+    font-size: 75%;
+    display: inline-block;
+    white-space: nowrap;
+    transform: translate(0, 100%) rotate(-90deg);
+    transform-origin: 0 0;
+    -webkit-transform: translate(0, 100%) rotate(-90deg);
+    -webkit-transform-origin: 0 0;
+}
+td.rotated:not(.not-rotated) > div > div::after, th.rotated:not(.not-rotated) > div > div::after {
+    content: "";
+    float: left;
+    margin-top: 100%;
+}
+
+.fullsize-textfields td:not(.noft) input, .fullsize-textfields td:not(.noft) textarea {
+    width:100%;
+}
+.fullsize-textfields td:not(.noft) {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+table {
+    width: 95%;
+}
+body {
+/*    font-size: 10pt;*/
+}
+.rowspanned-header {
+    vertical-align: bottom;
+    font-weight: normal;
+}
+.sub-header {
+    font-weight: normal;
+    text-align: right;
+}
+
+th {
+    border: 1px solid #aaaaaa;
+}

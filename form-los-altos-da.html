@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/form-ics213.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/form-los-altos-da.css"/>
+    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/js/form-ics213.js"></script>
+    <title>Los Altos DA Message Form</title>
+  </head>
+
+  <body>
+    <div class="hidden" id="form-name">Los Altos Damage Assessment Form</div>
+    <div class="hidden" id="message-header">
+!PACF! [field:MsgNo]_[field:4.severity|truncate:1]/[field:5.handling|truncate:1]_ICS213_[field:10.subject]
+# EOC Message Form
+# JS-ver. PR-3.9-2.6, 08/11/13,
+# FORMFILENAME: Message.html
+    </div>
+    <form id="the-form" name="the-form">
+      <div data-include-html="head"></div>
+      <table id="form-body" class="noborder border">
+        <tr>
+          <td colspan="18">
+            <label class="label-sameline">Subject:
+              <span class="field-number">10</span>
+              <input name="10.subject" type="text" size="80"
+                     value="Damage Summary for " required="true"
+                     pattern="Damage Summary for .*"
+                     title="This field must have a prefix of
+                            &quot;Damage Summary for&quot;"/>
+            </label>
+          </td>
+        </tr><tr>
+          <td colspan="18">
+            <label class="label-sameline">
+              Reference (e.g. Number of earlier msg.)
+              <span class="field-number">11</span>
+              <input name="11.reference" type="text" size="40"/>
+            </label>
+          </td>
+        </tr><tr>
+          <th scope="row" rowspan="4" class="rotated block-caption">
+            <div><div>Summary</div></div>
+          </th>
+          <th rowspan="4" class="rowspanned-header">Priority Location</th>
+          <th colspan="6">
+            People
+          </th><th colspan="3">
+            Damage
+          </th><th colspan="5">
+            Hazards
+          </th><th colspan="2">
+            Road
+          </th>
+        </tr>
+        <tr class="rotated">
+          <td rowspan="2"><div><div>Minor</div></div></td>
+          <td rowspan="2"><div><div>Delayed</div></div></td>
+          <td rowspan="2"><div><div>Immediate</div></div></td>
+          <td rowspan="2"><div><div>V</div></div></td>
+          <td rowspan="2"><div><div>Missing</div></div></td>
+          <td rowspan="2"><div><div>Trapped</div></div></td>
+          <td rowspan="2"><div><div>Light</div></div></td>
+          <td rowspan="2"><div><div>Moderate</div></div></td>
+          <td rowspan="2"><div><div>Heavy</div></div></td>
+          <th colspan="2" class="not-rotated"><div><div>Fires</div></div></th>
+          <td rowspan="2"><div><div>Electric</div></div></td>
+          <td rowspan="2"><div><div>Water</div></div></td>
+          <td rowspan="2"><div><div>Chemical</div></div></td>
+          <td rowspan="2"><div><div>Damaged</div></div></td>
+          <td rowspan="2"><div><div>No Access</div></div></td>
+        </tr>
+        <tr class="rotated">
+          <td><div><div>Burning</div></div></td>
+          <td><div><div>Out</div></div></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <td><input name="12.1a.people-minor" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1b.people-delayed" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1c.people-immediate" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1d.people-V" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1e.people-missing" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1f.people-trapped" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1g.damage-light" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1h.damage-moderate" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1i.damage-heavy" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1j.hazards-fires-burning" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1k.hazards-fires-out" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1l.hazards-electric" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1m.hazards-water" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1n.hazards-chemical" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1o.roads-damaged" type="text" pattern="\d+"
+                     required="true"/></td>
+          <td><input name="12.1p.roads-no-access" type="text" pattern="\d+"
+                     required="true"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th rowspan="2" scope="row" class="rotated block-caption">
+            <div><div>Priority #1</div></div>
+          </th>
+          <td style="width:20%;">
+            <span class="fullsize-textfields"><input name="12.2r.location" type="text"/></span>
+          </td>
+          <td><input name="12.2a.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.2b.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.2c.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.2d.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.2e.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.2f.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.2g.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.2h.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.2i.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.2j.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.2k.hazards-fires-out" type="text" pattern="\d+"/></td>
+          <td><input name="12.2l.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.2m.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.2n.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.2o.roads-damaged" type="text" pattern="\d+"/></td>
+          <td><input name="12.2p.roads-no-access" type="text" pattern="\d+"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th scope="row" class="sub-header">Notes:</th>
+          <td colspan="16"><input type="text" name="12.2q.notes"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th rowspan="2" scope="row" class="rotated block-caption">
+            <div><div>Priority #2</div></div>
+          </th>
+          <td>
+            <input name="12.3r.location" type="text"/>
+          </td>
+          <td><input name="12.3a.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.3b.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.3c.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.3d.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.3e.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.3f.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.3g.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.3h.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.3i.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.3j.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.3k.hazards-fires-out" type="text" pattern="\d+"/></td>
+          <td><input name="12.3l.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.3m.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.3n.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.3o.roads-damaged" type="text" pattern="\d+"/></td>
+          <td><input name="12.3p.roads-no-access" type="text" pattern="\d+"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th scope="row" class="sub-header">Notes:</th>
+          <td colspan="16"><input type="text" name="12.3q.notes"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th rowspan="2" scope="row" class="rotated block-caption"><div><div>Priority #3</div></div></th>
+          <td>
+            <input name="12.4r.location" type="text"/>
+          </td>
+          <td><input name="12.4a.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.4b.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.4c.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.4d.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.4e.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.4f.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.4g.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.4h.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.4i.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.4j.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.4k.hazards-fires-out" type="text" pattern="\d+"/></td>
+          <td><input name="12.4l.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.4m.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.4n.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.4o.roads-damaged" type="text" pattern="\d+"/></td>
+          <td><input name="12.4p.roads-no-access" type="text" pattern="\d+"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th scope="row" class="sub-header">Notes:</th>
+          <td colspan="16"><input type="text" name="12.3q.notes"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th scope="row" class="rotated block-caption">
+              <div><div>General notes</div></div>
+          </th>
+          <td colspan="17"><textarea name="12.4.general-notes" rows="4"></textarea></td>
+        </tr>
+      </table>
+      <div data-include-html="ics-footer"></div>
+    </form>
+    <div data-include-html="footer"></div>
+  </body>
+</html>
