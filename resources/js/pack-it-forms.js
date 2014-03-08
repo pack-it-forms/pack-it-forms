@@ -185,9 +185,11 @@ function expand_template(tmpl_str) {
             var value = template_repl_func[match[1]](match[2]);
             if (match[3]) {
                 split_with_escape(match[3], "|").forEach(function (f) {
-                    var a = f.split(":",2);
-                    if (template_filter_func.hasOwnProperty(a[0])) {
-                        value = template_filter_func[a[0]](a[1], value);
+                    var a = f.split(":");
+                    var fname = a.shift();
+                    var farg = a.join(":");
+                    if (template_filter_func.hasOwnProperty(fname)) {
+                        value = template_filter_func[fname](farg, value);
                     } else {
                         throw new TemplateException("Unknown filter function");
                     }
