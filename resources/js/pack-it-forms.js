@@ -257,6 +257,21 @@ function TemplateException(desc) {
     this.message = desc;
 }
 
+/* Check whether the form is valid */
+function check_the_form_validity() {
+    var button_header = document.querySelector("#button-header");
+    var submit_button = document.querySelector("#opdirect-submit");
+    var valid = document.querySelector("#the-form").checkValidity();
+    if (valid) {
+        button_header.classList.add("valid");
+        submit_button.disabled = false;
+    } else {
+        button_header.classList.remove("valid");
+        submit_button.disabled = true;
+    }
+    return valid
+}
+
 /* This function initializes a set of text fields to their default
    values.  The selection of text fields to use is determined by the
    "selector" argument, which is a selector suitable to be passed to
@@ -585,6 +600,12 @@ function init_form(next) {
     var first_field = document.querySelector("#the-form :invalid");
     first_field.focus()
     write_pacforms_representation();
+    /* Check form validity in a timeout because we need to wait for
+    Javascript to yield to allow the DOM to update the validity
+    status. */
+    window.setTimeout(function () {
+        check_the_form_validity();
+    }, 10);
     next();
 }
 
@@ -675,7 +696,7 @@ function combobox_other_manager(e) {
 function opdirect_submit(e) {
     write_pacforms_representation();
     hide_form_data();
-    if (document.querySelector("#the-form").checkValidity()) {
+    if (check_the_form_validity()) {
         e.preventDefault();
         document.querySelector("#form-data-form").submit();
         return false;
@@ -780,16 +801,7 @@ function open_async_request(method, url, responseType, cb) {
 
 function formChanged(event) {
     write_pacforms_representation();
-
-    var submit_button = document.querySelector("#opdirect-submit");
-    var button_header = document.querySelector("#button-header");
-    if (document.querySelector("#the-form").checkValidity()) {
-        button_header.classList.add("valid");
-        submit_button.disabled = false;
-    } else {
-        button_header.classList.remove("valid");
-        submit_button.disabled = true;
-    }
+    check_the_form_validity();
 }
 
 function remove_loading_overlay(next) {
