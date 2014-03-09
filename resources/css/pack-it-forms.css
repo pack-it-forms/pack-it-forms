@@ -38,7 +38,7 @@ body {
 }
 
 form :invalid {
-  box-shadow: 0 0 5px 1px red;
+    box-shadow: 0 0 5px 1px #e86060;
 }
 
 form :focus:invalid {
