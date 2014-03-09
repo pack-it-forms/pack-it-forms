@@ -197,7 +197,7 @@ manner of unix pipelines.  Each filter may take an optional argument,
 which may be ignored. */
 function expand_template(tmpl_str) {
     var final_str = ""
-    var repl_re = /\{\{([^:|\]]+)(?::([^|\]]+))?(?:\|([^\]]+))?}}/
+    var repl_re = /\{\{([^:|]+)(?::([^|]+))?(?:\|(.+))?}}/
     var match = repl_re.exec(tmpl_str);
     while (match) {
         final_str += tmpl_str.substring(0, match.index);
