@@ -748,7 +748,7 @@ var ActiveXObject_responseType_funcs = {
 }
 
 function escape_pacforms_string(string) {
-    return element.value.replace(/\\/g, "\\\\").replace(/\n/g,"\\n");
+    return string.replace(/\\/g, "\\\\").replace(/\n/g,"\\n");
 }
 
 var unescape_func = {
