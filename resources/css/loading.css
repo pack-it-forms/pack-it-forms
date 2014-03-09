@@ -6,6 +6,12 @@
     height:100%;
     z-index:9999;
     background-color:#eeeeee;
+    visibility: visible;
+    transition: visibility 0s 0.5s,opacity 0.5s;
+    -moz-transition: visibility 0s 0.5s,opacity 0.5s;
+    -webkit-transition: visibility 0s 0.5s,opacity 0.5s;
+    -o-transition: visibility 0s 0.5s,opacity 0.5s;
+    -ms-transition: visibility 0s 0.5s,opacity 0.5s;
 }
 
 #loading > div {
@@ -13,7 +19,63 @@
     font-size: xx-large;
     margin-left: 4px;
     opacity: 0;
+    animation: fadein 1s 1s 1 forwards;
+    -moz-animation: fadein 1s 1s 1 forwards;
+    -webkit-animation: fadein 1s 1s 1 forwards;
+    -o-animation: fadein 1s 1s 1 forwards;
+    -ms-animation: fadein 1s 1s 1 forwards;
 }
+
+#loading.done {
+    visibility: hidden;
+    opacity: 0;
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1.0;
+    }
+}
+
+@-moz-keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1.0;
+    }
+}
+
+@-webkit-keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1.0;
+    }
+}
+
+@-o-keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1.0;
+    }
+}
+
+@-ms-keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1.0;
+    }
+}
+
 
 #spin {
     display: inline-block;

@@ -760,20 +760,10 @@ function formChanged(event) {
     }
 }
 
-function reveal_spinner(next) {
-    window.setTimeout(function () {
-        var el = document.querySelector("#loading > div");
-        if (el) {
-            el.style.opacity = "1.0";
-        }
-    }, 1200);
-    next();
-}
-
 function remove_loading_overlay(next) {
     var el = document.querySelector("#loading");
     if (el) {
-        el.style.display = "none";
+        el.classList.add("done");
     }
     next();
 }
@@ -786,6 +776,5 @@ function startup_delay(next) {
 }
 
 /* These must be the last startup functions added */
-startup_functions.unshift(reveal_spinner);
 //startup_functions.push(startup_delay);  // Uncomment to test loading overlay
 startup_functions.push(remove_loading_overlay);
