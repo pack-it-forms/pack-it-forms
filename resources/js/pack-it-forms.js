@@ -512,6 +512,9 @@ function parse_form_data_text(text) {
         if (line.charAt(0) == "!" || line.charAt(0) == "#") {
             return;  // Ignore header and directives
         }
+        if (line.match(/^\s*$/)) {
+            return;  // Ignore empty lines
+        }
         var idx = 0;
         if (field_name == "") {
             idx = index_of_field_name_sep(linenum, line, idx);
