@@ -297,6 +297,11 @@ function process_html_includes(next) {
                 parent.insertBefore(to_add[0], include);
                 parent.children[child_index++].innerHTML += "";
             }
+            // Before invalidating the parent element, save the
+            // contents (which is the JSON object containing defaults
+            // for the fields in that block) to a variable for usage
+            // later.
+            var defaults = include.textContent;
             // For styles to be applied correctly in Firefox the
             // parent element has to be force-redisplayed as well.
             parent.innerHTML += "";
@@ -308,7 +313,6 @@ function process_html_includes(next) {
             // the <div> including the content.  This means that all
             // of the objects that need to be initialized are
             // accumulated and initialized at the end.
-            var defaults = include.textContent;
             process_html_includes(function() {
                 defaults ? init_form_from_fields(JSON.parse(defaults), 'name') : null;
                 next();
