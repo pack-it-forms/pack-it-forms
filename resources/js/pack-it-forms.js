@@ -348,7 +348,7 @@ var pacform_representation_funcs = {
         return element.value ? element.value : null;
     },
     "textarea": function(element) {
-        return element.value ? "\\n"+element.value : null;
+        return element.value ? escape_pacforms_string(element.value) : null;
     },
     "radio": function(element) {
         return element.checked ? element.value : null;
@@ -426,7 +426,7 @@ var init_from_msg_funcs = {
         return true;
     },
     "textarea": function(element, value) {
-        element.value = value.trim();
+        element.value = unescape_pacforms_string(value).trim();
         return true;
     },
     "radio": function(element, value) {
@@ -698,6 +698,38 @@ var ActiveXObject_responseType_funcs = {
     "document": function(result) {
         return new DOMParser().parseFromString(result, "text/html");
     }
+}
+
+function escape_pacforms_string(string) {
+    return element.value.replace(/\\/g, "\\\\").replace(/\n/g,"\\n");
+}
+
+var unescape_func = {
+    "\\": function () { return "\\"; },
+    "n": function () { return "\n"; }
+}
+
+/* This cannot be implemented as a string-replace function that
+   handles all cases, so it is implemented by iterating through the
+   given string and processing all of the escapes.  Each escape
+   character is looked up in a dictionary that contains functions that
+   return the correct character. */
+function unescape_pacforms_string(string) {
+    var processing_escape;
+    var result = "";
+    string.split('').forEach(function (element, index, array) {
+        if (processing_escape) {
+            if (unescape_func.hasOwnProperty(element)) {
+                result += unescape_func[element]();
+            }
+            processing_escape = false;
+        } else if (element == "\\") {
+            processing_escape = true;
+        } else {
+            result += element;
+        }
+    });
+    return result;
 }
 
 /* This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
