@@ -32,8 +32,8 @@ body {
     font-family: monospace;
     white-space: pre;
     border: 2px solid black;
-    overflow: hidden;
-    height: auto;
+    height: calc(50% - 4em);
+    overflow: auto;
     background-color: #eeeeee;
 }
 
