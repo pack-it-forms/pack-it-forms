@@ -52,3 +52,17 @@ form fieldset:invalid {
 #button-header.valid {
     background-color: #a8e8a8;
 }
+
+#button-header.readonly,#button-header.readonly.valid {
+    background-color: #a8a8e8;
+    height: 2.5em;
+}
+
+
+#the-form [readonly] {
+    background-color: #e7e7ed;
+}
+
+#the-form select[disabled] {
+    color: black;
+}

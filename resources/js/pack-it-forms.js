@@ -676,6 +676,29 @@ startup_functions.push(query_string_to_object);
 startup_functions.push(load_callprefix);
 startup_functions.push(init_form);
 
+/* Handle the readonly view mode
+
+This is indicated by a mode=readonly query parameter. */
+function setup_view_mode(next) {
+    var form = document.querySelector("#the-form")
+    if (query_object.mode && query_object.mode == "readonly") {
+        document.querySelector("#button-header").classList.add("readonly");
+        document.querySelector("#opdirect-submit").hidden = "true";
+        document.querySelector("#show-hide-data").hidden = "true";
+        array_for_each(form.elements, function (el) {
+            if (el.type.substr(0,6) == "select") {
+                el.disabled = "true";
+            } else {
+                el.readOnly = "true";
+            }
+        });
+    }
+    next();
+}
+
+// This must come after query_string_to_object in the startup functions
+startup_functions.push(setup_view_mode);
+
 
 
 /* Disable "other" controls when not in use
