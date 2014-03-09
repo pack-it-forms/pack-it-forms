@@ -582,6 +582,8 @@ function init_form(next) {
             }
         }
     }
+    var first_field = document.querySelector("#the-form :invalid");
+    first_field.focus()
     write_pacforms_representation();
     next();
 }
