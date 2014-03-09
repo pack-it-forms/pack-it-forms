@@ -10,6 +10,7 @@ body {
     padding-left: 3px;
     /* height: 3em;*/
     background-color: #aaaaaa;
+    border-bottom: 1px solid #888888;
     overflow: hidden;
 }
 
