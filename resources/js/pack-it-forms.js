@@ -600,13 +600,18 @@ function init_form(next) {
             }
         }
     }
-    var first_field = document.querySelector("#the-form :invalid");
-    first_field.focus()
     write_pacforms_representation();
     /* Check form validity in a timeout because we need to wait for
     Javascript to yield to allow the DOM to update the validity
     status. */
     window.setTimeout(function () {
+        var first_field = document.querySelector("#the-form :invalid");
+        console.log(first_field);
+        if (first_field) {
+            first_field.focus();
+        } else {
+            the_form[0].focus();
+        }
         check_the_form_validity();
     }, 10);
     next();
