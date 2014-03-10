@@ -294,7 +294,8 @@ function process_html_includes(next) {
     the replacement for the first node invalidates the second node. */
     var include = document.querySelector("[data-include-html]");
     if (include) {
-        var msg_url = "resources/html/"+include.dataset.includeHtml+".html";
+        var name = include.getAttribute("data-include-html");
+        var msg_url = "resources/html/"+name+".html";
         var msg_request = new XMLHttpRequest();
         open_async_request("GET", msg_url, "document", function (response) {
             var parent = include.parentNode;
