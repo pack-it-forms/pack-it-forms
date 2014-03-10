@@ -694,7 +694,7 @@ function setup_view_mode(next) {
         document.querySelector("#opdirect-submit").hidden = "true";
         document.querySelector("#show-hide-data").hidden = "true";
         array_for_each(form.elements, function (el) {
-            if (el.type.substr(0,6) == "select") {
+            if (el.type && el.type.substr(0,6) == "select") {
                 el.disabled = "true";
             } else {
                 el.readOnly = "true";
