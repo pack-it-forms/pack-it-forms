@@ -606,7 +606,6 @@ function init_form(next) {
     status. */
     window.setTimeout(function () {
         var first_field = document.querySelector("#the-form :invalid");
-        console.log(first_field);
         if (first_field) {
             first_field.focus();
         } else {
