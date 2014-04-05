@@ -25,7 +25,8 @@ respectful re-implementation with a number of advantages:
    sub-parts of forms as well.
 
 5. The full implementation is available to all for study and
-   enhancement
+   enhancement.
+
 
 Using Forms
 ===========
@@ -177,11 +178,11 @@ Forms for *pack-it-forms* are just normal HTML forms with some
 restrictions to allow the form to work smoothly with the Javscript
 code that implements pack-it-forms functionality.  The simplest way to
 get started creating a new form is to copy an existing form and
-replace the content `form` element with the id `the-form`.  With the
-exception of the title element in the document head, the rest of the
-HTML in the form outside this element is boilerplate required for the
-pack-it-forms Javascript and CSS to be able to display and process the
-forms correctly with the features described above.
+replace the content of the `form` element with the id `the-form`.
+With the exception of the title element in the document head, the rest
+of the HTML in the form outside this element is boilerplate required
+for the pack-it-forms Javascript and CSS to be able to display and
+process the forms correctly with the features described above.
 
 In general, it shouldn't be necessary to create new forms completely
 from scratch, but should you wish to try to do so, the _Explanation of
