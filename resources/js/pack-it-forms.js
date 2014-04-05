@@ -1,11 +1,14 @@
 /* Common code for handling PacFORMS forms */
 
-/* Cached query string parameters */
-var query_object;
-/* Cached call prefixes for expansion */
-var callprefixes;
+/* --- Commonly used global objects */
+var query_object;     // Cached query string parameters
+var callprefixes;     // Cached call prefixes for expansion
 
-/* Registry for functions to execute when the form is loaded. */
+/* --- Registration for code to run after page loads
+
+Registered startup functions are the initial entry points for
+execution after the page loads.  This is implements the mechanism, the
+calls registering startup functions are at the end of this file. */
 var startup_functions = new Array();
 
 function startup() {
@@ -25,46 +28,358 @@ function startup() {
 
 window.onload=startup;
 
-/* Simple padded number output string */
-function padded_int_str(num, cnt) {
-    var s = Math.floor(num).toString();
-    var pad = cnt - s.length
-    for (var i = 0; i < pad; i++) {
-        s = "0" + s;
+/* --- Initialize the form as required by query parameters */
+
+/* Initialize a form
+
+The form field values will either be set from the form data message
+contents found in one of these locations in order of preference:
+
+1. the textContent of the div with ID "form-data"
+2. a file at the location "msgs/<fragment-id>", where <fragment-id>
+   is the fragment identifier from the URL of the document.
+
+If no form data exists in any of these locations a new form will be
+filled with default contents.  The default data filling includes
+reading the Outpost query string parameters, which should allow for
+good Outpost integration. */
+function init_form(next) {
+    // Setup focus tracking within the form
+    var the_form = document.querySelector("#the-form");
+    last_active_form_element = document.activeElement;
+    the_form.addEventListener("focus", function (ev) {
+        last_active_form_element = ev.target;
+    }, true);
+    the_form.addEventListener("input", formChanged);
+
+    // Some fields always need to be initialized
+    init_empty_form();
+    var text = get_form_data_from_div();
+    if (text.trim().length != 0) {
+        init_form_from_msg_data(text);
+    } else {
+        msgno = query_object['msgno'];
+        if (msgno) {
+            msg_url = "msgs/" + msgno;
+            try {
+                open_async_request("GET", msg_url, "text", function (text) {
+                    if (text.trim().length > 0) {
+                        set_form_data_div(text);
+                        init_form_from_msg_data(text);
+                    }
+                });
+            } catch (e) {
+            }
+        }
     }
-    return s;
+    write_pacforms_representation();
+    /* Check form validity in a timeout because we need to wait for
+    Javascript to yield to allow the DOM to update the validity
+    status. */
+    window.setTimeout(function () {
+        var first_field = document.querySelector("#the-form :invalid");
+        if (first_field) {
+            first_field.focus();
+        } else {
+            the_form[0].focus();
+        }
+        check_the_form_validity();
+    }, 10);
+    next();
 }
 
-/* Make forEach() & friends easier to use on Array-like objects
+/* Cross-browser resource loading w/local file handling
 
-This is handy for iterating over NodeSets, etc. from the DOM which
-don't provide a forEach method.  In theory we could inject the forEach
-method into those object's prototypes but that can on occasion cause
-problems. */
-function array_for_each(array, func) {
-    return Array.prototype.forEach.call(array, func);
-}
-
-function array_some(array, funct) {
-    return Array.prototype.some.call(array, funct);
-}
-
-/* Execute a statement on each line of a string
-
-The supplied function will be called with two arguments, the line
-number of the line being processed and a string with the text of the
-line. */
-function for_each_line(str, func) {
-    var linenum = 1;
-    var last_idx = 0
-    var idx = str.indexOf("\n", last_idx);
-    while (idx >= 0) {
-        func(linenum++, str.substring(last_idx, idx));
-        last_idx = idx + 1;
-        idx = str.indexOf("\n", last_idx);
+This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
+Explorer and a regular XMLHttpRequest in other places because using
+the ActiveXObject in Internet Explorer allows a file loaded through a
+file:// uri to access other resources through a file:// uri. */
+function open_async_request(method, url, responseType, cb) {
+    var request;
+    if (window.ActiveXObject !== undefined) {
+        request = new ActiveXObject("Msxml2.XMLHTTP");
+        request.open(method, url, false);
+        request.onreadystatechange = function(e) {
+            if (request.readyState == 4) {
+                var text = request.responseText;
+                if (ActiveXObject_responseType_funcs.hasOwnProperty(responseType)) {
+                    cb(ActiveXObject_responseType_funcs[responseType](text));
+                } else {
+                    return null;
+                }
+            }
+        }
+        request.send();
+    } else {
+        request = new XMLHttpRequest();
+        request.open(method, url, true);
+        request.responseType = responseType;
+        // Opera won't load HTML documents unless the MIME type is
+        // set to text/xml
+        var overriden = false;
+        request.onreadystatechange = function callcb(e) {
+            if (e.target.readyState == e.target.DONE) {
+                if (e.target.response) {
+                    cb(e.target.response);
+                } else if (responseType == "document" && !overriden) {
+                    request = new XMLHttpRequest();
+                    request.open(method, url, true);
+                    request.responseType = responseType;
+                    request.overrideMimeType("text/xml");
+                    overriden = true;
+                    request.onreadystatechange = callcb;
+                    request.send();
+                }
+            }
+        };
+        request.send();
     }
-    if (last_idx < str.length) {
-        func(linenum, str.substring(last_idx));
+}
+
+/* Since Msxml2.XMLHTTP doesn't support proper response types, we use
+   these functions in Internet Explorer to convert text into the
+   correct types.  Currently, only text and document types are
+   supported. */
+var ActiveXObject_responseType_funcs = {
+    "text": function(result) {
+        return result;
+    },
+    "document": function(result) {
+        return new DOMParser().parseFromString(result, "text/html");
+    }
+}
+
+
+/* --- Read PacFORMS message data and insert in form */
+
+/* Parse form field data from packet message and initialize fields.
+
+This function sets up a form with the contents of an already existing
+form data message, which is passed in as text.  It is implemented as a
+wrapper around init_form_from_fields. */
+function init_form_from_msg_data(text) {
+    var fields = parse_form_data_text(text);
+    init_form_from_fields(fields, "name");
+}
+
+function parse_form_data_text(text) {
+    var fields = {};
+    var field_name = "";
+    var field_value = "";
+    for_each_line(text, function (linenum, line) {
+        if (line.charAt(0) == "!" || line.charAt(0) == "#") {
+            return;  // Ignore header and directives
+        }
+        if (line.match(/^\s*$/)) {
+            return;  // Ignore empty lines
+        }
+        var idx = 0;
+        if (field_name == "") {
+            idx = index_of_field_name_sep(linenum, line, idx);
+            field_name = line.substring(0, idx);
+            idx = index_of_field_value_start(linenum, line, idx) + 1;
+        }
+        end_idx = line.indexOf("]", idx);
+        if (end_idx == -1) {
+            // Field continues on next line
+            field_value += line.substring(idx)
+        } else {
+            // Field is complete on this line
+            field_value += line.substring(idx, end_idx);
+            fields[field_name] = field_value;
+            field_name = ""
+            field_value = ""
+        }
+    });
+    return fields;
+}
+
+function FormDataParseException(linenum, desc) {
+    this.name = "FormDataParseException";
+    this.linenum = linenum;
+    this.message = "Parse error on line " + linenum.toString() + ": " + desc;
+}
+
+function index_of_field_name_sep(linenum, line, startAt) {
+    var idx = line.indexOf(":", startAt)
+    if (idx == -1) {
+        throw new FormDataParseException(linenum, "no field name/value separator on line");
+    }
+    return idx;
+}
+
+function index_of_field_value_start(linenum, line, startAt) {
+    var idx = line.indexOf("[", startAt);
+    if (idx == -1) {
+        throw new FormDataParseException(linenum, "no field value open bracket");
+    }
+    return idx;
+}
+
+/* Initialize form from dictionary of settings
+
+This function sets up a form with the contents of a fields object; it
+determines which fields should be initialized by matching the
+beginning of attribute againt the name of each field. */
+function init_form_from_fields(fields, attribute) {
+    for (var field in fields) {
+        var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
+        array_some(elem, function (element) {
+            if (init_from_msg_funcs.hasOwnProperty(element.type)) {
+                return init_from_msg_funcs[element.type](element, fields[field]);
+            }
+        });
+    }
+}
+
+/* Functions to set form fields to values
+
+These functions are used when reading the values from a PacForms-type
+text back into the form.  In general, they might be called multiple
+times with the same value argument, as some things require setting
+multiple elements, like radiobuttons.  A return value of true means
+that the caller should stop processing; any other return means that
+the caller should continue. */
+var init_from_msg_funcs = {
+    "text": function(element, value) {
+        element.value = value;
+        return true;
+    },
+    "textarea": function(element, value) {
+        element.value = unescape_pacforms_string(value).trim();
+        return true;
+    },
+    "radio": function(element, value) {
+        if (element.value == value) {
+            element.checked = true;
+            return true;
+        } else {
+            element.checked = false;
+            return false;
+        }
+    },
+    "select-one": function (element, value) {
+        var member = false;
+        element.value = "Other";
+        array_for_each(element.options, function (option) {
+            if (option.text == value) {
+                element.value = value;
+                member = true;
+            }
+        });
+        /* If it is one of the standard options and has been set, then
+        there is no need for further processing.  However, if it is
+        not a standard option, that we must continue processing and
+        set it as the "other" field's value. */
+        return member;
+    },
+    "checkbox": function (element, value) {
+        /* PacForms will only send a checkbox if it is checked */
+        element.checked = true;
+        return true;
+    }
+}
+
+var unescape_func = {
+    "\\": function () { return "\\"; },
+    "n": function () { return "\n"; }
+}
+
+/* This cannot be implemented as a string-replace function that
+   handles all cases, so it is implemented by iterating through the
+   given string and processing all of the escapes.  Each escape
+   character is looked up in a dictionary that contains functions that
+   return the correct character. */
+function unescape_pacforms_string(string) {
+    var processing_escape;
+    var result = "";
+    string.split('').forEach(function (element, index, array) {
+        if (processing_escape) {
+            if (unescape_func.hasOwnProperty(element)) {
+                result += unescape_func[element]();
+            }
+            processing_escape = false;
+        } else if (element == "\\") {
+            processing_escape = true;
+        } else {
+            result += element;
+        }
+    });
+    return result;
+}
+
+
+/* --- Generate PacFORMS message data from form fields */
+
+/* Generate PacForms-compatible representation of the form data
+
+A PacForm-like description of the for mfield values is written into
+the textContent of the div with ID "form-data". */
+function write_pacforms_representation() {
+    var form = document.querySelector("#the-form");
+    var msg = expand_template(
+        document.querySelector("#message-header").textContent).trim()
+    init_text_fields("input.init-on-submit", "value");
+    array_for_each(form.elements, function(element, index, array) {
+        var result;
+        if (pacform_representation_funcs.hasOwnProperty(element.type)) {
+            result = bracket_data(
+                pacform_representation_funcs[element.type](element));
+        } else {
+            result = null;
+        }
+        if (result) {
+            numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(element.name);
+            var resultText;
+            if (numberMatch) {
+                resultText = numberMatch[1]+": "+result;
+            } else {
+                resultText = element.name+": "+result;
+            }
+            msg += "\r\n"+resultText;
+        }
+    });
+    msg += "\r\n#EOF\r\n";
+    set_form_data_div(msg);
+    /* The init-on-submit fields should be reset to their default
+    values so that they will be inited again next time the form is
+    submitted. */
+    var elem = document.querySelectorAll("input.init-on-submit");
+    array_for_each(elem, function(element, index, array) {
+        element.value = element.defaultValue;
+    });
+}
+
+var pacform_representation_funcs = {
+    "text": function(element) {
+        return element.value ? element.value : null;
+    },
+    "textarea": function(element) {
+        return element.value ? escape_pacforms_string(element.value) : null;
+    },
+    "radio": function(element) {
+        return element.checked ? element.value : null;
+    },
+    "select-one": function(element) {
+        return element.value != "Other" ? element.value : null;
+    },
+    "checkbox": function(element) {
+        return element.checked ? "checked" : null;
+    }
+}
+
+function escape_pacforms_string(string) {
+    return string.replace(/\\/g, "\\\\").replace(/\n/g,"\\n");
+}
+
+function bracket_data(data) {
+    if (data) {
+        data = data.trim();
+        data = data.replace("`]", "``]");
+        data = data.replace(/([^`])]/, "$1`]");
+        return "[" + data + "]";
+    } else {
+        return null
     }
 }
 
@@ -74,87 +389,14 @@ function field_value(field_name) {
     array_for_each(elem, function (element) {
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
             var rep = pacform_representation_funcs[element.type](element);
-            result += stringify_possible_null(rep);
+            result += emptystr_if_null(rep);
         }
     });
     return result;
 }
 
-var template_repl_func = {
-    "{" : function (arg) {
-        return "{";
-    },
 
-    "date" : function (arg) {
-        var now = new Date();
-        return (padded_int_str(now.getMonth()+1, 2) + "/"
-                + padded_int_str(now.getDate(), 2) + "/"
-                + padded_int_str(now.getFullYear(), 4));
-    },
-
-    "time" : function (arg) {
-        var now = new Date();
-        return (padded_int_str(now.getHours(), 2) + ":"
-                + padded_int_str(now.getMinutes(), 2) + ":"
-                + padded_int_str(now.getSeconds(), 2));
-    },
-
-    "msgno" : function (arg) {
-        return stringify_possible_null(query_object['msgno']);
-    },
-
-    "field" : field_value,
-
-    "query-string" : function(arg) {
-        return stringify_possible_null(query_object[arg]);
-    },
-
-    "div-id" : function(arg) {
-        return document.querySelector("#"+arg).textContent;
-    },
-
-    "filename" : function (arg) {
-        var i = document.location.pathname.lastIndexOf("/")+1;
-        return document.location.pathname.substring(i);
-    },
-
-    "title" : function (arg) {
-        return document.title;
-    }
-};
-
-var template_filter_func = {
-    "truncate" : function (arg, orig_value) {
-        return orig_value.substr(0, arg);
-    },
-
-    "split" : function (arg, orig_value) {
-        return orig_value.split(arg);
-    },
-
-    "re_search" : function (arg, orig_value) {
-        re = new RegExp(arg);
-        match = re.exec(orig_value);
-        if (match.length == 1) {
-            return match[0];
-        } else {
-            return match;
-        }
-    },
-
-    "nth" : function (arg, orig_value) {
-        return orig_value[arg];
-    },
-
-    "trim" : function (arg, orig_value) {
-        return orig_value.trim();
-    },
-
-    "msgno2name" : function(arg, orig_value) {
-        var name = callprefixes[orig_value.split('-')[0]];
-        return name ? name : "";
-    }
-};
+/* --- Template expansion */
 
 /* Expand template string by replacing placeholders
 
@@ -247,37 +489,95 @@ function split_with_escape(str, sep) {
     return a;
 }
 
-function string_ends_with(str, val) {
-    end = str.substring(str.length - val.length);
-    return end == val;
-}
+
+var template_repl_func = {
+    "{" : function (arg) {
+        return "{";
+    },
+
+    "date" : function (arg) {
+        var now = new Date();
+        return (padded_int_str(now.getMonth()+1, 2) + "/"
+                + padded_int_str(now.getDate(), 2) + "/"
+                + padded_int_str(now.getFullYear(), 4));
+    },
+
+    "time" : function (arg) {
+        var now = new Date();
+        return (padded_int_str(now.getHours(), 2) + ":"
+                + padded_int_str(now.getMinutes(), 2) + ":"
+                + padded_int_str(now.getSeconds(), 2));
+    },
+
+    "msgno" : function (arg) {
+        return emptystr_if_null(query_object['msgno']);
+    },
+
+    "field" : field_value,
+
+    "query-string" : function(arg) {
+        return emptystr_if_null(query_object[arg]);
+    },
+
+    "div-id" : function(arg) {
+        return document.querySelector("#"+arg).textContent;
+    },
+
+    "filename" : function (arg) {
+        var i = document.location.pathname.lastIndexOf("/")+1;
+        return document.location.pathname.substring(i);
+    },
+
+    "title" : function (arg) {
+        return document.title;
+    }
+};
+
+var template_filter_func = {
+    "truncate" : function (arg, orig_value) {
+        return orig_value.substr(0, arg);
+    },
+
+    "split" : function (arg, orig_value) {
+        return orig_value.split(arg);
+    },
+
+    "re_search" : function (arg, orig_value) {
+        re = new RegExp(arg);
+        match = re.exec(orig_value);
+        if (match.length == 1) {
+            return match[0];
+        } else {
+            return match;
+        }
+    },
+
+    "nth" : function (arg, orig_value) {
+        return orig_value[arg];
+    },
+
+    "trim" : function (arg, orig_value) {
+        return orig_value.trim();
+    },
+
+    "msgno2name" : function(arg, orig_value) {
+        var name = callprefixes[orig_value.split('-')[0]];
+        return name ? name : "";
+    }
+};
 
 function TemplateException(desc) {
     this.name = "TemplateException";
     this.message = desc;
 }
 
-/* Check whether the form is valid */
-function check_the_form_validity() {
-    var button_header = document.querySelector("#button-header");
-    var submit_button = document.querySelector("#opdirect-submit");
-    var valid = document.querySelector("#the-form").checkValidity();
-    if (valid) {
-        button_header.classList.add("valid");
-        submit_button.disabled = false;
-    } else {
-        button_header.classList.remove("valid");
-        submit_button.disabled = true;
-    }
-    return valid
-}
+/* Initialize text fields to default values through template expansion
 
-/* This function initializes a set of text fields to their default
-   values.  The selection of text fields to use is determined by the
-   "selector" argument, which is a selector suitable to be passed to
-   document.querySelectorAll.  This does not have to be used on input
-   elements; attribute determines what attribute will be read and
-   expanded. */
+The selection of text fields to use is determined by the "selector"
+argument, which is a selector suitable to be passed to
+document.querySelectorAll.  This does not have to be used on input
+elements; attribute determines what attribute will be read and
+expanded. */
 function init_text_fields(selector, attribute) {
     var fields = document.querySelectorAll(selector);
     array_for_each(fields, function (field) {
@@ -285,9 +585,21 @@ function init_text_fields(selector, attribute) {
     });
 }
 
-/* This function process all of the HTML elements with
-   "data-include-html" attributes to include the html files that they
-   are pointing at. */
+
+/* --- Document fragment inclusion */
+
+/* Insert HTML include content in document
+
+This function process all of the HTML elements with an attribute named
+"data-include-html".  Each of these elements is replaced with the
+contents of outermost div in the the file:
+
+     resources/html/<attribute value>.html
+
+If the replaced element contained body text that is a valid JSON
+object any fields in the included HTML that match the property names
+in the JSON objects will have their default values set to the
+corresponding property value. */
 function process_html_includes(next) {
     /* This has to find and do a node, then find the next one, then do
     it, etc. because if two nodes are under one parent then inserting
@@ -340,281 +652,75 @@ function process_html_includes(next) {
     }
 }
 
-startup_functions.push(process_html_includes);
 
-/* Initialize an empty form
+/* --- Configuration data loading */
 
-This function sets up a new empty form. */
-function init_empty_form() {
-    init_text_fields(".templated", "textContent");
-    init_text_fields("input:not(.init-on-submit)", "value");
+/* Load the msgno prefix JSON file into a global variable
+
+This is run at startup, and loads the msgno prefix expansion JSON into
+a variable which can then by used by the msgno2name template filter to
+determine the location that a msgno prefix originates from. */
+function load_callprefix(next) {
+    open_async_request("GET", "cfgs/msgno-prefixes.json", "text", function (data) {
+        callprefixes = JSON.parse(data);
+        next();
+    });
 }
 
-function get_form_data_from_div() {
-    return document.querySelector("#form-data").value;
+
+/* --- Form related utility functions */
+
+/* Clear the form to original contents */
+function clear_form() {
+    document.querySelector("#the-form").reset();
+    set_form_data_div("");
 }
 
-function set_form_data_div(text) {
-    form_data = document.querySelector("#form-data")
-    form_data.value = text;
-}
-
-var pacform_representation_funcs = {
-    "text": function(element) {
-        return element.value ? element.value : null;
-    },
-    "textarea": function(element) {
-        return element.value ? escape_pacforms_string(element.value) : null;
-    },
-    "radio": function(element) {
-        return element.checked ? element.value : null;
-    },
-    "select-one": function(element) {
-        return element.value != "Other" ? element.value : null;
-    },
-    "checkbox": function(element) {
-        return element.checked ? "checked" : null;
-    }
-}
-
-function bracket_data(data) {
-    if (data) {
-        data = data.trim();
-        data = data.replace("`]", "``]");
-        data = data.replace(/([^`])]/, "$1`]");
-        return "[" + data + "]";
+/* Check whether the form is valid */
+function check_the_form_validity() {
+    var button_header = document.querySelector("#button-header");
+    var submit_button = document.querySelector("#opdirect-submit");
+    var valid = document.querySelector("#the-form").checkValidity();
+    if (valid) {
+        button_header.classList.add("valid");
+        submit_button.disabled = false;
     } else {
-        return null
+        button_header.classList.remove("valid");
+        submit_button.disabled = true;
     }
+    return valid
 }
 
-/* Generate PacForms-compatible representation of the form data
-
-A PacForm-like description of the for mfield values is written into
-the textContent of the div with ID "form-data". */
-
-function write_pacforms_representation() {
-    var form = document.querySelector("#the-form");
-    var msg = expand_template(
-        document.querySelector("#message-header").textContent).trim()
-    init_text_fields("input.init-on-submit", "value");
-    array_for_each(form.elements, function(element, index, array) {
-        var result;
-        if (pacform_representation_funcs.hasOwnProperty(element.type)) {
-            result = bracket_data(
-                pacform_representation_funcs[element.type](element));
-        } else {
-            result = null;
-        }
-        if (result) {
-            numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(element.name);
-            var resultText;
-            if (numberMatch) {
-                resultText = numberMatch[1]+": "+result;
-            } else {
-                resultText = element.name+": "+result;
-            }
-            msg += "\r\n"+resultText;
-        }
-    });
-    msg += "\r\n#EOF\r\n";
-    set_form_data_div(msg);
-    /* The init-on-submit fields should be reset to their default
-    values so that they will be inited again next time the form is
-    submitted. */
-    var elem = document.querySelectorAll("input.init-on-submit");
-    array_for_each(elem, function(element, index, array) {
-        element.value = element.defaultValue;
-    });
-}
-
-/* Functions to set form fields to values
-
-These functions are used when reading the values from a PacForms-type
-text back into the form.  In general, they might be called multiple
-times with the same value argument, as some things require setting
-multiple elements, like radiobuttons.  A return value of true means
-that the caller should stop processing; any other return means that
-the caller should continue. */
-var init_from_msg_funcs = {
-    "text": function(element, value) {
-        element.value = value;
-        return true;
-    },
-    "textarea": function(element, value) {
-        element.value = unescape_pacforms_string(value).trim();
-        return true;
-    },
-    "radio": function(element, value) {
-        if (element.value == value) {
-            element.checked = true;
-            return true;
-        } else {
-            element.checked = false;
-            return false;
-        }
-    },
-    "select-one": function (element, value) {
-        var member = false;
-        element.value = "Other";
-        array_for_each(element.options, function (option) {
-            if (option.text == value) {
-                element.value = value;
-                member = true;
-            }
-        });
-        /* If it is one of the standard options and has been set, then
-        there is no need for further processing.  However, if it is
-        not a standard option, that we must continue processing and
-        set it as the "other" field's value. */
-        return member;
-    },
-    "checkbox": function (element, value) {
-        /* PacForms will only send a checkbox if it is checked */
-        element.checked = true;
-        return true;
-    }
-}
-
-
-/* Initialize form from dictionary of settings
-
-This function sets up a form with the contents of a fields object; it
-determines which fields should be initialized by matching the
-beginning of attribute againt the name of each field. */
-function init_form_from_fields(fields, attribute) {
-    for (var field in fields) {
-        var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
-        array_some(elem, function (element) {
-            if (init_from_msg_funcs.hasOwnProperty(element.type)) {
-                return init_from_msg_funcs[element.type](element, fields[field]);
-            }
-        });
-    }
-}
-
-/* Parse form field data from packet message
-and initialize fields.
-
-This function sets up a form with the contents of an already existing
-form data message, which is passed in as text.  It is implemented as a
-wrapper around init_form_from_fields. */
-function init_form_from_msg_data(text) {
-    var fields = parse_form_data_text(text);
-    init_form_from_fields(fields, "name");
-}
-
-
-function parse_form_data_text(text) {
-    var fields = {};
-    var field_name = "";
-    var field_value = "";
-    for_each_line(text, function (linenum, line) {
-        if (line.charAt(0) == "!" || line.charAt(0) == "#") {
-            return;  // Ignore header and directives
-        }
-        if (line.match(/^\s*$/)) {
-            return;  // Ignore empty lines
-        }
-        var idx = 0;
-        if (field_name == "") {
-            idx = index_of_field_name_sep(linenum, line, idx);
-            field_name = line.substring(0, idx);
-            idx = index_of_field_value_start(linenum, line, idx) + 1;
-        }
-        end_idx = line.indexOf("]", idx);
-        if (end_idx == -1) {
-            // Field continues on next line
-            field_value += line.substring(idx)
-        } else {
-            // Field is complete on this line
-            field_value += line.substring(idx, end_idx);
-            fields[field_name] = field_value;
-            field_name = ""
-            field_value = ""
-        }
-    });
-    return fields;
-}
-
-function FormDataParseException(linenum, desc) {
-    this.name = "FormDataParseException";
-    this.linenum = linenum;
-    this.message = "Parse error on line " + linenum.toString() + ": " + desc;
-}
-
-function index_of_field_name_sep(linenum, line, startAt) {
-    var idx = line.indexOf(":", startAt)
-    if (idx == -1) {
-        throw new FormDataParseException(linenum, "no field name/value separator on line");
-    }
-    return idx;
-}
-
-function index_of_field_value_start(linenum, line, startAt) {
-    var idx = line.indexOf("[", startAt);
-    if (idx == -1) {
-        throw new FormDataParseException(linenum, "no field value open bracket");
-    }
-    return idx;
-}
-
-/* Initialize a form
-
-The form field values will either be set from the form data message
-contents found in one of these locations in order of preference:
-
-1. the textContent of the div with ID "form-data"
-2. a file at the location "msgs/<fragment-id>", where <fragment-id>
-   is the fragment identifier from the URL of the document.
-
-If no form data exists in any of these locations a new form will be
-filled with default contents.  The default data filling includes
-reading the Outpost query string parameters, which should allow for
-good Outpost integration. */
-function init_form(next) {
-    // Setup focus tracking within the form
-    var the_form = document.querySelector("#the-form");
-    last_active_form_element = document.activeElement;
-    the_form.addEventListener("focus", function (ev) {
-        last_active_form_element = ev.target;
-    }, true);
-    the_form.addEventListener("input", formChanged);
-
-    // Some fields always need to be initialized
-    init_empty_form();
-    var text = get_form_data_from_div();
-    if (text.trim().length != 0) {
-        init_form_from_msg_data(text);
-    } else {
-        msgno = query_object['msgno'];
-        if (msgno) {
-            msg_url = "msgs/" + msgno;
-            try {
-                open_async_request("GET", msg_url, "text", function (text) {
-                    if (text.trim().length > 0) {
-                        set_form_data_div(text);
-                        init_form_from_msg_data(text);
-                    }
-                });
-            } catch (e) {
-            }
-        }
-    }
+/* Callback invoked when the form changes */
+function formChanged(event) {
     write_pacforms_representation();
-    /* Check form validity in a timeout because we need to wait for
-    Javascript to yield to allow the DOM to update the validity
-    status. */
-    window.setTimeout(function () {
-        var first_field = document.querySelector("#the-form :invalid");
-        if (first_field) {
-            first_field.focus();
-        } else {
-            the_form[0].focus();
-        }
-        check_the_form_validity();
-    }, 10);
-    next();
+    check_the_form_validity();
+}
+
+/* Function invoked when form is submitted */
+function opdirect_submit(e) {
+    write_pacforms_representation();
+    hide_form_data();
+    if (check_the_form_validity()) {
+        e.preventDefault();
+        document.querySelector("#form-data-form").submit();
+        return false;
+    }
+}
+
+/* Disable "other" controls when not in use
+
+This is a callback function to be used in the onChange handler of a
+combobox; it will enable the relevant -other field if and only if the
+combobox is set to "Other". */
+function combobox_other_manager(e) {
+    var other = document.querySelector("[name=\""+e.name+"-other\"]");
+    if (e.value == "Other") {
+        other.disabled = false;
+    } else {
+        other.disabled = true;
+        other.value = "";
+    }
 }
 
 /* Handle form data message visibility */
@@ -646,44 +752,6 @@ function toggle_form_data_visibility() {
     }
 }
 
-/* Clear the form to original contents */
-function clear_form() {
-    document.querySelector("#the-form").reset();
-    set_form_data_div("");
-}
-
-/* Utility: generate an object from the query string.  This should be
-   called as an init function; it will store the result in the global
-   variable query_object */
-function query_string_to_object(next) {
-    var query = {};
-    string = window.location.search.substring(1);
-    list = string ? string.split("&") : [];
-    list.forEach(function(element, index, array) {
-        list = element.split("=");
-        query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
-    });
-    query_object = query;
-    next();
-}
-
-
-/* Load the msgno prefix JSON file into a global variable
-
-   This is run at startup, and loads the msgno prefix expansion JSON
-   into a variable which can then by used by the msgno2name
-   template filter to determine the location that a msgno prefix
-   originates from. */
-function load_callprefix(next) {
-    open_async_request("GET", "cfgs/msgno-prefixes.json", "text", function (data) {
-        callprefixes = JSON.parse(data);
-        next();
-    });
-}
-startup_functions.push(query_string_to_object);
-startup_functions.push(load_callprefix);
-startup_functions.push(init_form);
-
 /* Handle the readonly view mode
 
 This is indicated by a mode=readonly query parameter. */
@@ -704,135 +772,91 @@ function setup_view_mode(next) {
     next();
 }
 
-// This must come after query_string_to_object in the startup functions
-startup_functions.push(setup_view_mode);
 
+/* --- Misc. utility functions */
 
+/* Initialize an empty form */
+function init_empty_form() {
+    init_text_fields(".templated", "textContent");
+    init_text_fields("input:not(.init-on-submit)", "value");
+}
 
-/* Disable "other" controls when not in use
+function get_form_data_from_div() {
+    return document.querySelector("#form-data").value;
+}
 
-This is a callback function to be used in the onChange handler of a
-combobox; it will enable the relevant -other field if and only if the
-combobox is set to "Other". */
-function combobox_other_manager(e) {
-    var other = document.querySelector("[name=\""+e.name+"-other\"]");
-    if (e.value == "Other") {
-        other.disabled = false;
-    } else {
-        other.disabled = true;
-        other.value = "";
+function set_form_data_div(text) {
+    form_data = document.querySelector("#form-data")
+    form_data.value = text;
+}
+
+/* Test whether the end of one string matches another */
+function string_ends_with(str, val) {
+    end = str.substring(str.length - val.length);
+    return end == val;
+}
+
+/* Simple padded number output string */
+function padded_int_str(num, cnt) {
+    var s = Math.floor(num).toString();
+    var pad = cnt - s.length
+    for (var i = 0; i < pad; i++) {
+        s = "0" + s;
+    }
+    return s;
+}
+
+/* Make forEach() & friends easier to use on Array-like objects
+
+This is handy for iterating over NodeSets, etc. from the DOM which
+don't provide a forEach method.  In theory we could inject the forEach
+method into those object's prototypes but that can on occasion cause
+problems. */
+function array_for_each(array, func) {
+    return Array.prototype.forEach.call(array, func);
+}
+
+function array_some(array, funct) {
+    return Array.prototype.some.call(array, funct);
+}
+
+/* Execute a statement on each line of a string
+
+The supplied function will be called with two arguments, the line
+number of the line being processed and a string with the text of the
+line. */
+function for_each_line(str, func) {
+    var linenum = 1;
+    var last_idx = 0
+    var idx = str.indexOf("\n", last_idx);
+    while (idx >= 0) {
+        func(linenum++, str.substring(last_idx, idx));
+        last_idx = idx + 1;
+        idx = str.indexOf("\n", last_idx);
+    }
+    if (last_idx < str.length) {
+        func(linenum, str.substring(last_idx));
     }
 }
 
-function opdirect_submit(e) {
-    write_pacforms_representation();
-    hide_form_data();
-    if (check_the_form_validity()) {
-        e.preventDefault();
-        document.querySelector("#form-data-form").submit();
-        return false;
-    }
-}
-
-function stringify_possible_null(argument) {
+function emptystr_if_null(argument) {
     return argument ? argument : "";
 }
 
+/* Generate an object from the query string.
 
-/* Since Msxml2.XMLHTTP doesn't support proper response types, we use
-   these functions in Internet Explorer to convert text into the
-   correct types.  Currently, only text and document types are
-   supported. */
-var ActiveXObject_responseType_funcs = {
-    "text": function(result) {
-        return result;
-    },
-    "document": function(result) {
-        return new DOMParser().parseFromString(result, "text/html");
-    }
-}
-
-function escape_pacforms_string(string) {
-    return string.replace(/\\/g, "\\\\").replace(/\n/g,"\\n");
-}
-
-var unescape_func = {
-    "\\": function () { return "\\"; },
-    "n": function () { return "\n"; }
-}
-
-/* This cannot be implemented as a string-replace function that
-   handles all cases, so it is implemented by iterating through the
-   given string and processing all of the escapes.  Each escape
-   character is looked up in a dictionary that contains functions that
-   return the correct character. */
-function unescape_pacforms_string(string) {
-    var processing_escape;
-    var result = "";
-    string.split('').forEach(function (element, index, array) {
-        if (processing_escape) {
-            if (unescape_func.hasOwnProperty(element)) {
-                result += unescape_func[element]();
-            }
-            processing_escape = false;
-        } else if (element == "\\") {
-            processing_escape = true;
-        } else {
-            result += element;
-        }
+This should be called as an init function; it will store the result in
+the global variable query_object */
+function query_string_to_object(next) {
+    var query = {};
+    string = window.location.search.substring(1);
+    list = string ? string.split("&") : [];
+    list.forEach(function(element, index, array) {
+        list = element.split("=");
+        query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
     });
-    return result;
-}
-
-/* This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
-   Explorer and a regular XMLHttpRequest in other places because using
-   the ActiveXObject in Internet Explorer allows a file loaded through
-   a file:// uri to access other resources through a file:// uri. */
-function open_async_request(method, url, responseType, cb) {
-    var request;
-    if (window.ActiveXObject !== undefined) {
-        request = new ActiveXObject("Msxml2.XMLHTTP");
-        request.open(method, url, false);
-        request.onreadystatechange = function(e) {
-            if (request.readyState == 4) {
-                var text = request.responseText;
-                if (ActiveXObject_responseType_funcs.hasOwnProperty(responseType)) {
-                    cb(ActiveXObject_responseType_funcs[responseType](text));
-                } else {
-                    return null;
-                }
-            }
-        }
-        request.send();
-    } else {
-        request = new XMLHttpRequest();
-        request.open(method, url, true);
-        request.responseType = responseType;
-        // Opera won't load HTML documents unless the MIME type is
-        // set to text/xml
-        var overriden = false;
-        request.onreadystatechange = function callcb(e) {
-            if (e.target.readyState == e.target.DONE) {
-                if (e.target.response) {
-                    cb(e.target.response);
-                } else if (responseType == "document" && !overriden) {
-                    request = new XMLHttpRequest();
-                    request.open(method, url, true);
-                    request.responseType = responseType;
-                    request.overrideMimeType("text/xml");
-                    overriden = true;
-                    request.onreadystatechange = callcb;
-                    request.send();
-                }
-            }
-        };
-        request.send();
-    }
-}
-
-function formChanged(event) {
-    write_pacforms_representation();
-    check_the_form_validity();
+    query_object = query;
+    next();
 }
 
 function remove_loading_overlay(next) {
@@ -850,6 +874,15 @@ function startup_delay(next) {
     }, 10000);
 }
 
-/* These must be the last startup functions added */
+
+/* --- Registration of startup functions that run on page load */
+
+startup_functions.push(process_html_includes);
+startup_functions.push(query_string_to_object);
+startup_functions.push(load_callprefix);
+startup_functions.push(init_form);
+// This must come after query_string_to_object in the startup functions
+startup_functions.push(setup_view_mode);
+// These must be the last startup functions added
 //startup_functions.push(startup_delay);  // Uncomment to test loading overlay
 startup_functions.push(remove_loading_overlay);
