@@ -230,3 +230,67 @@ describes the boilerplate in the standard forms and how it interacts
 with the pack-it-forms Javascript and CSS.  With this information you
 can make choices about how much of this functionality you'd like to
 support in your form.
+
+To do this we'll walk through the ICS213 form file and comment on each
+section.
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+Standard HTML5 document start specifying a UTF-8 encoding.
+
+        <link rel="stylesheet" type="text/css" href="resources/css/loading.css"/>
+
+CSS that works with the div element with id "loading" that will be
+encountered shortly, to hide the rest of the form as all the form
+structure and contents are loaded.
+
+        <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
+
+CSS file that contains styles for the form interaction elements and
+that are likely to be useful in more than one form.  This is highly
+recommended.
+
+        <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+
+Javascript file that contains the Javascript code to implement the
+form behavior.  This is required to have a functioning form.
+
+        <title>ICS213: Message Form</title>
+      </head>
+
+      <body>
+
+Completion of the normal HTML5 head section and start of the body
+section.  An appropriate title should be specified for each form.
+
+        <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
+
+Nested markup required to enable the animated loading progress bar
+without requiring any external graphics.
+
+        <form id="the-form" name="the-form">
+           ...
+        </form>
+
+The actual from itself replaces the ellipses here.  The Javascript
+requires that the id of the form have the value "the-form".
+
+        <div data-include-html="outpost_message_header"></div>
+
+An include reference that is replaced with data used to format the
+outpost message header.  This is required for the Javascript to work
+properly.  It should come after the form.
+
+        <div data-include-html="submit-buttons"></div>
+
+An include reference that is replaced with the submit buttons and
+related markup.  This is required for the Javascript to work
+correctly.  It should come after the form.
+
+      </body>
+    </html>
+
+Standard HTML5 body and document close.
