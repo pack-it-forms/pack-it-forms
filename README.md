@@ -265,8 +265,87 @@ template, which will be expanded (see the next section).
 Setup Default and On-submit Behavior on Fields
 ----------------------------------------------
 
-TODO: describe default and on-submit behaviors using templates and
-appropriate classes on elements.
+Default field values can be specified using the normal HTML form
+mechanisms.  For text fields, however, there a template system
+provides additional flexibility in establishing the defaults.
+
+Template expansion will be performed on the `value` attribute of all
+input elements with a `type` attribute value of "text" when the
+document is loaded.  This will establish default values for form
+fields that the user can later edit.
+
+The one exception to the expansion when the document is loaded is
+those elements with the class `init-on-submit`.  These are intended to
+be automatically filled out at the time the form is submitted.  When
+the form is initially displayed the template value will be shown in
+the field to provide an indication that something will be filled in
+later.  Since these fields aren't usually intended to be edited by the
+user they usually have their `disabled` attribute set to "true".
+
+Regular text in templates is copied from the template to the resulting
+string.  The difference comes when placeholder values that are
+surrounded by double curly braces are encountered.  To give an
+example, on January 1st, 2020, the template:
+
+        The date is: {{date}}.
+
+will result in the output text:
+
+        The date is 01/20/2020.
+
+This is the simplest possible template value, with just the name of
+the template to use.  Some template types require additional
+information, in which case it can be supplied after the template name,
+separated by a colon.  For example, if the query string of the
+document contains a `msgno` parameter with the value `ABC001`, then:
+
+        The msgno is {{query-string:msgno}}.
+
+will result in the output text:
+
+        The msgno is ABC001.
+
+Finally, the output of template expansion can be further modified by
+filters.  Filters are separated from the template type by a vertical
+bar character.  Filters can also take an argument separated by a
+colon.  Assuming again that the date is January 1st, 2020, an example
+of a filter is:
+
+        The month is: {{date|truncate:2}}
+
+will result in the output text:
+
+        The month is: 01
+
+because "01" is the first two characters of the date string that would
+be substituted without the filter.  Multiple filters can be chained
+together one after another, each separated by a vertical bar.
+
+The following template types are available:
+
+| Name         | Argument   | Description                                     |
+|--------------|------------|-------------------------------------------------|
+| date         | none       | Current date string in "mm/dd/yyyy" format      |
+| time         | none       | Current local time string in hh:mm:ss format    |
+| msgno        | none       | Message number for this message as a string     |
+| field        | field name | Value of a field in the form                    |
+| query-string | key        | Value of query string parameter with name 'key' |
+| div-id       | id value   | Text content of the named `div` element         |
+| filename     | none       | Filename of the form (final name in URI path)   |
+| title        | none       | Title of the HTML document                      |
+| {            | none       | Insert a single '{' character                   |
+
+The following filters are available:
+
+| Name       | Argument  | Description                                        |
+|------------|-----------|----------------------------------------------------|
+| truncate   | length    | Truncate string to max of `length` characters      |
+| split      | fld delim | Split into list by `fld delim` string              |
+| re_search  | regexp    | Match regexp match, returning text or capture list |
+| nth        | index     | Return the nth list item or character              |
+| trim       | none      | Remove whitespace at start and end of string       |
+| msgno2name | msgno     | Expand message number to station                   |
+
 
 You might also want to add some amount of validation to your custom
 form fields.  *pack-it-forms* uses normal HTML5 form validation for
