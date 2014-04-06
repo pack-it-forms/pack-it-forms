@@ -67,7 +67,7 @@ function init_form(next) {
                         set_form_data_div(text);
                         init_form_from_msg_data(text);
                     }
-                });
+                }, function () {});
             } catch (e) {
             }
         }
@@ -94,7 +94,7 @@ This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
 Explorer and a regular XMLHttpRequest in other places because using
 the ActiveXObject in Internet Explorer allows a file loaded through a
 file:// uri to access other resources through a file:// uri. */
-function open_async_request(method, url, responseType, cb) {
+function open_async_request(method, url, responseType, cb, err) {
     var request;
     if (window.ActiveXObject !== undefined) {
         request = new ActiveXObject("Msxml2.XMLHTTP");
@@ -129,6 +129,8 @@ function open_async_request(method, url, responseType, cb) {
                     overriden = true;
                     request.onreadystatechange = callcb;
                     request.send();
+                } else {
+                    err();
                 }
             }
         };
@@ -645,6 +647,9 @@ function process_html_includes(next) {
                 defaults ? init_form_from_fields(JSON.parse(defaults), 'name') : null;
                 next();
             });
+        }, function () {
+            include.parentNode.removeChild(include);
+            process_html_includes(next);
         });
     } else {
         // If all includes have been processed, then continue;
@@ -661,10 +666,19 @@ This is run at startup, and loads the msgno prefix expansion JSON into
 a variable which can then by used by the msgno2name template filter to
 determine the location that a msgno prefix originates from. */
 function load_callprefix(next) {
-    open_async_request("GET", "cfgs/msgno-prefixes.json", "text", function (data) {
-        callprefixes = JSON.parse(data);
+    try {
+        open_async_request("GET", "cfgs/msgno-prefixes.json", "text", function (data) {
+            if (data) {
+                callprefixes = JSON.parse(data);
+            } else {
+                callprefixes = {};
+            }
+            next();
+        }, function () { callprefixes = {}; next(); });
+    } catch (e) {
+        callprefixes = {};
         next();
-    });
+    }
 }
 
 
