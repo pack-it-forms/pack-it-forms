@@ -202,13 +202,63 @@ The next sections cover each of these in detail.
 Change the Title Element in the Document Head
 ---------------------------------------------
 
-TODO: describe changing the title element.
+You should change the value of the `title` element to be the name of
+your new form; this will automatically be used both for the page title
+and for the form name header in the upper left hand side of the form.
 
 Add Input Elements to the Form
 ------------------------------
 
-TODO: describe adding input elements. Mention ability to include files
-in the resources/html directory.
+To add fields to your form, you just need to add standard html `input`
+and `textarea` elements --- just like any other HTML form.  However,
+the input elements must contain a `name` attribute formatted like
+this:
+
+   * If the element maps to a number in the form that you are trying
+     to replicate, like `10`, then the value should be that number
+     followed by a period followed by a short description.  Example:
+     `10.subject`.  This means that the number will be used as the
+     reference to the information in the PacFORMS output
+   * Otherwise, just use a short, descriptive name like `Method`.
+     Since the field name won't start with a number, this means that
+     the whole text of the field name will be used as the reference in
+     the PacFORMS output.
+
+While you can use different methods for adding descriptions to
+inputs, here are a few ways that generally work well with the default CSS:
+
+   * If the control is a single control, it is a good idea to wrap it
+     in a `label` element, with the text for the description
+     preceding the actual `input` element.
+   * If you are using something like a set of radio buttons that
+     need to be grouped together, use the same scheme for each element
+     but wrap them in a `fieldset` element with a `legend` element
+     including the description for the entire set.
+   * If the field is for a certain number of the form, putting a
+     `<span class="field-number">` that contains the number inside the
+     label will make a small superscript number appear in the label at
+     its position, similar to the way that field numbers are conveyed
+     in the paper version of an ICS form.
+
+If your form fits the ICS standards, you will need a large number of
+fields that contain information about the way that the form was
+transmitted and who it is going to/who it is from.  *pack-it-forms*
+makes this easy to do: it is possible to include fragments of HTML
+from files in the resources/html directory.  If you create a `div`
+element that has a `data-include-html` attribute in it, the element
+will be replaced with the contents of the first `div` element in the
+file resources/html/<attribute value>.html where <attribute value>
+signifies the value of the `data-include-html` attribute.
+
+One thing that you may want to do with included HTML files is set the
+default values of included elements.  You can do that by putting a
+JSON object that maps form field names to default values for those
+fields inside the <div> that will be replaced with the included
+content.  The values are in the same format as the PacFORMS field
+values:  a checkbox should have a value of CHECKED if it should be
+checked, and a collection of radiobuttons should have a value that
+matches one of the `name` attributes.  Text fields can be set to a
+template, which will be expanded (see the next section).
 
 Setup Default and On-submit Behavior on Fields
 ----------------------------------------------
@@ -219,8 +269,11 @@ appropriate classes on elements.
 Adjust Layout and Styling
 -------------------------
 
-TODO: describe adjusting layout and style.
-
+Forms written using the above guidelines should be styled to look like
+paper forms, and to have a fairly responsive layout that will work
+with a large variety of screen sizes.  However, if your form requires
+some specific styling, create the file resources/css/<form name>.css
+and put any form-specific styling in it.
 
 Explanation of the Form Boilerplate
 -----------------------------------
