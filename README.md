@@ -266,6 +266,19 @@ Setup Default and On-submit Behavior on Fields
 TODO: describe default and on-submit behaviors using templates and
 appropriate classes on elements.
 
+You might also want to add some amount of validation to your custom
+form fields.  *pack-it-forms* uses normal HTML5 form validation for
+validating fields:  the default CSS provides a visual indication of
+which fields are invalid, and the top bar changes color depending on
+whether or not the form is fully valid.  Here are a few tips to get
+you started with HTML5 form validation of this type:
+
+   * If you have a field that must have some input in it, add the
+     attribute `required="true"`
+   * If the contents of the field has to be in a certain format, add a
+     `pattern` attribute: the value should be a regular expression
+     that will match values of the desired format.
+
 Adjust Layout and Styling
 -------------------------
 
