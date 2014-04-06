@@ -2,6 +2,8 @@
 
 /* Cached query string parameters */
 var query_object;
+/* Cached call prefixes for expansion */
+var callprefixes;
 
 /* Registry for functions to execute when the form is loaded. */
 var startup_functions = new Array();
@@ -146,6 +148,10 @@ var template_filter_func = {
 
     "trim" : function (arg, orig_value) {
         return orig_value.trim();
+    },
+
+    "msgno2name" : function(arg, orig_value) {
+        return callprefixes[orig_value.split('-')[0]];
     }
 };
 
@@ -608,8 +614,26 @@ function query_string_to_object(next) {
     query_object = query;
     next();
 }
+
+
+/* Load the msgno prefix JSON file into a global variable
+
+   This is run at startup, and loads the msgno prefix expansion JSON
+   into a variable which can then by used by the msgno2name
+   template filter to determine the location that a msgno prefix
+   originates from. */
+function load_callprefix(next) {
+    open_async_request("GET", "cfgs/msgno-prefixes.json", "text", function (data) {
+        console.log(data)
+        callprefixes = JSON.parse(data);
+        next();
+    });
+}
 startup_functions.push(query_string_to_object);
+startup_functions.push(load_callprefix);
 startup_functions.push(init_form);
+
+
 
 /* Disable "other" controls when not in use
 
