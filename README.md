@@ -39,59 +39,54 @@ downloaded archive in an appropriate directory.
 
 If you'll be using pack-it-forms with OutPost a few more installation
 steps are required.  For now, this is a somewhat complex and manual
-installation until proper integration with OutPost can PacFORMS can be
-worked out.
+installation until proper integration with OutPost and PacFORMS can be
+worked out.  Once it is complete you can create and view both PacFORMs
+and pack-it-forms based forms.
 
-*NOTE: after making these changes normal PacFORMS processing will not
-work.* The pack-it-forms `XSC ICS-213 Message Form` should be
-interoperable with PacFORMS running on other systems, although this
-has not yet been fully verified.  However, only the generic ICS-213
-message and city-scan forms are supported in the current version of
-pack-it-forms.  None of the other PacFORMS forms will work correctly
-after following this procedure.
+To allow Outpost to open messages formatted by pack-it-forms, we make
+a copy of the PacFORMS pac-read.exe program and replace it with a
+wrapper program that knows how to open pack-it-forms forms and call
+the original pac-read.exe for PacFORMS forms:
 
-To use `pack-it-forms` with OutPost, do the following:
+1. Download and extract the install archive of pack-it-forms.  It is
+   recommended that you unpack it in `C:\pack-it-forms`
+2. Set the environment variable PACKITFORMS_BASE to the directory
+   where you extracted pack-it-forms.
+3. Copy the file: `C:\PacFORMS\exec\pac-read.exe` to
+   `C:\PacFORMS\exec\pac-read-pacforms.exe`
+4. Copy all the contents of the following directory
+   `<pack-it-forms>\resources\scripts\pac-read\build\exe.win32-3.4` to
+   the directory `C:\PacFORMS\exec`.  This will overwrite the original
+   pac-read.exe file.  This new executable is a "frozen" python script
+   (made with cx_Freeze) that requires support files in the same
+   directory.  The rest of the copied files are these support files.
+   None of them should overwrite any existing PacFORMS file.
+5. Finally, for the replacement pac-read.exe program to work
+   correctly you need to have MSVCR100.dll installed. This may be
+   missing from the computer.  To determine if you need to install
+   this DLL, open a Windows Command Prompt, change to the
+   `C:\PacFORMS\exec` directory and run the command `pac-read.exe`.
+   If you get a traceback everything is fine.  If you get a pop-up
+   window saying MSVCR100.dll is missing you need to install the
+   32-bit Microsoft Visual C++ Redistributable Package.  Follow the
+   instructions at the following URL to download and install the
+   required package:
+   `http://www.microsoft.com/en-gb/download/details.aspx?id=5555`.
 
-   1. Install OutPost and PacFORMS according to their instructions
-   2. Download and unpack the install archive of pack-it-forms
-   3. Make a backup copy of `C:\PacFORMS` so you can restore normal
-      PacFORMS functionality in the future.
-   4. Copy all the contents of the following directory:
-        `<pack-it-forms>\resources\scripts\pac-read\build\exe.win32-3.3`
-      to the directory `C:\PacFORMS\exec`:
-   5. Make a new directory at `C:\PacFORMS\resources`
-   6. Copy the following directories and their contents:
-        `<pack-it-forms>\resources\css`
-        `<pack-it-forms>\resources\html`
-        `<pack-it-forms>\resources\js`
-      to C:\PacFORMS\exec\resources
-   7. Copy the directory `<pack-it-forms>\msgs` and its contents to
-      `C:\PacFORMS\`.
-   8. Copy the directory `<pack-it-forms>\cfgs` and its contents to
-      `C:\PacFORMS\`.
-   9. Copy `<pack-it-forms>\form-ics213.html` to
-      `C:\PacFORMS\Message.html`.  This will allow the new version of
-      the normal ICS 213 message form to be opened using the `XSC
-      ICS-213 Message Form` menu entry in Outpost.
-  10. Copy <pack-it-forms>\form-los-altos-da.html to
-      `C:\PacFORMS\exec\city-scan.html`.  This will allow the Los Altos
-      Damage Assessment form to be opened with the `XSC City
-      Scan/Flash Report` menu entry in Outpost.
-  11. Finally, for the replacement pac-read.exe program to work
-      correctly you need to have MSVCR100.dll installed. This may be
-      missing from the computer.  To determine if you need to install
-      this DLL, open a Windows Command Prompt, change to the
-      `C:\PacFORMS\exec` directory and run the command `pac-read.exe`.
-      If you get a traceback everything is fine.  If you get a pop-up
-      window saying MSVCR100.dll is missing you need to install the
-      32-bit Microsoft Visual C++ Redistributable Package.  Follow the
-      instructions at the following URL to download and install the
-      required package:
-      `http://www.microsoft.com/en-gb/download/details.aspx?id=5555`.
+The PacFORMS installer is not aware of pack-it-forms, so these steps
+will likely be required every time PacFORMS is updated.
 
-If you want to return to normal PacFORMS processing, remove the entire
-`C:\PacFORMS` directory and replace with the backup taken in step 3.
+To enable creation of pack-it-forms using Outpost's Form menu:
 
+1. Locate the file launch.ini in the Outpost data directory.
+2. Add an appropriately formatted line in each pack-it-form form you
+   would like to create.
+
+The Outpost installer is not yet aware of pack-it-forms, so these
+steps will likely be required every time Outpost is updated.
+
+All the above steps can be reversed to remove pack-it-forms from your
+Outpost and PacFORMS installation.
 
 Entering Data in a New Form
 ---------------------------
