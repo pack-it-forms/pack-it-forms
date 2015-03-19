@@ -334,9 +334,8 @@ A PacForm-like description of the for mfield values is written into
 the textContent of the div with ID "form-data". */
 function write_pacforms_representation() {
     var form = document.querySelector("#the-form");
-    var msg = expand_template(
-        document.querySelector("#message-header").textContent).trim()
     init_text_fields("input.init-on-submit", "value");
+    fldtxt = ""
     array_for_each(form.elements, function(element, index, array) {
         var result;
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
@@ -353,10 +352,12 @@ function write_pacforms_representation() {
             } else {
                 resultText = element.name+": "+result;
             }
-            msg += "\r\n"+resultText;
+            fldtxt += "\r\n"+resultText;
         }
     });
-    msg += "\r\n#EOF\r\n";
+    var msg = expand_template(
+        document.querySelector("#message-header").textContent).trim()
+    msg += fldtxt + "\r\n#EOF\r\n";
     set_form_data_div(msg);
     /* The init-on-submit fields should be reset to their default
     values so that they will be inited again next time the form is
