@@ -400,16 +400,20 @@ function bracket_data(data) {
     }
 }
 
-function field_value(field_name) {
-    var result = ""
-    var elem = document.querySelectorAll("[name=\""+field_name+"\"]");
+function selected_field_values(css_selector) {
+    var result = [];
+    var elem = document.querySelectorAll(css_selector);
     array_for_each(elem, function (element) {
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
             var rep = pacform_representation_funcs[element.type](element);
-            result += emptystr_if_null(rep);
+            result.push(emptystr_if_null(rep));
         }
     });
     return result;
+}
+
+function field_value(field_name) {
+    return selected_field_values("[name=\""+field_name+"\"]").join("")
 }
 
 
