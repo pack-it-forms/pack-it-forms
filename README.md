@@ -318,17 +318,18 @@ together one after another, each separated by a vertical bar.
 
 The following template types are available:
 
-| Name         | Argument   | Description                                     |
-|--------------|------------|-------------------------------------------------|
-| date         | none       | Current date string in "mm/dd/yyyy" format      |
-| time         | none       | Current local time string in hh:mm:ss format    |
-| msgno        | none       | Message number for this message as a string     |
-| field        | field name | Value of a field in the form                    |
-| query-string | key        | Value of query string parameter with name 'key' |
-| div-id       | id value   | Text content of the named `div` element         |
-| filename     | none       | Filename of the form (final name in URI path)   |
-| title        | none       | Title of the HTML document                      |
-| {            | none       | Insert a single '{' character                   |
+| Name            | Argument   | Description                                     |
+|-----------------|------------|-------------------------------------------------|
+| date            | none       | Current date string in "mm/dd/yyyy" format      |
+| time            | none       | Current local time string in hh:mm:ss format    |
+| msgno           | none       | Message number for this message as a string     |
+| selected-fields | css-sel    | Get list of field values returned by `css-sel`  |
+| field           | field name | Value of a field in the form                    |
+| query-string    | key        | Value of query string parameter with name 'key' |
+| div-id          | id value   | Text content of the named `div` element         |
+| filename        | none       | Filename of the form (final name in URI path)   |
+| title           | none       | Title of the HTML document                      |
+| {               | none       | Insert a single '{' character                   |
 
 The following filters are available:
 
@@ -336,11 +337,13 @@ The following filters are available:
 |------------|-----------|----------------------------------------------------|
 | truncate   | length    | Truncate string to max of `length` characters      |
 | split      | fld delim | Split into list by `fld delim` string              |
+| join       | separator | Join list with `separator` between elements        |
+| remove     | value     | Remove elements matching `value` from list         |
+| sort       | type      | Sort list, if `type` is 'num', numeric, else text  |
 | re_search  | regexp    | Match regexp match, returning text or capture list |
 | nth        | index     | Return the nth list item or character              |
 | trim       | none      | Remove whitespace at start and end of string       |
 | msgno2name | msgno     | Expand message number to station                   |
-
 
 You might also want to add some amount of validation to your custom
 form fields.  *pack-it-forms* uses normal HTML5 form validation for

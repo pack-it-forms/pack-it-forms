@@ -536,6 +536,8 @@ var template_repl_func = {
 
     "field" : field_value,
 
+    "selected-fields" : selected_field_values,
+
     "query-string" : function(arg) {
         return emptystr_if_null(query_object[arg]);
     },
@@ -561,6 +563,28 @@ var template_filter_func = {
 
     "split" : function (arg, orig_value) {
         return orig_value.split(arg);
+    },
+
+    "join" : function (arg, orig_value) {
+        return orig_value.join(arg);
+    },
+
+    "remove" : function (arg, orig_value) {
+        var result = [];
+        orig_value.forEach(function(elem, index, array) {
+            if (elem != arg) {
+                result.push(elem);
+            }
+        });
+        return result;
+    },
+
+    "sort" : function (arg, orig_value) {
+        if (arg == "num") {
+            return orig_value.sort(function (a,b) { return a-b; });
+        } else {
+            return orig_value.sort();
+        }
     },
 
     "re_search" : function (arg, orig_value) {
