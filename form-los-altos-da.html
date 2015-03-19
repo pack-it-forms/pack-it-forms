@@ -28,19 +28,20 @@
       </div>
       <table id="form-body" class="noborder border">
         <tr>
-          <td colspan="18">
+          <td colspan="17">
             <label class="label-sameline">Subject:
               <span class="field-number">10</span>
               <input name="10.subject" type="text" size="80"
-                     value="Damage Summary for {{msgno|msgno2name}}"
+                     class="init-on-submit"
+                     value="Damage Summary for BAT(s) {{selected-fields:[name$='batnum']|remove:|sort:num|join:, }}"
                      required="true"
-                     pattern="Damage Summary for .*"
+                     pattern="Damage Summary for BAT\(s\) .*"
                      title="This field must have a prefix of
-                            &quot;Damage Summary for&quot;"/>
+                            &quot;Damage Summary for BAT(s) &quot;"/>
             </label>
           </td>
         </tr><tr>
-          <td colspan="18">
+          <td colspan="17">
             <label class="label-sameline">
               Reference (e.g. Number of earlier msg.)
               <span class="field-number">11</span>
@@ -48,162 +49,251 @@
             </label>
           </td>
         </tr><tr>
-          <th scope="row" rowspan="4" class="rotated block-caption">
-            <div><div>Summary</div></div>
-          </th>
-          <th rowspan="4" class="rowspanned-header">Priority Location</th>
+          <th rowspan="2" class="rowspanned-header">BAT</th>
+          <th rowspan="2" class="rowspanned-header">OK</th>
           <th colspan="6">
             People
           </th><th colspan="3">
             Damage
           </th><th colspan="5">
             Hazards
-          </th><th colspan="2">
+          </th><th colspan="1">
             Road
           </th>
         </tr>
         <tr class="rotated">
-          <td rowspan="2"><div><div>Minor</div></div></td>
-          <td rowspan="2"><div><div>Delayed</div></div></td>
-          <td rowspan="2"><div><div>Immediate</div></div></td>
-          <td rowspan="2"><div><div>V</div></div></td>
-          <td rowspan="2"><div><div>Missing</div></div></td>
-          <td rowspan="2"><div><div>Trapped</div></div></td>
-          <td rowspan="2"><div><div>Light</div></div></td>
-          <td rowspan="2"><div><div>Moderate</div></div></td>
-          <td rowspan="2"><div><div>Heavy</div></div></td>
-          <th colspan="2" class="not-rotated"><div><div>Fires</div></div></th>
-          <td rowspan="2"><div><div>Electric</div></div></td>
-          <td rowspan="2"><div><div>Water</div></div></td>
-          <td rowspan="2"><div><div>Chemical</div></div></td>
-          <td rowspan="2"><div><div>Damaged</div></div></td>
-          <td rowspan="2"><div><div>No Access</div></div></td>
-        </tr>
-        <tr class="rotated">
-          <td><div><div>Burning</div></div></td>
-          <td><div><div>Out</div></div></td>
+          <td><div><div>Minor</div></div></td>
+          <td><div><div>Delayed</div></div></td>
+          <td><div><div>Immediate</div></div></td>
+          <td><div><div>Fatalities</div></div></td>
+          <td><div><div>Missing</div></div></td>
+          <td><div><div>Trapped</div></div></td>
+          <td><div><div>Light</div></div></td>
+          <td><div><div>Moderate</div></div></td>
+          <td><div><div>Heavy</div></div></td>
+          <td><div><div>Fire</div></div></td>
+          <td><div><div>Electric</div></div></td>
+          <td><div><div>Water</div></div></td>
+          <td><div><div>Gas</div></div></td>
+          <td><div><div>Chemical</div></div></td>
+          <td><div><div>Blocked</div></div></td>
         </tr>
         <tr class="fullsize-textfields">
-          <td><input name="12.1a.people-minor" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1b.people-delayed" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1c.people-immediate" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1d.people-V" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1e.people-missing" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1f.people-trapped" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1g.damage-light" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1h.damage-moderate" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1i.damage-heavy" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1j.hazards-fires-burning" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1k.hazards-fires-out" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1l.hazards-electric" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1m.hazards-water" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1n.hazards-chemical" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1o.roads-damaged" type="text" pattern="\d+"
-                     required="true"/></td>
-          <td><input name="12.1p.roads-no-access" type="text" pattern="\d+"
-                     required="true"/></td>
-        </tr>
-        <tr class="fullsize-textfields">
-          <th rowspan="2" scope="row" class="rotated block-caption">
-            <div><div>Priority #1</div></div>
-          </th>
-          <td style="width:20%;">
-            <input name="12.2r.location" type="text"/>
+          <td style="width:10%;">
+            <input name="12.0a.batnum" type="text"/>
           </td>
-          <td><input name="12.2a.people-minor" type="text" pattern="\d+"/></td>
-          <td><input name="12.2b.people-delayed" type="text" pattern="\d+"/></td>
-          <td><input name="12.2c.people-immediate" type="text" pattern="\d+"/></td>
-          <td><input name="12.2d.people-V" type="text" pattern="\d+"/></td>
-          <td><input name="12.2e.people-missing" type="text" pattern="\d+"/></td>
-          <td><input name="12.2f.people-trapped" type="text" pattern="\d+"/></td>
-          <td><input name="12.2g.damage-light" type="text" pattern="\d+"/></td>
-          <td><input name="12.2h.damage-moderate" type="text" pattern="\d+"/></td>
-          <td><input name="12.2i.damage-heavy" type="text" pattern="\d+"/></td>
-          <td><input name="12.2j.hazards-fires-burning" type="text" pattern="\d+"/></td>
-          <td><input name="12.2k.hazards-fires-out" type="text" pattern="\d+"/></td>
-          <td><input name="12.2l.hazards-electric" type="text" pattern="\d+"/></td>
-          <td><input name="12.2m.hazards-water" type="text" pattern="\d+"/></td>
-          <td><input name="12.2n.hazards-chemical" type="text" pattern="\d+"/></td>
-          <td><input name="12.2o.roads-damaged" type="text" pattern="\d+"/></td>
-          <td><input name="12.2p.roads-no-access" type="text" pattern="\d+"/></td>
+          <td><input name="12.0b.ok" type="checkbox"/></td>
+          <td><input name="12.0c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.0d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.0e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.0f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.0g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.0h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.0i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.0j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.0k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.0l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.0m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.0n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.0o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.0p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.0q.roads-no-access" type="checkbox"/></td>
         </tr>
         <tr class="fullsize-textfields">
-          <th scope="row" class="sub-header">Notes:</th>
-          <td colspan="16"><input type="text" name="12.2q.notes"/></td>
-        </tr>
-        <tr class="fullsize-textfields">
-          <th rowspan="2" scope="row" class="rotated block-caption">
-            <div><div>Priority #2</div></div>
-          </th>
-          <td>
-            <input name="12.3r.location" type="text"/>
+          <td style="width:10%;">
+            <input name="12.1a.batnum" type="text"/>
           </td>
-          <td><input name="12.3a.people-minor" type="text" pattern="\d+"/></td>
-          <td><input name="12.3b.people-delayed" type="text" pattern="\d+"/></td>
-          <td><input name="12.3c.people-immediate" type="text" pattern="\d+"/></td>
-          <td><input name="12.3d.people-V" type="text" pattern="\d+"/></td>
-          <td><input name="12.3e.people-missing" type="text" pattern="\d+"/></td>
-          <td><input name="12.3f.people-trapped" type="text" pattern="\d+"/></td>
-          <td><input name="12.3g.damage-light" type="text" pattern="\d+"/></td>
-          <td><input name="12.3h.damage-moderate" type="text" pattern="\d+"/></td>
-          <td><input name="12.3i.damage-heavy" type="text" pattern="\d+"/></td>
-          <td><input name="12.3j.hazards-fires-burning" type="text" pattern="\d+"/></td>
-          <td><input name="12.3k.hazards-fires-out" type="text" pattern="\d+"/></td>
-          <td><input name="12.3l.hazards-electric" type="text" pattern="\d+"/></td>
-          <td><input name="12.3m.hazards-water" type="text" pattern="\d+"/></td>
-          <td><input name="12.3n.hazards-chemical" type="text" pattern="\d+"/></td>
-          <td><input name="12.3o.roads-damaged" type="text" pattern="\d+"/></td>
-          <td><input name="12.3p.roads-no-access" type="text" pattern="\d+"/></td>
+          <td><input name="12.1b.ok" type="checkbox"/></td>
+          <td><input name="12.1c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.1d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.1e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.1f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.1g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.1h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.1i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.1j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.1k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.1l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.1m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.1n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.1o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.1p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.1q.roads-no-access" type="checkbox"/></td>
         </tr>
         <tr class="fullsize-textfields">
-          <th scope="row" class="sub-header">Notes:</th>
-          <td colspan="16"><input type="text" name="12.3q.notes"/></td>
-        </tr>
-        <tr class="fullsize-textfields">
-          <th rowspan="2" scope="row" class="rotated block-caption"><div><div>Priority #3</div></div></th>
-          <td>
-            <input name="12.4r.location" type="text"/>
+          <td style="width:10%;">
+            <input name="12.2a.batnum" type="text"/>
           </td>
-          <td><input name="12.4a.people-minor" type="text" pattern="\d+"/></td>
-          <td><input name="12.4b.people-delayed" type="text" pattern="\d+"/></td>
-          <td><input name="12.4c.people-immediate" type="text" pattern="\d+"/></td>
-          <td><input name="12.4d.people-V" type="text" pattern="\d+"/></td>
-          <td><input name="12.4e.people-missing" type="text" pattern="\d+"/></td>
-          <td><input name="12.4f.people-trapped" type="text" pattern="\d+"/></td>
-          <td><input name="12.4g.damage-light" type="text" pattern="\d+"/></td>
-          <td><input name="12.4h.damage-moderate" type="text" pattern="\d+"/></td>
-          <td><input name="12.4i.damage-heavy" type="text" pattern="\d+"/></td>
-          <td><input name="12.4j.hazards-fires-burning" type="text" pattern="\d+"/></td>
-          <td><input name="12.4k.hazards-fires-out" type="text" pattern="\d+"/></td>
-          <td><input name="12.4l.hazards-electric" type="text" pattern="\d+"/></td>
-          <td><input name="12.4m.hazards-water" type="text" pattern="\d+"/></td>
-          <td><input name="12.4n.hazards-chemical" type="text" pattern="\d+"/></td>
-          <td><input name="12.4o.roads-damaged" type="text" pattern="\d+"/></td>
-          <td><input name="12.4p.roads-no-access" type="text" pattern="\d+"/></td>
+          <td><input name="12.2b.ok" type="checkbox"/></td>
+          <td><input name="12.2c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.2d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.2e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.2f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.2g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.2h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.2i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.2j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.2k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.2l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.2m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.2n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.2o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.2p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.2q.roads-no-access" type="checkbox"/></td>
         </tr>
         <tr class="fullsize-textfields">
-          <th scope="row" class="sub-header">Notes:</th>
-          <td colspan="16"><input type="text" name="12.3q.notes"/></td>
+          <td style="width:10%;">
+            <input name="12.3a.batnum" type="text"/>
+          </td>
+          <td><input name="12.3b.ok" type="checkbox"/></td>
+          <td><input name="12.3c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.3d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.3e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.3f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.3g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.3h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.3i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.3j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.3k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.3l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.3m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.3n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.3o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.3p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.3q.roads-no-access" type="checkbox"/></td>
         </tr>
         <tr class="fullsize-textfields">
-          <th scope="row" class="rotated block-caption">
-              <div><div>General notes</div></div>
+          <td style="width:10%;">
+            <input name="12.4a.batnum" type="text"/>
+          </td>
+          <td><input name="12.4b.ok" type="checkbox"/></td>
+          <td><input name="12.4c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.4d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.4e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.4f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.4g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.4h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.4i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.4j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.4k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.4l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.4m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.4n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.4o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.4p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.4q.roads-no-access" type="checkbox"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <td style="width:10%;">
+            <input name="12.5a.batnum" type="text"/>
+          </td>
+          <td><input name="12.5b.ok" type="checkbox"/></td>
+          <td><input name="12.5c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.5d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.5e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.5f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.5g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.5h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.5i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.5j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.5k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.5l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.5m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.5n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.5o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.5p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.5q.roads-no-access" type="checkbox"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <td style="width:10%;">
+            <input name="12.6a.batnum" type="text"/>
+          </td>
+          <td><input name="12.6b.ok" type="checkbox"/></td>
+          <td><input name="12.6c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.6d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.6e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.6f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.6g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.6h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.6i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.6j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.6k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.6l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.6m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.6n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.6o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.6p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.6q.roads-no-access" type="checkbox"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <td style="width:10%;">
+            <input name="12.7a.batnum" type="text"/>
+          </td>
+          <td><input name="12.7b.ok" type="checkbox"/></td>
+          <td><input name="12.7c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.7d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.7e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.7f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.7g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.7h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.7i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.7j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.7k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.7l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.7m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.7n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.7o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.7p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.7q.roads-no-access" type="checkbox"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <td style="width:10%;">
+            <input name="12.8a.batnum" type="text"/>
+          </td>
+          <td><input name="12.8b.ok" type="checkbox"/></td>
+          <td><input name="12.8c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.8d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.8e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.8f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.8g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.8h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.8i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.8j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.8k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.8l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.8m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.8n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.8o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.8p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.8q.roads-no-access" type="checkbox"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <td style="width:10%;">
+            <input name="12.9a.batnum" type="text"/>
+          </td>
+          <td><input name="12.9b.ok" type="checkbox"/></td>
+          <td><input name="12.9c.people-minor" type="text" pattern="\d+"/></td>
+          <td><input name="12.9d.people-delayed" type="text" pattern="\d+"/></td>
+          <td><input name="12.9e.people-immediate" type="text" pattern="\d+"/></td>
+          <td><input name="12.9f.people-V" type="text" pattern="\d+"/></td>
+          <td><input name="12.9g.people-missing" type="text" pattern="\d+"/></td>
+          <td><input name="12.9h.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.9i.damage-light" type="text" pattern="\d+"/></td>
+          <td><input name="12.9j.damage-moderate" type="text" pattern="\d+"/></td>
+          <td><input name="12.9k.damage-heavy" type="text" pattern="\d+"/></td>
+          <td><input name="12.9l.hazards-fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.9m.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.9n.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.9o.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.9p.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.9q.roads-no-access" type="checkbox"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th colspan="17" scope="row" class="block-caption">
+              <div><div>Notes</div></div>
           </th>
-          <td colspan="17"><textarea name="12.4.general-notes" rows="4"></textarea></td>
+        </tr><tr>
+          <td colspan="17"><textarea name="12.10.general-notes" rows="6" cols="80"></textarea></td>
         </tr>
       </table>
       <div data-include-html="ics-footer"></div>
