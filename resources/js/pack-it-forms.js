@@ -87,7 +87,6 @@ function init_form(next) {
             }
         }
     }
-    write_pacforms_representation();
     /* Wait 10ms to force Javascript to yield so that the DOM can be
      * updated before we do other work. */
     window.setTimeout(function () {
@@ -98,6 +97,7 @@ function init_form(next) {
             the_form[0].focus();
         }
         check_the_form_validity();
+        write_pacforms_representation();
         next();
     }, 10);
 }
@@ -333,13 +333,15 @@ A PacForm-like description of the for mfield values is written into
 the textContent of the div with ID "form-data". */
 function write_pacforms_representation() {
     var form = document.querySelector("#the-form");
-    init_text_fields("input.init-on-submit", "value");
     fldtxt = ""
     array_for_each(form.elements, function(element, index, array) {
         var result;
         if (pacform_representation_funcs.hasOwnProperty(element.type)) {
-            result = bracket_data(
-                pacform_representation_funcs[element.type](element));
+            result = pacform_representation_funcs[element.type](element);
+            if (element.classList.contains("init-on-submit")) {
+                result = expand_template(result);
+            }
+            result = bracket_data(result);
         } else {
             result = null;
         }
@@ -358,13 +360,6 @@ function write_pacforms_representation() {
         document.querySelector("#message-header").textContent).trim()
     msg += fldtxt + "\r\n#EOF\r\n";
     set_form_data_div(msg);
-    /* The init-on-submit fields should be reset to their default
-    values so that they will be inited again next time the form is
-    submitted. */
-    var elem = document.querySelectorAll("input.init-on-submit");
-    array_for_each(elem, function(element, index, array) {
-        element.value = element.defaultValue;
-    });
 }
 
 var pacform_representation_funcs = {
