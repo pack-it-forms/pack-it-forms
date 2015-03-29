@@ -344,6 +344,7 @@ The following filters are available:
 | nth        | index     | Return the nth list item or character              |
 | trim       | none      | Remove whitespace at start and end of string       |
 | msgno2name | msgno     | Expand message number to station                   |
+| expandtmpl | none      | Apply another layer of template expansion          |
 
 You might also want to add some amount of validation to your custom
 form fields.  *pack-it-forms* uses normal HTML5 form validation for

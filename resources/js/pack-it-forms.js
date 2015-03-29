@@ -608,6 +608,10 @@ var template_filter_func = {
     "msgno2name" : function(arg, orig_value) {
         var name = callprefixes[orig_value.split('-')[0]];
         return name ? name : "";
+    },
+
+    "expandtmpl" : function(arg, orig_value) {
+        return expand_template(orig_value);
     }
 };
 
