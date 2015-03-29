@@ -88,9 +88,8 @@ function init_form(next) {
         }
     }
     write_pacforms_representation();
-    /* Check form validity in a timeout because we need to wait for
-    Javascript to yield to allow the DOM to update the validity
-    status. */
+    /* Wait 10ms to force Javascript to yield so that the DOM can be
+     * updated before we do other work. */
     window.setTimeout(function () {
         var first_field = document.querySelector("#the-form :invalid");
         if (first_field) {
@@ -99,8 +98,8 @@ function init_form(next) {
             the_form[0].focus();
         }
         check_the_form_validity();
+        next();
     }, 10);
-    next();
 }
 
 /* Cross-browser resource loading w/local file handling
