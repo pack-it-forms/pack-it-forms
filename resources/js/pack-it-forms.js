@@ -817,13 +817,26 @@ function setup_view_mode(next) {
         document.querySelector("#button-header").classList.add("readonly");
         document.querySelector("#opdirect-submit").hidden = "true";
         document.querySelector("#show-hide-data").hidden = "true";
+        /* In view mode, we don't want to show the input control chrome.  This
+           is difficult to do with textareas which might need scrollbars, etc.
+           so insert a div with the same contents and use CSS to appropriately
+           style it and hide the textarea. */
+        var textareas_to_redisplay = [];
         array_for_each(form.elements, function (el) {
             if (el.type && el.type.substr(0,6) == "select") {
                 el.disabled = "true";
+            } else if (el.type && el.type.substr(0,8) == "textarea") {
+                el.readOnly = "true";
+                textareas_to_redisplay.push(el);
             } else {
                 el.readOnly = "true";
             }
         });
+        for (var i = 0; i < textareas_to_redisplay.length; i++) {
+            var el = textareas_to_redisplay[i];
+            var textNode = create_text_div(el.value,"view-mode-textarea");
+            el.parentNode.insertBefore(textNode, el);
+        }
     }
     next();
 }
@@ -860,6 +873,15 @@ function padded_int_str(num, cnt) {
         s = "0" + s;
     }
     return s;
+}
+
+/* Create a DIV element containing the provided text */
+function create_text_div(text, className) {
+    var elem = document.createElement("div");
+    elem.classList.add(className);
+    var textelem = document.createTextNode(text);
+    elem.appendChild(textelem);
+    return elem;
 }
 
 /* Make forEach() & friends easier to use on Array-like objects

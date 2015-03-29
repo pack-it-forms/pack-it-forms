@@ -201,17 +201,49 @@ form fieldset:invalid {
     height: 2.5em;
 }
 
+/* Style init-on-submit to indicate they are fixed */
+
+form input.init-on-submit {
+    background-color: transparent;
+    border-color: transparent;
+}
+
 
 /* Readonly (display) form styling */
 
-#the-form [readonly] {
-    background-color: #e7e7ed;
+#the-form textarea[readonly] {
+    display: none;
 }
 
-#the-form select[disabled] {
+#the-form [readonly] {
+    background-color: transparent;
+    border-color: transparent;
     color: black;
 }
 
+#the-form select[disabled] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    background-color: transparent;
+    border-color: transparent;
+    color: black;
+}
+
+#the-form select[disabled]::-ms-expand {
+    display: none;
+}
+
+#the-form div.view-mode-textarea {
+    min-height: 3ex;
+    display: block;
+    unicode-bidi: embed;
+    font-family: monospace;
+    white-space: pre-wrap;
+    width: 100%;
+}
 
 /* Rotation for headers.  Inspiration: http://kizu.ru/en/fun/rotated-text/ */
 
