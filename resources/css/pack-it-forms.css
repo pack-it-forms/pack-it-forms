@@ -181,7 +181,12 @@ form :invalid {
 }
 
 form :valid {
-    transition: box-shadow 0.5s;
+    transition: box-shadow 0.5s, background-color 0.5s;
+}
+
+form input:invalid,select:invalid,textarea:invalid {
+    background-color: #f8ecec;
+    transition: background-color 0.5s;
 }
 
 form :focus:invalid {
