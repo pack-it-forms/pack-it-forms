@@ -777,6 +777,7 @@ function combobox_other_manager(e) {
         other.disabled = true;
         other.value = "";
     }
+    check_the_form_validity();
 }
 
 /* Handle form data message visibility */
