@@ -48,8 +48,17 @@ a copy of the PacFORMS pac-read.exe program and replace it with a
 wrapper program that knows how to open pack-it-forms forms and call
 the original pac-read.exe for PacFORMS forms:
 
-1. Download and extract the install archive of pack-it-forms.  It is
-   recommended that you unpack it in `C:\pack-it-forms`
+1. Download and extract the install archive of pack-it-forms for
+   windows.  Recent zip archives are hosted at:
+
+     http://www.picnicpark.org/keith/ham-radio/pack-it-forms/
+
+   Unless you have a good reason to get an old version, select the
+   most recent version, typically the last in the list.  The zip file
+   contains a single directory called `pack-it-forms` with all
+   required files.  It is recommended that you unpack the zip file in
+   the root of the `C:\` drive so that the files will all be in
+   `C:\pack-it-forms`.
 2. Set the environment variable PACKITFORMS_BASE to the directory
    where you extracted pack-it-forms.
 3. Copy the file: `C:\PacFORMS\exec\pac-read.exe` to
