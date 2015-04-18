@@ -59,19 +59,35 @@ the original pac-read.exe for PacFORMS forms:
    required files.  It is recommended that you unpack the zip file in
    the root of the `C:\` drive so that the files will all be in
    `C:\pack-it-forms`.
-2. Set the environment variable PACKITFORMS_BASE to the directory
-   where you extracted pack-it-forms.
-3. Copy the file: `C:\PacFORMS\exec\pac-read.exe` to
-   `C:\PacFORMS\exec\pac-read-pacforms.exe`
+2. If you have never installed pack-it-forms before, set the
+   environment variable PACKITFORMS_BASE to the directory where you
+   extracted pack-it-forms.  It is preferable to use a "User" variable
+   instead of a "System" variable as generally multiple users should
+   not use the same pack-it-forms directory.  If you are updating an
+   existing installation and unpacking the files on top of the former
+   location, this step can be skipped.
+3. If you have never installed pack-it-forms before, copy the file:
+   `C:\PacFORMS\exec\pac-read.exe` to
+   `C:\PacFORMS\exec\pac-read-pacforms.exe`.  If you are updating an
+   existing installation, this step isn't required unless PacFORMS has
+   also been updated, overwriting the previously installed
+   pack-it-forms version of `pac-read.exe`.  To determine whether this
+   is the case, issue the command `C:\PacFORMS\exec\pac-read.exe` in a
+   Windows Command Prompt shell.  If the first line of output in the
+   shell window starts with "Traceback", then you should *not* copy
+   `pac-read.exe` to `pac-read-pacforms.exe`, otherwise go ahead and
+   make a copy.
 4. Copy all the contents of the following directory
    `<pack-it-forms>\resources\scripts\pac-read\build\exe.win32-3.4` to
-   the directory `C:\PacFORMS\exec`.  This will overwrite the original
-   pac-read.exe file.  This new executable is a "frozen" python script
-   (made with cx_Freeze) that requires support files in the same
-   directory.  The rest of the copied files are these support files.
-   None of them should overwrite any existing PacFORMS file.
-5. Finally, for the replacement pac-read.exe program to work
-   correctly you need to have MSVCR100.dll installed. This may be
+   the directory `C:\PacFORMS\exec`.  This will overwrite the
+   `pac-read.exe` file that currently exists in that directory,
+   replacing either the PacFORMS version or the earlier pack-it-forms
+   version.  This new executable is a "frozen" python script (made
+   with cx_Freeze) that requires support files in the same directory.
+   The rest of the copied files are these support files.  None of them
+   should overwrite any existing PacFORMS file.
+5. Finally, for the replacement `pac-read.exe` program to work
+   correctly you need to have `MSVCR100.dll` installed. This may be
    missing from the computer.  To determine if you need to install
    this DLL, open a Windows Command Prompt, change to the
    `C:\PacFORMS\exec` directory and run the command `pac-read.exe`.
@@ -85,11 +101,15 @@ the original pac-read.exe for PacFORMS forms:
 The PacFORMS installer is not aware of pack-it-forms, so these steps
 will likely be required every time PacFORMS is updated.
 
-To enable creation of pack-it-forms using Outpost's Form menu:
+If you have never installed pack-it-forms before or Outpost has been
+updated since it was last installed, you can enable creation of
+pack-it-forms forms using Outpost's Form menu with the following
+steps:
 
 1. Locate the file launch.ini in the Outpost data directory.
-2. Add an appropriately formatted line in each pack-it-form form you
-   would like to create.
+2. Add an appropriately formatted line for each pack-it-form form you
+   would like to create.  The format is the same as for pack-it-forms
+   but with the filename for the pack-it-forms form substituted.
 
 The Outpost installer is not yet aware of pack-it-forms, so these
 steps will likely be required every time Outpost is updated.
