@@ -504,7 +504,7 @@ function split_with_escape(str, sep) {
                 a.push(v.substring(0, v.length-1));
                 a.push(c);
             } else if (string_ends_with(v, "\\")) {
-                a.push(v + c);
+                a.push(v.substring(0, v.length-1) + sep + c);
             } else {
                 a.push(v);
                 a.push(c);
