@@ -16,8 +16,9 @@
 /* Common code for handling PacFORMS forms */
 
 /* --- Commonly used global objects */
-var query_object;     // Cached query string parameters
-var callprefixes;     // Cached call prefixes for expansion
+var query_object = {};     // Cached query string parameters
+var outpost_envelope = {}; // Cached outpost envelop information
+var callprefixes = {};     // Cached call prefixes for expansion
 
 /* --- Registration for code to run after page loads
 
@@ -183,11 +184,19 @@ function parse_form_data_text(text) {
     var field_name = "";
     var field_value = "";
     for_each_line(text, function (linenum, line) {
-        if (line.charAt(0) == "!" || line.charAt(0) == "#") {
-            return;  // Ignore header and directives
+        if (line.charAt(0) == "#") {
+            return;  // Ignore "comments"
         }
         if (line.match(/^\s*$/)) {
             return;  // Ignore empty lines
+        }
+        if (line.match(/^!PACF!/)) {
+            return;  // Ignore PACF line as we don't need anything from it.
+        }
+        if (line.match(/^!OUTPOST! /)) {
+            // Grab outpost data fields and store for substitution
+            outpost_envelope = outpost_envelope_to_object(line);
+            return
         }
         var idx = 0;
         if (field_name == "") {
@@ -535,6 +544,10 @@ var template_repl_func = {
 
     "query-string" : function(arg) {
         return emptystr_if_null(query_object[arg]);
+    },
+
+    "envelope" : function(arg) {
+        return emptystr_if_null(outpost_envelope[arg]);
     },
 
     "div-id" : function(arg) {
@@ -920,6 +933,17 @@ function for_each_line(str, func) {
 
 function emptystr_if_null(argument) {
     return argument ? argument : "";
+}
+
+function outpost_envelope_to_object(line) {
+    var data = {};
+    line = line.substring(10); // Get rid of "!OUTPOST! "
+    list = line ? line.split(", ") : [];
+    list.forEach(function(element, index, array) {
+        list = element.split("=");
+        data[list[0]] = list.slice(1).join("=");
+    });
+    return data
 }
 
 /* Generate an object from the query string.

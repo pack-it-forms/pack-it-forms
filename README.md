@@ -355,6 +355,7 @@ The following template types are available:
 | selected-fields | css-sel    | Get list of field values returned by `css-sel`  |
 | field           | field name | Value of a field in the form                    |
 | query-string    | key        | Value of query string parameter with name 'key' |
+| envelope        | field name | Value of !OUTPOST! envelope field               |
 | div-id          | id value   | Text content of the named `div` element         |
 | filename        | none       | Filename of the form (final name in URI path)   |
 | title           | none       | Title of the HTML document                      |
