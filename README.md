@@ -347,19 +347,30 @@ together one after another, each separated by a vertical bar.
 
 The following template types are available:
 
-| Name            | Argument   | Description                                     |
-|-----------------|------------|-------------------------------------------------|
-| date            | none       | Current date string in "mm/dd/yyyy" format      |
-| time            | none       | Current local time string in hh:mm:ss format    |
-| msgno           | none       | Message number for this message as a string     |
-| selected-fields | css-sel    | Get list of field values returned by `css-sel`  |
-| field           | field name | Value of a field in the form                    |
-| query-string    | key        | Value of query string parameter with name 'key' |
-| envelope        | field name | Value of !OUTPOST! envelope field               |
-| div-id          | id value   | Text content of the named `div` element         |
-| filename        | none       | Filename of the form (final name in URI path)   |
-| title           | none       | Title of the HTML document                      |
-| {               | none       | Insert a single '{' character                   |
+| Name              | Argument   | Description                                     |
+|-------------------|------------|-------------------------------------------------|
+| date              | none       | Current date string in "mm/dd/yyyy" format      |
+| time              | none       | Current local time string in hh:mm:ss format    |
+| msgno             | none       | Message number for this message as a string     |
+| selected-fields   | css-sel    | Get list of field values returned by `css-sel`  |
+| field             | field name | Value of a field in the form                    |
+| msg-field         | field name | Value of a field in the received message        |
+| query-string      | key        | Value of query string parameter with name 'key' |
+| envelope          | field name | Value of !OUTPOST! envelope field               |
+| div-id            | id value   | Text content of the named `div` element         |
+| filename          | none       | Filename of the form (final name in URI path)   |
+| title             | none       | Title of the HTML document                      |
+| {                 | none       | Insert a single '{' character                   |
+
+The difference between `field` and `msg-field` is subtle but
+important.  The `field` type retrieves the value of the form field
+with the given name.  If the field exists in the form it will always
+get the current contents of that form element in the DOM.  The
+`msg-field` type retrieves the value of a form field that was sent in
+a received message.  When creating a new form, all msg-field fields
+will have a value that is the empty string.  This distinction is
+important because some form fields have different values in the sender
+and receiver version of the form.
 
 The following filters are available:
 

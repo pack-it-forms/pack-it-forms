@@ -19,6 +19,7 @@
 var query_object = {};     // Cached query string parameters
 var outpost_envelope = {}; // Cached outpost envelop information
 var callprefixes = {};     // Cached call prefixes for expansion
+var msgfields = {};        // Cached message field values
 
 /* --- Registration for code to run after page loads
 
@@ -175,8 +176,8 @@ This function sets up a form with the contents of an already existing
 form data message, which is passed in as text.  It is implemented as a
 wrapper around init_form_from_fields. */
 function init_form_from_msg_data(text) {
-    var fields = parse_form_data_text(text);
-    init_form_from_fields(fields, "name");
+    msgfields = parse_form_data_text(text);
+    init_form_from_fields(msgfields, "name");
 }
 
 function parse_form_data_text(text) {
@@ -595,6 +596,10 @@ var template_repl_func = {
     "field" : field_value,
 
     "selected-fields" : selected_field_values,
+
+    "msg-field" : function(arg) {
+        return emptystr_if_null(msgfields[arg]);
+    },
 
     "query-string" : function(arg) {
         return emptystr_if_null(query_object[arg]);
