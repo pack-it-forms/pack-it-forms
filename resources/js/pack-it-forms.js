@@ -620,6 +620,15 @@ var template_repl_func = {
 
     "title" : function (arg) {
         return document.title;
+    },
+
+    "expand-while-null" : function (arg) {
+        var templates = split_with_escape_tokenized(arg, ",");
+        var value = expand_template(templates.shift());
+        while (templates.length  > 0 && value.length == 0) {
+            value = expand_template(templates.shift());
+        }
+        return value;
     }
 };
 

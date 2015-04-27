@@ -360,6 +360,7 @@ The following template types are available:
 | div-id            | id value   | Text content of the named `div` element         |
 | filename          | none       | Filename of the form (final name in URI path)   |
 | title             | none       | Title of the HTML document                      |
+| expand-while-null | templates  | Comma separated templates (\, escapes)          |
 | {                 | none       | Insert a single '{' character                   |
 
 The difference between `field` and `msg-field` is subtle but
