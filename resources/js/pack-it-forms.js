@@ -463,55 +463,109 @@ Additionally, multiple filters can be chained one after another in the
 manner of unix pipelines.  Each filter may take an optional argument,
 which may be ignored. */
 function expand_template(tmpl_str) {
-    var final_str = ""
-    var repl_re = /\{\{([^:|]+?)(?::([^|]+?))?(?:\|(.+?))?}}/
-    var match = repl_re.exec(tmpl_str);
-    while (match) {
-        final_str += tmpl_str.substring(0, match.index);
-        if (template_repl_func.hasOwnProperty(match[1])) {
-            var value = template_repl_func[match[1]](match[2]);
-            if (match[3]) {
-                split_with_escape(match[3], "|").forEach(function (f) {
-                    var a = f.split(":");
-                    var fname = a.shift();
-                    var farg = a.join(":");
-                    if (template_filter_func.hasOwnProperty(fname)) {
-                        value = template_filter_func[fname](farg, value);
-                    } else {
-                        throw new TemplateException("Unknown filter function");
-                    }
-                });
-            }
+    var final_str = "";
+    var tokens = tokenize_template(tmpl_str);
+    tokens.forEach(function (t) {
+        if (t[0] == "literal") {
+            final_str += t[1];
+        } else if (t[0] == "template") {
+            var stages = split_with_escape_tokenized(t[1], "|");
+            var a = stages.shift().split(":");
+            var fname = a.shift();
+            var farg = a.join(":")
+            var value = template_repl_func[fname](farg);
+            stages.forEach(function (f) {
+                var a = f.split(":");
+                var fname = a.shift();
+                var farg = a.join(":");
+                if (template_filter_func.hasOwnProperty(fname)) {
+                    value = template_filter_func[fname](farg, value);
+                } else {
+                    throw new TemplateException("Unknown filter function");
+                }
+            });
+            final_str += value;
         } else {
-            throw new TemplateException("Unknown replacement function");
+            throw new TemplateException("Unknown template token type");
         }
-        final_str += value;
-        tmpl_str = tmpl_str.substr(match.index + match[0].length);
-        match = repl_re.exec(tmpl_str);
-    }
-    final_str += tmpl_str;
+    });
     return final_str;
 }
 
-function split_with_escape(str, sep) {
+function tokenize_template(tmpl_str) {
+    var result = []
+    var stack = []
+    var frag = tmpl_str.split("{{");
+    frag = frag.map(function (e) { return e.split("}}"); });
+    result.push([ "literal", frag[0].join("}}")]);
+    for (var i = 1; i < frag.length; i++) {
+        stack.push(frag[i][0]);
+        for (var j = 1; j < frag[i].length; j++) {
+            // Closing previously opened
+            if (stack.length > 1) {
+                var top = stack.pop();
+                var next = stack.pop();
+                stack.push(next + "{{" + top + "}}" + frag[i][j]);
+            } else if (stack.length == 1) {
+                result.push(["template", stack.pop()]);
+                result.push(["literal", frag[i][j]]);
+            } else {
+                result.push(["literal", "}}" + frag[i][j]]);
+            }
+        }
+    }
+    return result;
+}
+
+function split_with_escape(str, sep, limit=0) {
+    var cnt = 0;
     var a = Array();
     str.split(sep).forEach(function (c) {
         if (a.length == 0) {
             a.push(c);
         } else {
             var v = a.pop();
-            if (string_ends_with(v, "\\\\")) {
+            if (limit > 0 && cnt >= limit) {
+                a.push(v + sep + c);
+            } else if (string_ends_with(v, "\\\\")) {
                 a.push(v.substring(0, v.length-1));
                 a.push(c);
+                cnt++;
             } else if (string_ends_with(v, "\\")) {
                 a.push(v.substring(0, v.length-1) + sep + c);
             } else {
                 a.push(v);
                 a.push(c);
+                cnt++;
             }
         }
     });
     return a;
+}
+
+function split_with_escape_tokenized(str, sep) {
+    var result = [];
+    var tokens = tokenize_template(str);
+    tokens.forEach(function (t) {
+        var v = ""
+        if (result.length > 0) {
+            v = result.pop();
+        }
+        if (t[0] == "literal") {
+            var elements = split_with_escape(t[1], sep);
+            result.push(v + elements.shift());
+            elements.forEach(function (e) {
+                if (e != "") {
+                    result.push(e);
+                }
+            });
+        } else if (t[0] == "template") {
+            result.push(v + "{{" + t[1] + "}}");
+        } else {
+            throw new TemplateException("Unknown template token type");
+        }
+    });
+    return result;
 }
 
 
