@@ -254,6 +254,9 @@ function init_form_from_fields(fields, attribute, className) {
     for (var field in fields) {
         var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
         array_some(elem, function (element) {
+            if (element.classList.contains("no-msg-init")) {
+                return true;
+            }
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
                 if (className) {
                     element.classList.add(className)
