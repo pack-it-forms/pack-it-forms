@@ -69,8 +69,6 @@ function init_form(next) {
     }, true);
     the_form.addEventListener("input", formChanged);
 
-    // Some fields always need to be initialized
-    init_empty_form();
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
         init_form_from_msg_data(text);
@@ -92,6 +90,7 @@ function init_form(next) {
     /* Wait 10ms to force Javascript to yield so that the DOM can be
      * updated before we do other work. */
     window.setTimeout(function () {
+        expand_templated_items();
         var first_field = document.querySelector("#the-form :invalid");
         if (first_field) {
             first_field.focus();
@@ -924,8 +923,7 @@ function setup_view_mode(next) {
 
 /* --- Misc. utility functions */
 
-/* Initialize an empty form */
-function init_empty_form() {
+function expand_templated_items() {
     init_text_fields(".templated", "textContent");
     init_text_fields("input:not(.init-on-submit)", "value");
 }
