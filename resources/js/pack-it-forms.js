@@ -556,9 +556,7 @@ function split_with_escape_tokenized(str, sep) {
             var elements = split_with_escape(t[1], sep);
             result.push(v + elements.shift());
             elements.forEach(function (e) {
-                if (e != "") {
-                    result.push(e);
-                }
+                result.push(e);
             });
         } else if (t[0] == "template") {
             result.push(v + "{{" + t[1] + "}}");
