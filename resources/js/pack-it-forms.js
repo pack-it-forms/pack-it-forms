@@ -176,7 +176,7 @@ form data message, which is passed in as text.  It is implemented as a
 wrapper around init_form_from_fields. */
 function init_form_from_msg_data(text) {
     msgfields = parse_form_data_text(text);
-    init_form_from_fields(msgfields, "name");
+    init_form_from_fields(msgfields, "name", "msg-value");
 }
 
 function parse_form_data_text(text) {
@@ -245,12 +245,19 @@ function index_of_field_value_start(linenum, line, startAt) {
 
 This function sets up a form with the contents of a fields object; it
 determines which fields should be initialized by matching the
-beginning of attribute againt the name of each field. */
-function init_form_from_fields(fields, attribute) {
+beginning of attribute againt the name of each field.
+
+If the optional third parameter is supplied it is the name of a class
+that should be added to the classList of the elements that are set by
+this function.*/
+function init_form_from_fields(fields, attribute, className) {
     for (var field in fields) {
         var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
         array_some(elem, function (element) {
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
+                if (className) {
+                    element.classList.add(className)
+                }
                 return init_from_msg_funcs[element.type](element, fields[field]);
             }
         });
@@ -925,7 +932,7 @@ function setup_view_mode(next) {
 
 function expand_templated_items() {
     init_text_fields(".templated", "textContent");
-    init_text_fields("input:not(.init-on-submit)", "value");
+    init_text_fields("input:not(.init-on-submit):not(.msg-value)", "value");
 }
 
 function get_form_data_from_div() {
