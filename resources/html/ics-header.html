@@ -4,16 +4,17 @@
       <td><h1 class="templated">{{title}}</h1></td>
       <td>
         <label>Sender's Msg #<span class="field-number">2</span>
-          <input name="2.txmsgno" class="" type="text" size="15"/>
+          <input name="2.txmsgno" class="" type="text" size="15"
+                 value="{{msg-field:MsgNo}}"/>
         </label>
       </td><td>
         <label>My Msg #:
-          <input name="MsgNo" class="" type="text"
-                 size="15" required="true" value="{{query-string:msgno}}"/>
+          <input name="MsgNo" class="no-msg-init" type="text"
+                 size="15" required="true" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
         </label>
       </td><td>
         <label>Receiver's Msg #<span class="field-number">3</span>
-          <input name="3.rxmsgno" class="" type="text" size="15"/>
+          <input name="3.rxmsgno" class="no-msg-init" type="text" size="15"/>
         </label>
       </td>
     </tr>
