@@ -299,12 +299,14 @@ document is loaded.  This will establish default values for form
 fields that the user can later edit.
 
 The one exception to the expansion when the document is loaded is
-those elements with the class `init-on-submit`.  These are intended to
-be automatically filled out at the time the form is submitted.  When
-the form is initially displayed the template value will be shown in
-the field to provide an indication that something will be filled in
-later.  Since these fields aren't usually intended to be edited by the
-user they usually have their `disabled` attribute set to "true".
+those elements with the class `no-load-init`, which prevents the
+expansion.  Typically, these elements also have the class
+`init-on-submit`, which indicates that template expansion should occur
+at the time the form is submitted.  In this case, when the form is
+initially displayed the template value will be shown in the field to
+provide an indication that something will be filled in later.  Since
+these fields aren't usually intended to be edited by the user they
+usually have their `disabled` attribute set to "true".
 
 Regular text in templates is copied from the template to the resulting
 string.  The difference comes when placeholder values that are

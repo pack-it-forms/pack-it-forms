@@ -935,7 +935,7 @@ function setup_view_mode(next) {
 
 function expand_templated_items() {
     init_text_fields(".templated", "textContent");
-    init_text_fields("input:not(.init-on-submit):not(.msg-value)", "value");
+    init_text_fields("input:not(.no-load-init):not(.msg-value)", "value");
 }
 
 function get_form_data_from_div() {
