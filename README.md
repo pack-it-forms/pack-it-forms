@@ -363,7 +363,10 @@ The following template types are available:
 | filename          | none       | Filename of the form (final name in URI path)   |
 | title             | none       | Title of the HTML document                      |
 | expand-while-null | templates  | Comma separated templates (\, escapes)          |
-| {                 | none       | Insert a single '{' character                   |
+| open-brace        | none       | Insert a single '{' character                   |
+| close-brace       | none       | Insert a single '}' character                   |
+| open-tmpl         | none       | Insert a template open string ('{{')            |
+| close-tmpl        | none       | Insert a template close string ('}}')           |
 
 The difference between `field` and `msg-field` is subtle but
 important.  The `field` type retrieves the value of the form field

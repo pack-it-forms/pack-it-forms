@@ -578,8 +578,20 @@ function split_with_escape_tokenized(str, sep) {
 
 
 var template_repl_func = {
-    "{" : function (arg) {
+    "open-brace" : function (arg) {
         return "{";
+    },
+
+    "close-brace" : function (arg) {
+        return "}";
+    },
+
+    "open-tmpl" : function (arg) {
+        return "{{";
+    },
+
+    "close-tmpl" : function (arg) {
+        return "}}";
     },
 
     "date" : function (arg) {
