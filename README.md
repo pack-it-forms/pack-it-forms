@@ -193,6 +193,12 @@ can be specified.  If the value specified is `readonly` then the
 presentation mode will switch to the read-only view as described for
 the OutPost method of viewing messages above.
 
+Note that pack-it-forms is used to replicate the paper forms used in
+the manual process and for ICS-213 derived forms the sender and
+receiver forms have different data in a few fields such as the various
+fields used for recording message numbers, the operate name/callsign,
+and the date/time the message was sent/received.  Don't be surprised
+by this.
 
 
 Creating New Forms
@@ -285,6 +291,16 @@ values:  a checkbox should have a value of CHECKED if it should be
 checked, and a collection of radiobuttons should have a value that
 matches one of the `name` attributes.  Text fields can be set to a
 template, which will be expanded (see the next section).
+
+If an input element represents a field that should have different
+values in a receiver's copy of a form than the senders, give the field
+the class `no-msg-init` which will prevent the senders field value
+(which is included in the message data) from being populated into the
+field for display.  Use the template system (described in the next
+section) to substitute a different value for the receiver or the
+transmitter.  The `ics-header.html` and `ics-footer.html` html
+fragments provide good examples of this.
+
 
 Setup Default and On-submit Behavior on Fields
 ----------------------------------------------
