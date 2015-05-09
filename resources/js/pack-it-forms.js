@@ -527,7 +527,7 @@ function tokenize_template(tmpl_str) {
     return result;
 }
 
-function split_with_escape(str, sep, limit=0) {
+function split_with_escape(str, sep, limit) {
     var cnt = 0;
     var a = Array();
     str.split(sep).forEach(function (c) {
@@ -562,7 +562,7 @@ function split_with_escape_tokenized(str, sep) {
             v = result.pop();
         }
         if (t[0] == "literal") {
-            var elements = split_with_escape(t[1], sep);
+            var elements = split_with_escape(t[1], sep, 0);
             result.push(v + elements.shift());
             elements.forEach(function (e) {
                 result.push(e);
