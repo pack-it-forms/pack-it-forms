@@ -221,6 +221,12 @@ form input.init-on-submit {
 }
 
 
+/* Prevent things from getting overly wide or narrow */
+#the-form {
+    max-width: 9in;
+    min-width: 6in;
+}
+
 /* Readonly (display) form styling */
 
 #the-form textarea[readonly] {
