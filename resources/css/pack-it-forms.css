@@ -318,3 +318,19 @@ td.rotated:not(.not-rotated) > div > div::after, th.rotated:not(.not-rotated) > 
     float: left;
     margin-top: 100%;
 }
+
+/* Print styling */
+
+@media print {
+   body {
+       background-color: #ffffff;
+       font-family: sans-serif;
+       font-size: 8pt;
+   }
+   #loading,#message-header,#button-header,#form-data-form {
+       display: none;
+   }
+   table {
+      width: 100%;
+   }
+}
