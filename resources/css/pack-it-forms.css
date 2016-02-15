@@ -119,6 +119,7 @@ table ~ table :first-child:first-child > td {
     top: 0px;
     left: 0px;
     width: 100%;
+    padding-top: 3px;
     padding-bottom: 3px;
     padding-left: 3px;
     background-color: #aaaaaa;
