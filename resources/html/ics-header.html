@@ -4,17 +4,17 @@
       <td><h1 class="templated">{{title}}</h1></td>
       <td>
         <label>Sender's Msg #<span class="field-number">2</span>
-          <input name="2.txmsgno" class="" type="text" size="15"
+          <input name="2.txmsgno" class="" type="text"
                  value="{{msg-field:MsgNo}}"/>
         </label>
       </td><td>
         <label>My Msg #:
           <input name="MsgNo" class="no-msg-init" type="text"
-                 size="15" required="true" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
+                 required="true" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
         </label>
       </td><td>
         <label>Receiver's Msg #<span class="field-number">3</span>
-          <input name="3.rxmsgno" class="no-msg-init" type="text" size="15"/>
+          <input name="3.rxmsgno" class="no-msg-init" type="text"/>
         </label>
       </td>
     </tr>
@@ -78,7 +78,7 @@
             <!--   by: <input name="6c.reply-by" type="text" size="12"/> -->
             <!-- </label> -->
             <label><input name="6b.reply" type="radio" value="Yes"/>Yes,</label>
-            <label>by: <input name="6d.reply-by" type="text" size="12"/></label>
+            <label>by: <input name="6d.reply-by" type="text"/></label>
             <label>
               <input name="6b.reply" type="radio" value="No"/> No
             </label>
@@ -91,7 +91,7 @@
     </tr><tr>
       <td>
         <label>Time:<span class="field-number">1b</span>
-          <input name="1b.time" class="" type="text" size="10"
+          <input name="1b.time" class="" type="text"
                  required="true" pattern="\d{1,2}:\d{2}(:\d{2})?"
                  value="{{time}}"/>
         </label>
@@ -116,7 +116,7 @@
             <option value="Safety Officer">Safety Officer</option>
             <option value="Other">Other:</option>
           </select>
-          <input name="7.to-ics-position-other" type="text" size="20" disabled="true" required="true"/>
+          <input name="7.to-ics-position-other" type="text" disabled="true" required="true"/>
         </fieldset>
       </td><td rowspan="4" class="block-caption">
         From:
@@ -135,37 +135,37 @@
             <option value="Safety Officer">Safety Officer</option>
             <option value="Other">Other:</option>
           </select>
-          <input name="8.from-ics-position-other" type="text" size="20" disabled="true" required="true"/>
+          <input name="8.from-ics-position-other" type="text" disabled="true" required="true"/>
         </fieldset>
       </td>
     </tr><tr>
       <td>
         <label>Location<span class="field-number">9a</span>
-          <input name="9a.to-location" type="text" size="20" required="true"/>
+          <input name="9a.to-location" type="text" required="true"/>
         </label>
       </td><td>
         <label>Location<span class="field-number">9b</span>
-          <input name="9b.from-location" type="text" size="20" required="true"/>
+          <input name="9b.from-location" type="text" required="true"/>
         </label>
       </td>
     </tr><tr>
       <td>
         <label>Name:
-          <input name="ToName" type="text" size="20"/>
+          <input name="ToName" type="text"/>
         </label>
       </td><td>
         <label>Name:
-          <input name="FmName" type="text" size="20"/>
+          <input name="FmName" type="text"/>
         </label>
       </td>
     </tr><tr>
       <td>
         <label>Telephone #:
-          <input name="ToTel" type="text" size="20"/>
+          <input name="ToTel" type="text"/>
         </label>
       </td><td>
         <label>Telephone #:
-          <input name="FmTel" type="text" size="20"/>
+          <input name="FmTel" type="text"/>
         </label>
       </td>
     </tr>

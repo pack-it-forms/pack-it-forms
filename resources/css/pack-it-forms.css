@@ -36,7 +36,8 @@ table {
 td {
     vertical-align: top;
     border: 1px solid #aaaaaa;
-    padding-left: 1em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
     padding-top: 0.5ex;
     padding-bottom: 0.5ex;
 }
@@ -55,8 +56,15 @@ label.intext {
     margin-right: 0.5em;
 }
 
-form input, textarea {
+form input {
     display: block;
+}
+form input[type="text"] {
+    width: 100%;
+}
+form textarea {
+    display: block;
+    width: 100%;
 }
 form input:enabled,textarea:enabled {
     background-color: #ffffff;
@@ -67,11 +75,8 @@ form input:disabled,textarea:disabled {
     border: 1px solid #cccccc;
 }
 form label.label-sameline input {
-    display: inline;
-    margin-left: 1.5em;
-}
-form fieldset input {
-    display: inline;
+    display: inline;;
+    margin-left: 1em;
 }
 form fieldset label {
     display: block;
@@ -80,6 +85,9 @@ form fieldset label {
 form fieldset {
     border: none;
     padding: 0;
+}
+form fieldset input,select {
+    display: inline;
 }
 form .horizontal label {
     display: inline;
