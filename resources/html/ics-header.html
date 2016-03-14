@@ -10,7 +10,7 @@
       </td><td>
         <label>My Msg #:
           <input name="MsgNo" class="no-msg-init" type="text"
-                 required="true" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
+                 required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
         </label>
       </td><td>
         <label>Receiver's Msg #<span class="field-number">3</span>
@@ -23,7 +23,7 @@
       <td>
         <label>Date<span class="field-number">1a</span>
           <input name="1a.date" class="" type="text" size="10"
-                 required="true" pattern="\d{1,2}/\d{1,2}/\d{4}"
+                 required="required" pattern="\d{1,2}/\d{1,2}/\d{4}"
                  value="{{date}}"/>
         </label>
       </td><td rowspan="2">
@@ -31,13 +31,13 @@
           <legend>Severity:<span class="field-number">4</span></legend>
           <label title="Life Threat">
             <input name="4.severity" type="radio"
-                   required="true" value="EMERGENCY"/> Emergency
+                   required="required" value="EMERGENCY"/> Emergency
           </label><label title="Property Threat">
             <input name="4.severity" type="radio"
-                   required="true" value="URGENT"/> Urgent
+                   required="required" value="URGENT"/> Urgent
           </label><label>
             <input name="4.severity" type="radio"
-                   required="true" value="OTHER"/> Other
+                   required="required" value="OTHER"/> Other
           </label>
         </fieldset>
       </td><td rowspan="2">
@@ -47,13 +47,13 @@
           </legend>
           <label title="As soon as possible">
             <input name="5.handling" type="radio"
-                   required="true" value="IMMEDIATE"/> Immediate
+                   required="required" value="IMMEDIATE"/> Immediate
           </label><label title="Less than one hour">
             <input name="5.handling" type="radio"
-                   required="true" value="PRIORITY"/> Priority
+                   required="required" value="PRIORITY"/> Priority
           </label><label title="More than one hour">
             <input name="5.handling" type="radio"
-                   required="true" value="ROUTINE"/> Routine
+                   required="required" value="ROUTINE"/> Routine
           </label>
         </fieldset>
       </td><td rowspan="2">
@@ -92,7 +92,7 @@
       <td>
         <label>Time:<span class="field-number">1b</span>
           <input name="1b.time" class="" type="text"
-                 required="true" pattern="\d{1,2}:\d{2}(:\d{2})?"
+                 required="required" pattern="\d{1,2}:\d{2}(:\d{2})?"
                  value="{{time}}"/>
         </label>
       </td>
@@ -104,8 +104,8 @@
       </td><td>
         <fieldset>
           <legend>ICS Position:<span class="field-number">7</span></legend>
-          <select name="7.to-ics-position" onchange="combobox_other_manager(this);" required="true">
-            <option value="" disabled="true" selected="true">Select one...</option>
+          <select name="7.to-ics-position" onchange="combobox_other_manager(this);" required="required">
+            <option value="" disabled="disabled" selected="selected">Select one...</option>
             <option value="Incident Commander">Incident Commander</option>
             <option value="Operations">Operations</option>
             <option value="Planning">Planning</option>
@@ -116,15 +116,15 @@
             <option value="Safety Officer">Safety Officer</option>
             <option value="Other">Other:</option>
           </select>
-          <input name="7.to-ics-position-other" type="text" disabled="true" required="true"/>
+          <input name="7.to-ics-position-other" type="text" disabled="disabled" required="required"/>
         </fieldset>
       </td><td rowspan="4" class="block-caption">
         From:
       </td><td>
         <fieldset>
           <legend>ICS Position<span class="field-number">8</span></legend>
-          <select name="8.from-ics-position" onchange="combobox_other_manager(this);" required="true">
-            <option value="" disabled="true" selected="true">Select one...</option>
+          <select name="8.from-ics-position" onchange="combobox_other_manager(this);" required="required">
+            <option value="" disabled="disabled" selected="selected">Select one...</option>
             <option value="Incident Commander">Incident Commander</option>
             <option value="Operations">Operations</option>
             <option value="Planning">Planning</option>
@@ -135,17 +135,17 @@
             <option value="Safety Officer">Safety Officer</option>
             <option value="Other">Other:</option>
           </select>
-          <input name="8.from-ics-position-other" type="text" disabled="true" required="true"/>
+          <input name="8.from-ics-position-other" type="text" disabled="disabled" required="required"/>
         </fieldset>
       </td>
     </tr><tr>
       <td>
         <label>Location<span class="field-number">9a</span>
-          <input name="9a.to-location" type="text" required="true"/>
+          <input name="9a.to-location" type="text" required="required"/>
         </label>
       </td><td>
         <label>Location<span class="field-number">9b</span>
-          <input name="9b.from-location" type="text" required="true"/>
+          <input name="9b.from-location" type="text" required="required"/>
         </label>
       </td>
     </tr><tr>
