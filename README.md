@@ -108,7 +108,7 @@ steps:
 
 1. Locate the file launch.ini in the Outpost data directory.
 2. Add an appropriately formatted line for each pack-it-form form you
-   would like to create.  The format is the same as for pack-it-forms
+   would like to create.  The format is the same as for PacFORMS
    but with the filename for the pack-it-forms form substituted.
 
 The Outpost installer is not yet aware of pack-it-forms, so these
