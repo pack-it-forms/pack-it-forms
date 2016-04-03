@@ -107,7 +107,11 @@ def pack_it_forms_handler(form_filename, msg_filename, msgno):
                  form_filename, msgno, msg_filename)
     try:
         # Copy the input file to the msg directory with filename msgno
-        shutil.copy(msg_filename, os.path.join(msg_directory, msgno))
+        dst_filename = os.path.join(msg_directory, msgno)
+        if os.path.abspath(msg_filename) != os.path.abspath(dst_filename):
+            shutil.copy(msg_filename, dst_filename)
+        else:
+            debug("Skipping copy because supplied file is already in msgs dir.")
     except Exception as e:
         print(e)
         sys.exit(1)
