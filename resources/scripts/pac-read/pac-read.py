@@ -88,6 +88,21 @@ def debug_close():
         debug("Closing debug log file")
         debug_logfile.close()
 
+def print_version():
+    version_filename = os.path.join(base_directory, "VERSION")
+    try:
+        f = open(version_filename, "r")
+        v = f.readline().rstrip()
+    except Exception as e:
+        debug("Exception: {!r}", e)
+        print("""It seems pack-it-forms is incorrectly installed.
+
+Verify that you set the "PACKITFORMS_BASE" environment variable
+correctly and that it contains a file named "VERSION".
+""")
+        sys.exit(1)
+    print(v)
+
 def form_filename_from_msg(filename):
     global base_directory
     # Which form to open a message with is determined by the "#
