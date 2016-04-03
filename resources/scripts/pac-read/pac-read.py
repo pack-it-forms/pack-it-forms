@@ -21,7 +21,16 @@
 # pack-it-forms msg directory and opens the form.  If not, it calls
 # the original pac-read.exe with the same arguments it was called with.
 
-import sys, os, os.path, subprocess, shutil, winreg
+import sys, os, os.path, subprocess, shutil
+try:
+    import winreg
+except ImportError as e:
+    class winreg:
+        "Dummy winreg class to allow testing on Linux"
+        @staticmethod
+        def QueryValue(tree, var):
+            return "\"firefox"
+        HKEY_CLASSES_ROOT=""
 
 # Assume the original PacFORMS pac-read.exe was renamed
 # pac-read-pacforms.exe in the same directory and this script replaced
