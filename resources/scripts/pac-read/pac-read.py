@@ -60,7 +60,7 @@ def main():
     debug("pac-read started as: {!r}", sys.argv)
     if len(sys.argv) == 2 and sys.argv[1] == "--pack-it-forms-version":
         print_version()
-    else:
+    elif len(sys.argv) == 4:
         # The message data input filename is held in the third parameter
         msg_filename = sys.argv[3]
         msgno = os.path.basename(msg_filename).split("_")[0]
@@ -69,6 +69,8 @@ def main():
             pack_it_forms_handler(form_filename, msg_filename, msgno)
         else:
             pacforms_handler()
+    else:
+        pacforms_handler()
 
 def debug_open():
     global debug_logfile

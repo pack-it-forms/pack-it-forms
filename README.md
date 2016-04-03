@@ -72,11 +72,12 @@ the original pac-read.exe for PacFORMS forms:
    existing installation, this step isn't required unless PacFORMS has
    also been updated, overwriting the previously installed
    pack-it-forms version of `pac-read.exe`.  To determine whether this
-   is the case, issue the command `C:\PacFORMS\exec\pac-read.exe` in a
-   Windows Command Prompt shell.  If the first line of output in the
-   shell window starts with "Traceback", then you should *not* copy
-   `pac-read.exe` to `pac-read-pacforms.exe`, otherwise go ahead and
-   make a copy.
+   is the case, issue the command `C:\PacFORMS\exec\pac-read.exe
+   --pack-it-forms-version` in a Windows Command Prompt shell.  If a
+   version is printed out and you are returned to the command prompt,
+   you should *not* copy `pac-read.exe` to `pac-read-pacforms.exe`.
+   If you are prompted to enter a file, then you *do* need to make the
+   copy.
 4. Copy all the contents of the following directory
    `<pack-it-forms>\resources\scripts\pac-read\build\exe.win32-3.4` to
    the directory `C:\PacFORMS\exec`.  This will overwrite the
@@ -90,12 +91,12 @@ the original pac-read.exe for PacFORMS forms:
    correctly you need to have `MSVCR100.dll` installed. This may be
    missing from the computer.  To determine if you need to install
    this DLL, open a Windows Command Prompt, change to the
-   `C:\PacFORMS\exec` directory and run the command `pac-read.exe`.
-   If you get a traceback everything is fine.  If you get a pop-up
-   window saying MSVCR100.dll is missing you need to install the
-   32-bit Microsoft Visual C++ Redistributable Package.  Follow the
-   instructions at the following URL to download and install the
-   required package:
+   `C:\PacFORMS\exec` directory and run the command `pac-read.exe
+   --pack-it-forms-version`.  If a version number is printed
+   everything is fine.  If you get a pop-up window saying MSVCR100.dll
+   is missing you need to install the 32-bit Microsoft Visual C++
+   Redistributable Package.  Follow the instructions at the following
+   URL to download and install the required package:
    `http://www.microsoft.com/en-gb/download/details.aspx?id=5555`.
 
 The PacFORMS installer is not aware of pack-it-forms, so these steps
