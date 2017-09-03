@@ -322,15 +322,27 @@ td.rotated:not(.not-rotated) > div > div::after, th.rotated:not(.not-rotated) > 
 /* Print styling */
 
 @media print {
+  @page { margin: 0.5in 0.25in; }
    body {
        background-color: #ffffff;
        font-family: sans-serif;
        font-size: 8pt;
+       margin: 0px;
+       border: 0px;
+       padding: 0px;
    }
    #loading,#message-header,#button-header,#form-data-form {
        display: none;
    }
    table {
       width: 100%;
+   }
+   input, textarea, select{
+       font-size: 8pt;
+       background-color: transparent !important;
+       border-color: transparent !important;
+   }
+   textarea {
+       resize: none;
    }
 }
