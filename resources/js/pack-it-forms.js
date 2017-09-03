@@ -369,7 +369,9 @@ function write_pacforms_representation() {
     fldtxt = ""
     array_for_each(form.elements, function(element, index, array) {
         var result;
-        if (pacform_representation_funcs.hasOwnProperty(element.type)) {
+        if (element.disabled) {
+            result = null;
+        } else if (pacform_representation_funcs.hasOwnProperty(element.type)) {
             result = pacform_representation_funcs[element.type](element);
             if (element.classList.contains("init-on-submit")) {
                 result = expand_template(result);
@@ -878,20 +880,33 @@ function opdirect_submit(e) {
     }
 }
 
+/* Enable or disable a different control based on onChange values
+
+This is a callback function to be used in the onChange handler of a
+select. It enables the form element with name 'target_name' when the
+value of the element on which it is add is in the list
+'enabledValues'. When the value is not in that list, then target
+element is disabled and the targets balue is set to
+'target_disabled_value'. */
+function value_based_enabler(e, enabledValues, target_name, target_disabled_value) {
+    var target = document.querySelector("[name=\""+target_name+"\"]");
+    if (array_contains(enabledValues, e.value)) {
+        target.disabled = false;
+    } else {
+        target.value = target_disabled_value;
+        target.disabled = true;
+    }
+    fireEvent(target, 'input');
+    check_the_form_validity();
+}
+
 /* Disable "other" controls when not in use
 
 This is a callback function to be used in the onChange handler of a
 combobox; it will enable the relevant -other field if and only if the
 combobox is set to "Other". */
 function combobox_other_manager(e) {
-    var other = document.querySelector("[name=\""+e.name+"-other\"]");
-    if (e.value == "Other") {
-        other.disabled = false;
-    } else {
-        other.disabled = true;
-        other.value = "";
-    }
-    check_the_form_validity();
+    value_based_enabler(e, ["Other"], e.name + "-other", "");
 }
 
 /* Handle form data message visibility */
