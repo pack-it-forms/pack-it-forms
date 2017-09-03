@@ -994,6 +994,17 @@ function array_for_each(array, func) {
     return Array.prototype.forEach.call(array, func);
 }
 
+/* Not very efficent, but handy if the array is known to be small */
+function array_contains(array, value) {
+    var found = false;
+    array_for_each(array, function (v, i, a) {
+        if (v == value) {
+            found = true;
+        }
+    });
+    return found;
+}
+
 function array_some(array, funct) {
     return Array.prototype.some.call(array, funct);
 }
