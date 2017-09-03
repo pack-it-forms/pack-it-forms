@@ -62,6 +62,11 @@ form input {
 form input[type="text"] {
     width: 100%;
 }
+form select {
+    border: 1px solid #cccccc;
+    padding: 1px;
+    background: #ffffff;
+}
 form textarea {
     display: block;
     width: 100%;
@@ -256,6 +261,8 @@ form input.init-on-submit {
     background-color: transparent;
     border-color: transparent;
     color: black;
+    border: 0px;
+    padding: 0px;
 }
 
 #the-form select[disabled]::-ms-expand {
