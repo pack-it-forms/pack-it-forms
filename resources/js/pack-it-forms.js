@@ -261,7 +261,11 @@ function init_form_from_fields(fields, attribute, className) {
                 if (className) {
                     element.classList.add(className)
                 }
-                return init_from_msg_funcs[element.type](element, fields[field]);
+                var stop = init_from_msg_funcs[element.type](element, fields[field]);
+                fireEvent(element, 'change');
+                return stop;
+            } else {
+                return false;
             }
         });
     }
