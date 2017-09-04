@@ -70,6 +70,8 @@ form select {
 form textarea {
     display: block;
     width: 100%;
+    resize: vertical;
+    white-space: pre-wrap;
 }
 form input:enabled,textarea:enabled {
     background-color: #ffffff;
