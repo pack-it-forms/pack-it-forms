@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="resources/css/loading.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="resources/css/pack-it-forms.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="resources/css/form-oa-muni-status.css"/>
+    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+
+    <title>Santa Clara OA Municipal Status</title>
+  </head>
+
+  <body>
+    <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
+    <div>
+      <form id="the-form" name="the-form" class="fullsize-textfields">
+        <h1>Santa Clara OA Municipal Status</h1>
+        <fieldset id="incident">
+          <label class="bold">Incident:
+            <input name="1.incident-name" required="required" size="60"
+                   placeholder="Name of incident or 'Incident independent'"/>
+          </label><br/>
+          <label class="bold">Municipality Name/Unincorporated:
+            <select name="2.municipality-name" required="required">
+              <option value="" disabled="disabled" selected="selected">
+                Select one...
+              </option>
+              <option value="Campbell">Campbell</option>
+              <option value="Cupertino">Cupertino</option>
+              <option value="Gilroy">Gilroy</option>
+              <option value="Los Altos">Los Altos</option>
+              <option value="Los Gatos">Los Gatos</option>
+              <option value="Milpitas">Milpitas</option>
+              <option value="Morgan Hill">Morgan Hill</option>
+              <option value="Mountain View">Mountain View</option>
+              <option value="NASA-Ames">NASA-Ames</option>
+              <option value="Palo Alto">Palo Alto</option>
+              <option value="San Jose">San Jose</option>
+              <option value="Santa Clara">Santa Clara</option>
+              <option value="Saratoga">Saratoga</option>
+              <option value="Stanford">Stanford</option>
+              <option value="Sunnyvale">Sunnyvale</option>
+              <option value="Unincorporated">Unincorporated</option>
+            </select>
+          </label>
+        </fieldset>
+        <fieldset id="contact-info" class="labeled-box">
+          <legend>Contact Information</legend>
+          <table id="contact-info-table" class="fullsize-textfields">
+            <tr>
+              <td class="label"><label>EOC Phone:</label></td>
+              <td>
+                <input name="3.eoc-phone"
+                       placeholder="000-000-0000"
+                       pattern="\(?[0-9]{3}\)?[ -]?[0-9]{3}[ -]?[0-9]{4}"/>
+              </td>
+              <td class="label"><label>EOC Fax:</label></td>
+              <td>
+                <input name="4.eoc-fax"
+                       placeholder="000-000-0000"
+                       pattern="\(?[0-9]{3}\)?[ -]?[0-9]{3}[ -]?[0-9]{4}"/>
+              </td>
+            </tr><tr>
+              <td class="label"><label>Primary EM Contact Name:</label></td>
+              <td><input name="5.pri-em-contact-name" required="required"></td>
+              <td class="label"><label>Primary EM Contact Phone:</label></td>
+              <td>
+                <input name="6.pri-em-contact-phone" required="required"
+                       placeholder="000-000-0000"
+                       pattern="\(?[0-9]{3}\)?[ -]?[0-9]{3}[ -]?[0-9]{4}"/>
+              </td>
+            </tr><tr>
+              <td class="label"><label>Secondary EM Contact Name:</label></td>
+              <td><input name="7.sec-em-contact-name"/></td>
+              <td class="label"><label>Secondary EM Contact Phone:</label></td>
+              <td>
+                <input name="8.sec-em-contact-phone"
+                       placeholder="000-000-0000"
+                       pattern="\(?[0-9]{3}\)?[ -]?[0-9]{3}[ -]?[0-9]{4}"/>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+        <fieldset id="gov-office-status" class="labeled-box">
+          <legend>Government Office Status</legend>
+          <table>
+            <tr>
+              <td class="label">
+                <label for="office-status">Office Status:</label>
+              </td><td>
+                <select name="9.office-status">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Open">Open</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </td>
+              <td></td>
+              <td></td>
+            </tr><tr>
+              <td class="label">
+                <label for="gov-expected-open-date">
+                  Expected to Open Date:
+                </label>
+              </td>
+              <td>
+                <input name="10.gov-expected-open-date" type="date"
+                       placeholder="MM/DD/YY"
+                       pattern="(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[0-9][0-9]"/>
+              </td><td class="label">
+                <label for="gov-expected-open-time">Expected to Open Time:</label>
+              </td><td>
+                <input name="11.gov-expected-open-time" type="time"
+                       placeholder="HH:MM" pattern="([01][0-9]|2[012]):[0-5][0-9]"/>
+              </td>
+            </tr><tr>
+              <td class="label">
+                <label for="gov-expected-close-date">Expected to Close Date:</label>
+              </td><td>
+                <input name="12.gov-expected-close-date" type="date"
+                       placeholder="MM/DD/YY"
+                       pattern="(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[0-9][0-9]"/>
+              </td><td class="label">
+                <label for="gov-expected-close-time">Expected to Close Time:</label>
+              </td><td>
+                <input name="13.gov-expected-close-time" type="time"
+                       placeholder="HH:MM"
+                       pattern="([01][0-9]|2[012]):[0-5][0-9]"/>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+        <fieldset id="eoc-status" class="labeled-box">
+          <legend>EOC Status</legend>
+          <table>
+            <tr>
+              <td class="label">
+                <label for="office-status">EOC Open:</label>
+              </td><td>
+                <select name="14.eoc-open" required="required"
+                        onchange="value_based_enabler(this, ['Yes'],
+                              '15.eoc-activation-level', 'Not applicable');">
+                  <option value="Unknown" selected="selected"
+                          disabled="disabled">
+                    Unknown
+                  </option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </td>
+              <td class="label">
+                <label for="activation-level">Activation Level:</label>
+              </td><td>
+                <select name="15.eoc-activation-level" required="required"
+                        disabled="disabled">
+                  <option value="Not applicable" selected="selected"
+                          disabled="disabled">
+                    Not Applicable
+                  </option>
+                  <option value"="Unknown">Unknown</option>
+                  <option value="Monitor">Monitor</option>
+                  <option value="Minimal">Minimal</option>
+                  <option value="Partial">Partial</option>
+                  <option value="Full">Full</option>
+                </select>
+              </td>
+            </tr><tr>
+              <td class="label">
+                <label for="eoc-expected-open-date">Expected to Open Date:</label>
+              </td><td>
+                <input name="16.eoc-expected-open-date" type="date"
+                       placeholder="MM/DD/YY"
+                       pattern="(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[0-9][0-9]"/>
+              </td><td class="label">
+                <label for="eoc-expected-open-time">Expected to Open Time:</label>
+              </td><td>
+                <input name="17.eoc-expected-open-time" type="time"
+                       placeholder="HH:MM" pattern="([01][0-9]|2[012]):[0-5][0-9]"/>
+              </td>
+            </tr><tr>
+              <td class="label">
+                <label for="eoc-expected-close-date">Expected to Close Date:</label>
+              </td><td>
+                <input name="18.eoc-expected-close-date" type="date"
+                       placeholder="MM/DD/YY"
+                       pattern="(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[0-9][0-9]"/>
+              </td>
+              <td class="label">
+                <label for="eoc-expected-close-time">Expected to Close Time:</label>
+              </td><td>
+                <input name="19.eoc-expected-close-time" type="time"
+                       placeholder="HH:MM" pattern="([01][0-9]|2[012]):[0-5][0-9]"/>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+        <fieldset id="proclamation" class="labeled-box">
+          <legend>Proclamation</legend>
+          <label for="state-of-emergency">State of Emergency:
+            <select name="20.state-of-emergency">
+              <option value="Unknown" selected="selected">Unknown</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </label>
+          <br/>
+          Send a copy of your proclamation to the OA EOC
+        </fieldset>
+        <fieldset  id="current-situation" class="labeled-box">
+          <legend>Current Situation</legend>
+          <table>
+            <tr>
+              <th class="label">Type</th>
+              <th>Status</th>
+              <th>Comments</th>
+            </tr>
+            <tr>
+              <td class="label">Communications</td>
+              <td>
+                <select name="21.0.communications" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '21.1.communications-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="21.1.communications-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Debris</td>
+              <td>
+                <select name="22.0.debris" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '22.1.debris-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="22.1.debris-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Flooding</td>
+              <td>
+                <select name="23.0.flooding" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '23.1.flooding-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="23.1.flooding-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Hazmat</td>
+              <td>
+                <select name="24.0.hazmat" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '24.1.hazmat-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="24.1.hazmat-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Emergency Services</td>
+              <td>
+                <select name="25.0.emergency-services" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '25.1.emergency-services-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="25.1.emergency-services-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Casualties</td>
+              <td>
+                <select name="26.0.casualties" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '26.1.casualties-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="26.1.casualties-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Utilities (Gas)</td>
+              <td>
+                <select name="27.0.utilities-gas" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '27.1.utilities-gas-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="27.1.utilities-gas-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Utilites (Electric)</td>
+              <td>
+                <select name="28.0.utilities-electric" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '28.1.utilities-electric-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="28.1.utilities-electric-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Infrastructure (Power)</td>
+              <td>
+                <select name="29.0.infrastructure-power" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '29.1.infrastructure-power-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="29.1.infrastructure-power-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Infrastructure (Water Systems)</td>
+              <td>
+                <select name="30.0.infrastructure-water-systems" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '30.1.infrastructure-water-systems-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="30.1.infrastructure-water-systems-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Infrastructure (Sewer Systems)</td>
+              <td>
+                <select name="31.0.infrastructure-sewer-systems" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '31.1.infrastructure-sewer-systems-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="31.1.infrastructure-sewer-systems-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Search and Rescue</td>
+              <td>
+                <select name="32.0.search-and-rescue" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '32.1.search-and-rescue-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="32.1.search-and-rescue-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Transportation (Roads)</td>
+              <td>
+                <select name="33.0.transportation-roads" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '33.1.transportation-roads-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="33.1.transportation-roads-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Transportation (Bridges)</td>
+              <td>
+                <select name="34.0.transportation-bridges" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '34.1.transportation-bridges-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="34.1.transportation-bridges-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Civil Unrest</td>
+              <td>
+                <select name="35.0.civil-unrest" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '35.1.civil-unrest-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="35.1.civil-unrest-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Animal Issues</td>
+              <td>
+                <select name="36.0.animal-issues" required="required"
+                        onchange="value_based_enabler(this,
+                              ['Problem', 'Failure'],
+                              '36.1.animal-issues-comments', '');">
+                  <option value="Unknown" selected="selected">Unknown</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Problem">Problem</option>
+                  <option value="Failure">Failure</option>
+                </select>
+              </td>
+              <td>
+                <textarea name="36.1.animal-issues-comments" rows="3"
+                          required="required" disabled="disabled"></textarea>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+      </form>
+    </div>
+    <div data-include-html="outpost_message_header"></div>
+    <div data-include-html="submit-buttons"></div>
+  </body>
+</html>
