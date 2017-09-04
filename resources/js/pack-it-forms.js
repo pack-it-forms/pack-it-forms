@@ -253,6 +253,16 @@ this function.*/
 function init_form_from_fields(fields, attribute, className) {
     for (var field in fields) {
         var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
+        /* The above CSS selector does a prefix match which can return
+           multiple elements. This is intentionally done to support a
+           special case for compatibility with the PacFORMs ICS213
+           form which uses a value from either a select element or, if
+           that select element has the value "Other", a corresponding
+           text input element instead with both using the same field
+           name in the PacFORMs representation. This means that the
+           value "Other" for a select element triggers additional
+           functionality. It is believed that this should not cause
+           issues for any existing or planned forms. */
         array_some(elem, function (element) {
             if (element.classList.contains("no-msg-init")) {
                 return true;
