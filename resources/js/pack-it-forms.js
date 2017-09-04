@@ -1032,6 +1032,20 @@ function emptystr_if_null(argument) {
     return argument ? argument : "";
 }
 
+/* --- Cross-browser convenience functions --- */
+
+function fireEvent(target, evt) {
+    var event = document.createEvent('Event');
+    event.initEvent(evt, true, true);
+    if (target.disabled && evt == 'input') {
+        // work around firefox not firing input events on disabled events
+        target.parentElement.dispatchEvent(event);
+    } else {
+        target.dispatchEvent(event);
+    }
+}
+
+
 function outpost_envelope_to_object(line) {
     var data = {};
     line = line.substring(10); // Get rid of "!OUTPOST! "
