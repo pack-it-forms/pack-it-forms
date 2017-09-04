@@ -248,6 +248,11 @@ form input.init-on-submit {
     display: none;
 }
 
+#the-form :placeholder-shown[readonly] {
+    visibility: hidden;
+}
+
+
 #the-form [readonly] {
     background-color: transparent;
     border-color: transparent;
@@ -353,5 +358,8 @@ td.rotated:not(.not-rotated) > div > div::after, th.rotated:not(.not-rotated) > 
    }
    textarea {
        resize: none;
+   }
+   #the-form :placeholder-shown {
+       visibility: hidden;
    }
 }
