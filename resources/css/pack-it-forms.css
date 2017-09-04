@@ -42,6 +42,11 @@ td {
     padding-bottom: 0.5ex;
 }
 
+td.label{
+  width: 1px;
+  white-space: nowrap;
+}
+
 label {
     font-weight: bold;
 }
@@ -101,6 +106,15 @@ form .horizontal label {
 }
 form .horizontal input {
     display: inline;
+}
+
+#the-form fieldset table {
+    width: 100%;
+}
+
+#the-form fieldset table td, #the-form fieldset table th {
+    padding: 0.2ex 0.5em;
+    border: 0px;
 }
 
 fieldset.labeled-box {
