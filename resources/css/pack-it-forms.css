@@ -103,6 +103,17 @@ form .horizontal input {
     display: inline;
 }
 
+fieldset.labeled-box {
+    border: 1px solid #aaaaaa;
+    margin-top: 2ex;
+    padding: 0.5ex 0.25em 0.5ex;
+}
+
+fieldset.labeled-box legend {
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-left: 1em;
+}
 
 .block-caption {
     background-color: #cccccc;
