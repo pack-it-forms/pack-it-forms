@@ -37,9 +37,9 @@ function startup() {
     function callclist(functions) {
         return function() {
             if (functions.length > 0) {
-                functions.shift()(callclist(functions))
+                functions.shift()(callclist(functions));
             }
-        }
+        };
     }
 }
 
@@ -73,9 +73,9 @@ function init_form(next) {
     if (text.trim().length != 0) {
         init_form_from_msg_data(text);
     } else {
-        msgno = query_object['msgno'];
+        var  msgno = query_object['msgno'];
         if (msgno) {
-            msg_url = "msgs/" + msgno;
+            var msg_url = "msgs/" + msgno;
             try {
                 open_async_request("GET", msg_url, "text", function (text) {
                     if (text.trim().length > 0) {
@@ -119,11 +119,9 @@ function open_async_request(method, url, responseType, cb, err) {
                 var text = request.responseText;
                 if (ActiveXObject_responseType_funcs.hasOwnProperty(responseType)) {
                     cb(ActiveXObject_responseType_funcs[responseType](text));
-                } else {
-                    return null;
                 }
             }
-        }
+        };
         request.send();
     } else {
         request = new XMLHttpRequest();
@@ -164,7 +162,7 @@ var ActiveXObject_responseType_funcs = {
     "document": function(result) {
         return new DOMParser().parseFromString(result, "text/html");
     }
-}
+};
 
 
 /* --- Read PacFORMS message data and insert in form */
@@ -196,7 +194,7 @@ function parse_form_data_text(text) {
         if (line.match(/^!OUTPOST! /)) {
             // Grab outpost data fields and store for substitution
             outpost_envelope = outpost_envelope_to_object(line);
-            return
+            return;
         }
         var idx = 0;
         if (field_name == "") {
@@ -204,16 +202,16 @@ function parse_form_data_text(text) {
             field_name = line.substring(0, idx);
             idx = index_of_field_value_start(linenum, line, idx) + 1;
         }
-        end_idx = line.indexOf("]", idx);
+        var end_idx = line.indexOf("]", idx);
         if (end_idx == -1) {
             // Field continues on next line
-            field_value += line.substring(idx)
+            field_value += line.substring(idx);
         } else {
             // Field is complete on this line
             field_value += line.substring(idx, end_idx);
             fields[field_name] = field_value;
-            field_name = ""
-            field_value = ""
+            field_name = "";
+            field_value = "";
         }
     });
     return fields;
@@ -226,7 +224,7 @@ function FormDataParseException(linenum, desc) {
 }
 
 function index_of_field_name_sep(linenum, line, startAt) {
-    var idx = line.indexOf(":", startAt)
+    var idx = line.indexOf(":", startAt);
     if (idx == -1) {
         throw new FormDataParseException(linenum, "no field name/value separator on line");
     }
@@ -269,7 +267,7 @@ function init_form_from_fields(fields, attribute, className) {
             }
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
                 if (className) {
-                    element.classList.add(className)
+                    element.classList.add(className);
                 }
                 var stop = init_from_msg_funcs[element.type](element, fields[field]);
                 fireEvent(element, 'change');
@@ -327,12 +325,12 @@ var init_from_msg_funcs = {
         element.checked = true;
         return true;
     }
-}
+};
 
 var unescape_func = {
     "\\": function () { return "\\"; },
     "n": function () { return "\n"; }
-}
+};
 
 /* This cannot be implemented as a string-replace function that
    handles all cases, so it is implemented by iterating through the
@@ -366,7 +364,7 @@ A PacForm-like description of the for mfield values is written into
 the textContent of the div with ID "form-data". */
 function write_pacforms_representation() {
     var form = document.querySelector("#the-form");
-    fldtxt = ""
+    var fldtxt = "";
     array_for_each(form.elements, function(element, index, array) {
         var result;
         if (element.disabled) {
@@ -381,7 +379,7 @@ function write_pacforms_representation() {
             result = null;
         }
         if (result) {
-            numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(element.name);
+            var numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(element.name);
             var resultText;
             if (numberMatch) {
                 resultText = numberMatch[1]+": "+result;
@@ -392,7 +390,7 @@ function write_pacforms_representation() {
         }
     });
     var msg = expand_template(
-        document.querySelector("#message-header").textContent).trim()
+        document.querySelector("#message-header").textContent).trim();
     msg += fldtxt + "\r\n#EOF\r\n";
     set_form_data_div(msg);
 }
@@ -413,7 +411,7 @@ var pacform_representation_funcs = {
     "checkbox": function(element) {
         return element.checked ? "checked" : null;
     }
-}
+};
 
 function escape_pacforms_string(string) {
     return string.replace(/\\/g, "\\\\").replace(/\n/g,"\\n");
@@ -426,7 +424,7 @@ function bracket_data(data) {
         data = data.replace(/([^`])]/, "$1`]");
         return "[" + data + "]";
     } else {
-        return null
+        return null;
     }
 }
 
@@ -443,7 +441,7 @@ function selected_field_values(css_selector) {
 }
 
 function field_value(field_name) {
-    return selected_field_values("[name=\""+field_name+"\"]").join("")
+    return selected_field_values("[name=\""+field_name+"\"]").join("");
 }
 
 
@@ -498,7 +496,7 @@ function expand_template(tmpl_str) {
             var stages = split_with_escape_tokenized(t[1], "|");
             var a = stages.shift().split(":");
             var fname = a.shift();
-            var farg = a.join(":")
+            var farg = a.join(":");
             var value = template_repl_func[fname](farg);
             stages.forEach(function (f) {
                 var a = f.split(":");
@@ -519,8 +517,8 @@ function expand_template(tmpl_str) {
 }
 
 function tokenize_template(tmpl_str) {
-    var result = []
-    var stack = []
+    var result = [];
+    var stack = [];
     var frag = tmpl_str.split("{{");
     frag = frag.map(function (e) { return e.split("}}"); });
     result.push([ "literal", frag[0].join("}}")]);
@@ -573,7 +571,7 @@ function split_with_escape_tokenized(str, sep) {
     var result = [];
     var tokens = tokenize_template(str);
     tokens.forEach(function (t) {
-        var v = ""
+        var v = "";
         if (result.length > 0) {
             v = result.pop();
         }
@@ -699,8 +697,8 @@ var template_filter_func = {
     },
 
     "re_search" : function (arg, orig_value) {
-        re = new RegExp(arg);
-        match = re.exec(orig_value);
+        var re = new RegExp(arg);
+        var match = re.exec(orig_value);
         if (match.length == 1) {
             return match[0];
         } else {
@@ -802,7 +800,9 @@ function process_html_includes(next) {
             // of the objects that need to be initialized are
             // accumulated and initialized at the end.
             process_html_includes(function() {
-                defaults ? init_form_from_fields(JSON.parse(defaults), 'name') : null;
+                if (defaults) {
+                    init_form_from_fields(JSON.parse(defaults), 'name');
+                }
                 next();
             });
         }, function () {
@@ -860,7 +860,7 @@ function check_the_form_validity() {
         button_header.classList.remove("valid");
         submit_button.disabled = true;
     }
-    return valid
+    return valid;
 }
 
 /* Callback invoked when the form changes */
@@ -873,11 +873,11 @@ function formChanged(event) {
 function opdirect_submit(e) {
     write_pacforms_representation();
     hide_form_data();
+    e.preventDefault();
     if (check_the_form_validity()) {
-        e.preventDefault();
         document.querySelector("#form-data-form").submit();
-        return false;
     }
+    return false;
 }
 
 /* Enable or disable a different control based on onChange values
@@ -942,7 +942,7 @@ function toggle_form_data_visibility() {
 
 This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
-    var form = document.querySelector("#the-form")
+    var form = document.querySelector("#the-form");
     if (query_object.mode && query_object.mode == "readonly") {
         document.querySelector("#button-header").classList.add("readonly");
         document.querySelector("#opdirect-submit").hidden = "true";
@@ -984,20 +984,20 @@ function get_form_data_from_div() {
 }
 
 function set_form_data_div(text) {
-    form_data = document.querySelector("#form-data")
+    var form_data = document.querySelector("#form-data");
     form_data.value = text;
 }
 
 /* Test whether the end of one string matches another */
 function string_ends_with(str, val) {
-    end = str.substring(str.length - val.length);
+    var end = str.substring(str.length - val.length);
     return end == val;
 }
 
 /* Simple padded number output string */
 function padded_int_str(num, cnt) {
     var s = Math.floor(num).toString();
-    var pad = cnt - s.length
+    var pad = cnt - s.length;
     for (var i = 0; i < pad; i++) {
         s = "0" + s;
     }
@@ -1045,7 +1045,7 @@ number of the line being processed and a string with the text of the
 line. */
 function for_each_line(str, func) {
     var linenum = 1;
-    var last_idx = 0
+    var last_idx = 0;
     var idx = str.indexOf("\n", last_idx);
     while (idx >= 0) {
         func(linenum++, str.substring(last_idx, idx));
@@ -1078,12 +1078,12 @@ function fireEvent(target, evt) {
 function outpost_envelope_to_object(line) {
     var data = {};
     line = line.substring(10); // Get rid of "!OUTPOST! "
-    list = line ? line.split(", ") : [];
+    var list = line ? line.split(", ") : [];
     list.forEach(function(element, index, array) {
         list = element.split("=");
         data[list[0]] = list.slice(1).join("=");
     });
-    return data
+    return data;
 }
 
 /* Generate an object from the query string.
@@ -1092,8 +1092,8 @@ This should be called as an init function; it will store the result in
 the global variable query_object */
 function query_string_to_object(next) {
     var query = {};
-    string = window.location.search.substring(1);
-    list = string ? string.split("&") : [];
+    var string = window.location.search.substring(1);
+    var list = string ? string.split("&") : [];
     list.forEach(function(element, index, array) {
         list = element.split("=");
         query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
