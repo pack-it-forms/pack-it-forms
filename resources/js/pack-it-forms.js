@@ -900,6 +900,11 @@ function email_submit(e) {
     return false;
 }
 
+/* Function invoked to clear the form */
+function clear_form(e) {
+    document.location.reload();
+}
+
 /* Enable or disable a different control based on onChange values
 
 This is a callback function to be used in the onChange handler of a

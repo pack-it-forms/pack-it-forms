@@ -6,6 +6,8 @@
            value="Submit to Outpost" form="the-form" disabled="disabled"/>
     <input id="email-submit" onclick="email_submit(event)" type="submit"
            value="Submit via Email" form="the-form"  disabled="disabled"/>
+    <input id="clear-form" type="button" value="Clear the form"
+           onclick="clear_form();"/>
   </div>
   <form id="form-data-form" method="post" action="http://127.0.0.1:9334/send">
     <textarea id="form-data" name="formtext" class="hidden"></textarea>
