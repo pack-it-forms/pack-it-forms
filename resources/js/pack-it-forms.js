@@ -852,13 +852,16 @@ function clear_form() {
 function check_the_form_validity() {
     var button_header = document.querySelector("#button-header");
     var submit_button = document.querySelector("#opdirect-submit");
+    var email_button  = document.querySelector("#email-submit");
     var valid = document.querySelector("#the-form").checkValidity();
     if (valid) {
         button_header.classList.add("valid");
         submit_button.disabled = false;
+        email_button.disabled = false;
     } else {
         button_header.classList.remove("valid");
         submit_button.disabled = true;
+        email_button.disabled = true;
     }
     return valid;
 }
@@ -876,6 +879,23 @@ function opdirect_submit(e) {
     e.preventDefault();
     if (check_the_form_validity()) {
         document.querySelector("#form-data-form").submit();
+    }
+    return false;
+}
+
+/* Function invoked when form is sent over email */
+function email_submit(e) {
+    write_pacforms_representation();
+    hide_form_data();
+    e.preventDefault();
+    if (check_the_form_validity()) {
+        var pacforms_rep = document.querySelector("#form-data").value;
+        // Use the subject line of the generated form, like outpost does
+        var subject = pacforms_rep.slice(6).split('\n',1)[0];
+        document.location = "mailto:?to="
+                          + "&Content-Type=application/pack-it-forms"
+                          + "&Subject=" + encodeURIComponent(subject)
+                          + "&body=" + encodeURIComponent(pacforms_rep);
     }
     return false;
 }
@@ -946,6 +966,7 @@ function setup_view_mode(next) {
     if (query_object.mode && query_object.mode == "readonly") {
         document.querySelector("#button-header").classList.add("readonly");
         document.querySelector("#opdirect-submit").hidden = "true";
+        document.querySelector("#email-submit").hidden = "true";
         document.querySelector("#show-hide-data").hidden = "true";
         /* In view mode, we don't want to show the input control chrome.  This
            is difficult to do with textareas which might need scrollbars, etc.
