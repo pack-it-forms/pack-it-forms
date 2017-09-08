@@ -1,11 +1,11 @@
 <div>
   <div id="button-header">
+    <input id="show-hide-data" type="button" value="Show Data Message"
+           onclick="toggle_form_data_visibility();" form="the-form"/>
     <input id="opdirect-submit" onclick="opdirect_submit(event)" type="submit"
            value="Submit to Outpost" form="the-form" disabled="disabled"/>
     <input id="email-submit" onclick="email_submit(event)" type="submit"
            value="Submit via Email" form="the-form"  disabled="disabled"/>
-    <input id="show-hide-data" type="button" value="Show Data Message"
-           onclick="toggle_form_data_visibility();" form="the-form"/>
   </div>
   <form id="form-data-form" method="post" action="http://127.0.0.1:9334/send">
     <textarea id="form-data" name="formtext" class="hidden"></textarea>
