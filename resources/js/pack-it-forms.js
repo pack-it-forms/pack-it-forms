@@ -973,6 +973,7 @@ function setup_view_mode(next) {
         document.querySelector("#opdirect-submit").hidden = "true";
         document.querySelector("#email-submit").hidden = "true";
         document.querySelector("#show-hide-data").hidden = "true";
+        document.querySelector("#clear-form").hidden = "true";
         /* In view mode, we don't want to show the input control chrome.  This
            is difficult to do with textareas which might need scrollbars, etc.
            so insert a div with the same contents and use CSS to appropriately
