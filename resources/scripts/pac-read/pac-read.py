@@ -118,16 +118,47 @@ def debug_close():
         debug_logfile.close()
 
 def registry_browser_cmd_fmt():
-    regkey = "\\http\\shell\\open\\command"
-    return winreg.QueryValue(winreg.HKEY_CLASSES_ROOT, regkey)
+    hkey_names = {
+            winreg.HKEY_CURRENT_USER: "HKEY_CURRENT_USER",
+            winreg.HKEY_LOCAL_MACHINE: "HKEL_LOCAL_MACHINE",
+            winreg.HKEY_CLASSES_ROOT: "HKEY_CLASSES_ROOT"
+        }
+    keys_to_check = [
+          (winreg.HKEY_CURRENT_USER,
+           "\\Software\\Classes\\FirefoxURL\\shell\\open\\command"),
+          (winreg.HKEY_LOCAL_MACHINE,
+           "\\Software\\Classes\\FirefoxURL\\shell\\open\\command"),
+          (winreg.HKEY_CLASSES_ROOT,
+           "\\FirefoxURL\\shell\\open\\command"),
+          (winreg.HKEY_CURRENT_USER,
+           "\\Software\\Classes\\http\\shell\\open\\command"),
+          (winreg.HKEY_LOCAL_MACHINE,
+           "\\Software\\Classes\\http\\shell\\open\\command"),
+          (winreg.HKEY_CLASSES_ROOT,
+           "\\http\\shell\\open\\command")
+        ]
+    for (category, keypath) in keys_to_check:
+        try:
+            value =  winreg.QueryValue(category, keypath)
+        except FileNotFoundError:
+            continue
+        else:
+            debug("Found browser command at: \\{!s}{!s}",
+                  hkey_names[category], keypath)
+            return value
+    debug("Could NOT find a browser command from the registry")
+    return None
 
 def verify_environment():
     global base_directory
     global version_filename
     global msg_directory
+    global config_filename
+    global config
     base_err = False
     install_err = False
     script_err = False
+    browser_err = False
     if not base_directory:
         debug("PACKITFORMS_BASE environment variable is not set")
         print("""
@@ -189,7 +220,23 @@ that location and replaced it with this script?
 
 """.format(original_pacread_exe))
         script_err = True
-    if base_err or install_err or script_err:
+    if not config["browser_cmd_fmt"]:
+        debug("No browser command was found or configured.")
+        print("""
+Could not determine a browser command.
+
+Try setting a browser in the file:
+
+   {!s}
+
+It should be formatted like:
+
+[pac-read]
+browser_cmd_fmt = "C:\\Program Files (x86)\\Firefox\\Firefox.exe" --url "%1"
+
+""".format(config_filename))
+        browser_err = True
+    if base_err or install_err or script_err or browser_err:
         sys.exit(1)
 
 def get_version():
