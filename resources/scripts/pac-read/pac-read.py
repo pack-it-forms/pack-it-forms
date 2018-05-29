@@ -105,8 +105,10 @@ def debug(fmt, *arg):
     global debug_logfile
     if debug_logfile:
         ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f ")
-        fmt = '{!s}' + fmt + '\n'
-        debug_logfile.write(fmt.format(ts, *arg))
+        lines = fmt.format(*arg).split("\n")
+        for l in lines:
+            if l.strip():
+                debug_logfile.write("{!s} {!s}\n".format(ts, l))
         debug_logfile.flush()
 
 def debug_close():
@@ -197,7 +199,7 @@ def get_version():
         v = f.readline().rstrip()
         return v
     except Exception as e:
-        debug("Ignoring exception while getting version {!r}",
+        debug("Ignoring exception while getting version\n{!s}",
               traceback.format_exc())
         return "unknown"
 
@@ -339,5 +341,5 @@ def pacforms_handler():
 try:
     main();
 except Exception as e:
-    debug("Exception caught at top level: {!r}", traceback.format_exc())
+    debug("Exception caught at top level\n{!s}", traceback.format_exc())
     raise e
