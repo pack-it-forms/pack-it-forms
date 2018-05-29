@@ -197,18 +197,15 @@ def get_version():
         v = f.readline().rstrip()
         return v
     except Exception as e:
-        debug("Exception: {!r}", e)
+        debug("Ignoring exception while getting version {!r}",
+              traceback.format_exc())
         return "unknown"
 
 def form_filename_from_msg(filename):
     global base_directory
     # Which form to open a message with is determined by the "#
     # FORMFILENAME: " line in the input file
-    try:
-        file = open(filename)
-    except Exception as e:
-        debug("Exception finding form filename in msg: {!r}", e)
-        raise e
+    file = open(filename)
     line = file.readline()
     while (not (line.startswith("# FORMFILENAME: ") or line == "")):
         line = file.readline();
@@ -222,29 +219,19 @@ def pack_it_forms_handler(form_filename, msg_filename, msgno):
                  form_filename, msgno, msg_filename)
     copy_msg_to_msgno_in_pack_it_forms_msgs_dir(msg_filename, msgno)
     url = "file:///" + form_filename + "?mode=readonly&msgno=" + msgno
-    try:
-        retcode = open_pack_it_forms_msg_in_browser(url)
-    except Exception as e:
-        debug("Exception: {!r}", e)
-        print(e)
-        sys.exit(1)
+    retcode = open_pack_it_forms_msg_in_browser(url)
     if retcode != 0:
         debug("browser returned error code {!r}", retcode)
     sys.exit(retcode)
 
 def copy_msg_to_msgno_in_pack_it_forms_msgs_dir(msg_filename, msgno):
     global msg_directory
-    try:
-        dst_filename = os.path.join(msg_directory, msgno)
-        if os.path.abspath(msg_filename) != os.path.abspath(dst_filename):
-            debug("Copying msg from {!r} to {!r}", msg_filename, dst_filename)
-            shutil.copy(msg_filename, dst_filename)
-        else:
-            debug("Skipping copy as supplied file is already in msgs dir.")
-    except Exception as e:
-        debug("Exception: {!r}", e)
-        print(e)
-        sys.exit(1)
+    dst_filename = os.path.join(msg_directory, msgno)
+    if os.path.abspath(msg_filename) != os.path.abspath(dst_filename):
+        debug("Copying msg from {!r} to {!r}", msg_filename, dst_filename)
+        shutil.copy(msg_filename, dst_filename)
+    else:
+        debug("Skipping copy as supplied file is already in msgs dir.")
 
 def open_pack_it_forms_msg_in_browser(url):
     cmd = format_browser_cmd(url)
@@ -344,12 +331,7 @@ def pacforms_handler():
     global original_read_exe
     sys.argv[0] = original_pacread_exe
     debug("running PacFORMS pac-read as: {!r}", sys.argv)
-    try:
-        retcode = subprocess.call(sys.argv)
-    except Exception as e:
-        debug("Exception: {!r}", e)
-        print(e)
-        sys.exit(1)
+    retcode = subprocess.call(sys.argv)
     if retcode != 0:
         debug("PacFORMS pac-read.exe returned error code {!r}", retcode)
     sys.exit(retcode)
