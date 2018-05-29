@@ -250,6 +250,7 @@ def format_browser_cmd(url):
     pending_backslash = False
     pending_percent = False
     in_quotes = False
+    last_was_quote = False
     for c in config["browser_cmd_fmt"]:
         if c == '\\':
             if pending_percent:
@@ -260,6 +261,7 @@ def format_browser_cmd(url):
                 pending_backslash = False
             else:
                 pending_backslash = True
+            last_was_quote = False
         elif c == '"':
             if pending_percent:
                 arg += '%'
@@ -269,6 +271,7 @@ def format_browser_cmd(url):
                 pending_backslash = False
             else:
                 in_quotes = not in_quotes
+            last_was_quote = True
         elif c == '%':
             if pending_backslash:
                 arg += '\\%'
@@ -278,6 +281,7 @@ def format_browser_cmd(url):
                 pending_percent = False
             else:
                 pending_percent = True
+            last_was_quote = False
         elif c == '1':
             if pending_backslash:
                 arg += '\\'
@@ -287,6 +291,7 @@ def format_browser_cmd(url):
                 pending_percent = False
             else:
                 arg += '1'
+            last_was_quote = False
         elif c == ' ' or c == '\t':
             if pending_backslash:
                 arg += '\\'
@@ -297,14 +302,10 @@ def format_browser_cmd(url):
             if in_quotes:
                 arg += c
             else:
-                # This logic will drop quoted empty arguments. I don't
-                # think this will be a problem in this application,
-                # but we'll see. Supporting empty arguments requires
-                # more logic to distinguish that case from multiple
-                # whitespace characters between arguments.
-                if len(arg) > 0:
+                if len(arg) > 0 or last_was_quote:
                     cmd.append(arg)
                     arg = ''
+            last_was_quote = False
         else:
             if pending_backslash:
                 arg += '\\'
@@ -313,18 +314,14 @@ def format_browser_cmd(url):
                 arg += '%'
                 pending_percent = False
             arg += c
+            last_was_quote = False
     if pending_backslash:
         arg += '\\'
         pending_backslash = False
     if pending_percent:
         arg += '%'
         pending_percent = False
-    # This logic will drop quoted empty arguments. I don't
-    # think this will be a problem in this application,
-    # but we'll see. Supporting empty arguments requires
-    # more logic to distinguish that case from multiple
-    # whitespace characters between arguments.
-    if len(arg) > 0:
+    if len(arg) > 0 or last_was_quote:
         cmd.append(arg)
         arg = ''
     return cmd
