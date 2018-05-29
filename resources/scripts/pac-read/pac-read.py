@@ -21,7 +21,7 @@
 # pack-it-forms msg directory and opens the form.  If not, it calls
 # the original pac-read.exe with the same arguments it was called with.
 
-import sys, os, os.path, subprocess, shutil, configparser, datetime
+import sys, os, os.path, subprocess, shutil, configparser, datetime, traceback
 try:
     import winreg
 except ImportError as e:
@@ -354,4 +354,8 @@ def pacforms_handler():
         debug("PacFORMS pac-read.exe returned error code {!r}", retcode)
     sys.exit(retcode)
 
-main();
+try:
+    main();
+except Exception as e:
+    debug("Exception caught at top level: {!r}", traceback.format_exc())
+    raise e
