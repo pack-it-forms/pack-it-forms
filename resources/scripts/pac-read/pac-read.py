@@ -89,7 +89,7 @@ def read_config():
     if config_filename and os.path.exists(config_filename):
         debug("Found config file at {!r}", config_filename)
 
-    config["browser_cmd_fmt"] = parser.get("pac-read", "browser",
+    config["browser_cmd_fmt"] = parser.get("pac-read", "browser_cmd_fmt",
                                            fallback=registry_browser_cmd_fmt())
 
 def debug_open():
