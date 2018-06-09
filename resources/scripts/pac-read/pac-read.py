@@ -22,6 +22,8 @@
 # the original pac-read.exe with the same arguments it was called with.
 
 import sys, os, os.path, subprocess, shutil, configparser, datetime, traceback
+import re
+
 try:
     import winreg
 except ImportError as e:
@@ -31,6 +33,12 @@ except ImportError as e:
         def QueryValue(tree, var):
             return '"firefox" "%1"'
         HKEY_CLASSES_ROOT=""
+
+HKEY_NAMES = {
+    winreg.HKEY_CURRENT_USER: "HKEY_CURRENT_USER",
+    winreg.HKEY_LOCAL_MACHINE: "HKEL_LOCAL_MACHINE",
+    winreg.HKEY_CLASSES_ROOT: "HKEY_CLASSES_ROOT"
+}
 
 # Assume the original PacFORMS pac-read.exe was renamed
 # pac-read-pacforms.exe in the same directory and this script replaced
@@ -118,18 +126,60 @@ def debug_close():
         debug_logfile.close()
 
 def registry_browser_cmd_fmt():
-    hkey_names = {
-            winreg.HKEY_CURRENT_USER: "HKEY_CURRENT_USER",
-            winreg.HKEY_LOCAL_MACHINE: "HKEL_LOCAL_MACHINE",
-            winreg.HKEY_CLASSES_ROOT: "HKEY_CLASSES_ROOT"
-        }
+    debug("Searching for browser command format in registry")
+    cmd = None
+    for f in [ registry_browser_from_firefox_url_class_search,
+               registry_browser_from_http_user_choice,
+               registry_browser_from_http_class_search ]:
+        cmd = f()
+        if cmd:
+            debug("Found format: {!s}", cmd)
+            break
+    return cmd
+
+def registry_browser_from_firefox_url_class_search():
+    debug("Searching for Firefox URL class")
+    global HKEY_NAMES
+    cmd = None
+    matches = registry_find_matching_subkey(winreg.HKEY_CURRENT_USER,
+                                            "\\Software\\Classes",
+                                            r"FirefoxURL(-[0-9a-fA-F]+)?")
+    matches += registry_find_matching_subkey(winreg.HKEY_LOCAL_MACHINE,
+                                             "\\Software\\Classes",
+                                             r"FirefoxURL(-[0-9a-fA-F]+)?")
+    matches += registry_find_matching_subkey(winreg.HKEY_CLASSES_ROOT,
+                                             "",
+                                             r"FirefoxURL(-[0-9a-fA-F]+)?")
+    if matches:
+        for (category, keypath) in matches:
+            debug("Checking {!s}{!s}", HKEY_NAMES[category], keypath)
+            key = keypath + "\\shell\\open\\command"
+            cmd = registry_get_key_with_default(category, key)
+            if cmd:
+                break
+    return cmd
+
+def registry_browser_from_http_user_choice():
+    debug("Checking HTTP user choice values")
+    global HKEY_NAMES
+    cmd = None
+    key = "\\SOFTWARE\\Microsoft\\Windows\\Shell\\Associations"
+    key += "\\UrlAssociations\\http\\UserChoice\\ProgId"
+    choice = registry_get_key_with_default(winreg.HKEY_CURRENT_USER, key)
+    debug("{!s}{!s} = {!r}",
+          HKEY_NAMES[winreg.HKEY_CURRENT_USER], key, choice)
+    if choice:
+        key = "\\" + choice + "\\shell\\open\\command"
+        cmd = registry_get_key_with_default(winreg.HKEY_CLASSES_ROOT, key)
+        debug("{!s}{!s} = {!r}",
+              HKEY_NAMES[winreg.HKEY_CLASSES_ROOT], key, cmd)
+    return cmd
+
+def registry_browser_from_http_class_search():
+    debug("Checking for HTTP class values")
+    global HKEY_NAMES
+
     keys_to_check = [
-          (winreg.HKEY_CURRENT_USER,
-           "\\Software\\Classes\\FirefoxURL\\shell\\open\\command"),
-          (winreg.HKEY_LOCAL_MACHINE,
-           "\\Software\\Classes\\FirefoxURL\\shell\\open\\command"),
-          (winreg.HKEY_CLASSES_ROOT,
-           "\\FirefoxURL\\shell\\open\\command"),
           (winreg.HKEY_CURRENT_USER,
            "\\Software\\Classes\\http\\shell\\open\\command"),
           (winreg.HKEY_LOCAL_MACHINE,
@@ -137,17 +187,69 @@ def registry_browser_cmd_fmt():
           (winreg.HKEY_CLASSES_ROOT,
            "\\http\\shell\\open\\command")
         ]
-    for (category, keypath) in keys_to_check:
+    cmd = registry_get_first_key(keys_to_check)
+    return cmd
+
+def registry_find_matching_subkey(category, keypath, regexp):
+    global HKEY_NAMES
+    matches = []
+    pattern = re.compile(regexp)
+    debug("Checking {!s}{!s} for keys in {!r}", HKEY_NAMES[category], keypath, regexp)
+    keyobjs = registry_open_keypath(category, keypath)
+    if keyobjs:
+        i = 0
+        while True:
+            try:
+                subkey = winreg.EnumKey(keyobjs[0], i)
+            except EnvironmentError:
+                break  # Checked all entries"
+            else:
+                if pattern.fullmatch(subkey):
+                    matches.append((category, keypath + "\\" + subkey))
+                    debug("Found {!s}{!s}\\{!s}", HKEY_NAMES[category], keypath, subkey)
+                i += 1
+    else:
+        debug("Path doesn't exist")
+    return matches
+
+def registry_open_keypath(category, keypath):
+    global HKEY_NAMES
+    keyobjs = []
+    current = category
+    for n in keypath.split("\\"):
         try:
-            value =  winreg.QueryValue(category, keypath)
+            current = winreg.OpenKey(current, n)
         except FileNotFoundError:
-            continue
+            registry_close_keypath(keyobjs)
+            return None
         else:
-            debug("Found browser command at: \\{!s}{!s}",
-                  hkey_names[category], keypath)
-            return value
-    debug("Could NOT find a browser command from the registry")
+            keyobjs.insert(0, current)
+    return keyobjs
+
+
+def registry_close_keypath(keyobjs):
+    for k in keyobjs:
+        winreg.CloseKey(k)
+
+def registry_get_first_key(key_tuple_list):
+    global HKEY_NAMES
+    for (category, keypath) in key_tuple_list:
+        debug("Checking key {!s}{!s}", HKEY_NAMES[category], keypath)
+        v = registry_get_key_with_default(category, keypath)
+        if v:
+            return v
     return None
+
+def registry_get_key_with_default(category, keypath, default=None):
+    keyobjs = registry_open_keypath(category, keypath)
+    if keyobjs:
+        try:
+            value = winreg.QueryValue(keyobjs[0], "")
+        finally:
+            registry_close_keypath(keyobjs)
+        return value
+    else:
+        return default
 
 def verify_environment():
     global base_directory
