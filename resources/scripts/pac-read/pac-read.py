@@ -186,7 +186,7 @@ def registry_browser_from_http_user_choice():
     debug("Checking HTTP user choice association")
     global HKEY_NAMES
     cmd = None
-    key = "\\SOFTWARE\\Microsoft\\Windows\\Shell\\Associations"
+    key = "\\Software\\Microsoft\\Windows\\Shell\\Associations"
     key += "\\UrlAssociations\\http\\UserChoice\\ProgId"
     choice = registry_get_key_with_default(winreg.HKEY_CURRENT_USER, key)
     if choice:
