@@ -143,7 +143,6 @@ def registry_browser_cmd_fmt():
                registry_browser_from_http_class_search ]:
         cmd = f()
         if cmd:
-            debug("Found format: {!s}", cmd)
             options.append(cmd)
             if not config["exhaustive_registry_check"]:
                 break
@@ -154,7 +153,7 @@ def registry_browser_cmd_fmt():
         return None
 
 def registry_browser_from_firefox_url_class_search():
-    debug("Searching for Firefox URL class")
+    debug("Checking for Firefox URL class entries")
     global HKEY_NAMES
     global config
     options = []
@@ -169,32 +168,35 @@ def registry_browser_from_firefox_url_class_search():
                                              r"FirefoxURL(-[0-9a-fA-F]+)?")
     if matches:
         for (category, keypath) in matches:
-            debug("Checking {!s}{!s}", HKEY_NAMES[category], keypath)
             key = keypath + "\\shell\\open\\command"
             cmd = registry_get_key_with_default(category, key)
             if cmd:
-                options.append(cmd)
+                options.append((category, key, cmd))
                 if not config["exhaustive_registry_check"]:
                     break
     if options:
-        return options[0]
+        debug("Selected {!s}{!s} = {!r}",
+              HKEY_NAMES[options[0][0]], options[0][1], options[0][2])
+        return options[0][2]
     else:
+        debug("None found")
         return None
 
 def registry_browser_from_http_user_choice():
-    debug("Checking HTTP user choice values")
+    debug("Checking HTTP user choice association")
     global HKEY_NAMES
     cmd = None
     key = "\\SOFTWARE\\Microsoft\\Windows\\Shell\\Associations"
     key += "\\UrlAssociations\\http\\UserChoice\\ProgId"
     choice = registry_get_key_with_default(winreg.HKEY_CURRENT_USER, key)
-    debug("{!s}{!s} = {!r}",
-          HKEY_NAMES[winreg.HKEY_CURRENT_USER], key, choice)
     if choice:
         key = "\\" + choice + "\\shell\\open\\command"
         cmd = registry_get_key_with_default(winreg.HKEY_CLASSES_ROOT, key)
-        debug("{!s}{!s} = {!r}",
+    if cmd:
+        debug("Selected {!s}{!s} = {!r}",
               HKEY_NAMES[winreg.HKEY_CLASSES_ROOT], key, cmd)
+    else:
+        debug("None found")
     return cmd
 
 def registry_browser_from_http_class_search():
@@ -216,7 +218,7 @@ def registry_find_matching_subkey(category, keypath, regexp):
     global HKEY_NAMES
     matches = []
     pattern = re.compile(regexp)
-    debug("Checking {!s}{!s} for keys in {!r}", HKEY_NAMES[category], keypath, regexp)
+    debug("Searching {!s}{!s} for keys in {!r}", HKEY_NAMES[category], keypath, regexp)
     keyobjs = registry_open_keypath(category, keypath)
     if keyobjs:
         try:
@@ -261,26 +263,35 @@ def registry_get_first_key(key_tuple_list):
     global config
     options = []
     for (category, keypath) in key_tuple_list:
-        debug("Checking key {!s}{!s}", HKEY_NAMES[category], keypath)
         v = registry_get_key_with_default(category, keypath)
         if v:
-            options.append(v)
+            options.append((category, keypath, v))
             if not config["exhaustive_registry_check"]:
                 break
     if options:
-        return options[0]
+        debug("Selected {!s}{!s} = {!r}",
+              HKEY_NAMES[options[0][0]], options[0][1], options[0][2])
+        return options[0][2]
     else:
+        debug("None found")
         return None
 
 def registry_get_key_with_default(category, keypath, default=None):
+    global HKEY_NAMES
+    global config
     keyobjs = registry_open_keypath(category, keypath)
     if keyobjs:
         try:
             value = winreg.QueryValue(keyobjs[0], "")
         finally:
             registry_close_keypath(keyobjs)
+        if config["exhaustive_registry_check"]:
+            debug("{!s}{!s} = {!r}", HKEY_NAMES[category], keypath, value)
         return value
     else:
+        if config["exhaustive_registry_check"]:
+            debug("{!s}{!s} not found, returning default {!r}",
+                  HKEY_NAMES[category], keypath, default)
         return default
 
 def verify_environment():
