@@ -19,7 +19,7 @@ fi
 tmpdir=$(mktemp -d -p .)
 dest="${tmpdir}/pack-it-forms"
 mkdir "${dest}"
-git ls-files -z | xargs -0 -L 1 --replace=file install -D "file" "${dest}/file"
+git ls-files -z | xargs -0 -L 1 --replace=file install -v -D "file" "${dest}/file"
 (cd "resources/scripts/pac-read" && python ./setup.py build)
 cp -r "resources/scripts/pac-read/build" "${dest}/resources/scripts/pac-read/"
 (cd "${tmpdir}" && powershell Compress-Archive -Path pack-it-forms -DestinationPath "..\\${distfile}")
