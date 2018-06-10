@@ -219,17 +219,20 @@ def registry_find_matching_subkey(category, keypath, regexp):
     debug("Checking {!s}{!s} for keys in {!r}", HKEY_NAMES[category], keypath, regexp)
     keyobjs = registry_open_keypath(category, keypath)
     if keyobjs:
-        i = 0
-        while True:
-            try:
-                subkey = winreg.EnumKey(keyobjs[0], i)
-            except EnvironmentError:
-                break  # Checked all entries"
-            else:
-                if pattern.fullmatch(subkey):
-                    matches.append((category, keypath + "\\" + subkey))
-                    debug("Found {!s}{!s}\\{!s}", HKEY_NAMES[category], keypath, subkey)
-                i += 1
+        try:
+            i = 0
+            while True:
+                try:
+                    subkey = winreg.EnumKey(keyobjs[0], i)
+                except EnvironmentError:
+                    break  # Checked all entries"
+                else:
+                    if pattern.fullmatch(subkey):
+                        matches.append((category, keypath + "\\" + subkey))
+                        debug("Found {!s}{!s}\\{!s}", HKEY_NAMES[category], keypath, subkey)
+                    i += 1
+        finally:
+            registry_close_keypath(keyobjs)
     else:
         debug("Path doesn't exist")
     return matches
