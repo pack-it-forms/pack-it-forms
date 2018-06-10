@@ -252,8 +252,9 @@ def registry_open_keypath(category, keypath):
 
 
 def registry_close_keypath(keyobjs):
-    for k in keyobjs:
-        winreg.CloseKey(k)
+    if keyobjs:
+        for k in keyobjs:
+            winreg.CloseKey(k)
 
 def registry_get_first_key(key_tuple_list):
     global HKEY_NAMES
