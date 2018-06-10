@@ -97,8 +97,12 @@ def read_config():
     if config_filename and os.path.exists(config_filename):
         debug("Found config file at {!r}", config_filename)
 
+    config["exhaustive_registry_check"] = parser.getboolean("pac-read",
+                                                   "exhaustive_registry_check",
+                                                   fallback=False)
     config["browser_cmd_fmt"] = parser.get("pac-read", "browser_cmd_fmt",
                                            fallback=registry_browser_cmd_fmt())
+    debug("Final command format: {!s}", config["browser_cmd_fmt"])
 
 def debug_open():
     global debug_logfile
@@ -126,7 +130,13 @@ def debug_close():
         debug_logfile.close()
 
 def registry_browser_cmd_fmt():
-    debug("Searching for browser command format in registry")
+    global config
+    exhaustive_msg = ""
+    if config["exhaustive_registry_check"]:
+        exhaustive_msg = " (exhaustively)"
+    debug("Searching for browser command format in registry{!s}",
+          exhaustive_msg)
+    options = []
     cmd = None
     for f in [ registry_browser_from_firefox_url_class_search,
                registry_browser_from_http_user_choice,
@@ -134,13 +144,20 @@ def registry_browser_cmd_fmt():
         cmd = f()
         if cmd:
             debug("Found format: {!s}", cmd)
-            break
-    return cmd
+            options.append(cmd)
+            if not config["exhaustive_registry_check"]:
+                break
+    if options:
+        debug("Registry search result: {!s}", options[0])
+        return options[0]
+    else:
+        return None
 
 def registry_browser_from_firefox_url_class_search():
     debug("Searching for Firefox URL class")
     global HKEY_NAMES
-    cmd = None
+    global config
+    options = []
     matches = registry_find_matching_subkey(winreg.HKEY_CURRENT_USER,
                                             "\\Software\\Classes",
                                             r"FirefoxURL(-[0-9a-fA-F]+)?")
@@ -156,8 +173,13 @@ def registry_browser_from_firefox_url_class_search():
             key = keypath + "\\shell\\open\\command"
             cmd = registry_get_key_with_default(category, key)
             if cmd:
-                break
-    return cmd
+                options.append(cmd)
+                if not config["exhaustive_registry_check"]:
+                    break
+    if options:
+        return options[0]
+    else:
+        return None
 
 def registry_browser_from_http_user_choice():
     debug("Checking HTTP user choice values")
@@ -213,7 +235,6 @@ def registry_find_matching_subkey(category, keypath, regexp):
     return matches
 
 def registry_open_keypath(category, keypath):
-    global HKEY_NAMES
     keyobjs = []
     current = category
     for n in keypath.split("\\"):
@@ -233,12 +254,19 @@ def registry_close_keypath(keyobjs):
 
 def registry_get_first_key(key_tuple_list):
     global HKEY_NAMES
+    global config
+    options = []
     for (category, keypath) in key_tuple_list:
         debug("Checking key {!s}{!s}", HKEY_NAMES[category], keypath)
         v = registry_get_key_with_default(category, keypath)
         if v:
-            return v
-    return None
+            options.append(v)
+            if not config["exhaustive_registry_check"]:
+                break
+    if options:
+        return options[0]
+    else:
+        return None
 
 def registry_get_key_with_default(category, keypath, default=None):
     keyobjs = registry_open_keypath(category, keypath)
