@@ -1,4 +1,0 @@
-[pac-read]
-#debug = True
-#browser_cmd_fmt = "C:\Program Files\Mozilla Firefox\firefox.exe" -osint -url "%1"
-#exhaustive_registry_check = True
