@@ -172,6 +172,10 @@ table ~ table :first-child:first-child > td {
     display: none;
 }
 
+.version {
+    display: none;
+}
+
 #message-header {
     display: none;
 }

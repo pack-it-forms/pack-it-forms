@@ -20,6 +20,7 @@ var query_object = {};     // Cached query string parameters
 var outpost_envelope = {}; // Cached outpost envelop information
 var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Cached message field values
+var versions = {};         // Version information
 
 /* --- Registration for code to run after page loads
 
@@ -651,6 +652,13 @@ var template_repl_func = {
         return document.location.pathname.substring(i);
     },
 
+    "version": function(arg) {
+        var includes = versions.includes.map(function(i) {
+            return i.name + "=" + i.version;
+        }).join(", ");
+        return versions.form + "; " + includes;
+    },
+
     "title" : function (arg) {
         return document.title;
     },
@@ -768,6 +776,10 @@ function process_html_includes(next) {
         var msg_url = "resources/html/"+name+".html";
         var msg_request = new XMLHttpRequest();
         open_async_request("GET", msg_url, "document", function (response) {
+            // Save the version of the included file
+            var version = response.querySelector(".version").textContent;
+            versions.includes.unshift({ name: name, version: version });
+
             var parent = include.parentNode;
             // We have to modify the innerHTML after appending for
             // Firefox to recognize the new elements.
@@ -810,6 +822,12 @@ function process_html_includes(next) {
             process_html_includes(next);
         });
     } else {
+        // Sort the version information to ensure a stable ordering
+        versions.includes.sort(function(a, b) {
+            if (a.name < b.name) { return -1; }
+            else if (b.name < a.name) { return 1; }
+            else { return 0; }
+        });
         // If all includes have been processed, then continue;
         next();
     }
@@ -1129,6 +1147,12 @@ function query_string_to_object(next) {
     next();
 }
 
+function load_form_version(next) {
+    versions.form = document.querySelector(".version").textContent;
+    versions.includes = [];
+    next();
+}
+
 function remove_loading_overlay(next) {
     var el = document.querySelector("#loading");
     if (el) {
@@ -1147,6 +1171,7 @@ function startup_delay(next) {
 
 /* --- Registration of startup functions that run on page load */
 
+startup_functions.push(load_form_version);
 startup_functions.push(process_html_includes);
 startup_functions.push(query_string_to_object);
 startup_functions.push(load_callprefix);
