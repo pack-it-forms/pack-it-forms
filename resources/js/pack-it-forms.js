@@ -715,6 +715,13 @@ var template_filter_func = {
     },
 
     "nth" : function (arg, orig_value) {
+        last = orig_value.length - 1
+        if (last < 0) {
+            return undefined;
+        }
+        if (arg > last) {
+            arg = last
+        }
         return orig_value[arg];
     },
 
