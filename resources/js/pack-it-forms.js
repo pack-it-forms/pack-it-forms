@@ -1,5 +1,6 @@
 /* Copyright 2014 Keith Amidon
    Copyright 2014 Peter Amidon
+   Copyright 2018 John Kristian
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,18 +30,29 @@ execution after the page loads.  This is implements the mechanism, the
 calls registering startup functions are at the end of this file. */
 var startup_functions = new Array();
 
+function alert_error(e) {
+    if (e && e.stack) {
+        alert(e.stack);
+    } else {
+        try {
+            throw(new Error(JSON.stringify(e)));
+        } catch(f) {
+            alert(f.stack);
+        }
+    }
+}
+
 function startup() {
     /* The startup functions are called in continuation-passing style,
     so that they can contain asynchronous code that moves to the next
     function when it is complete. */
-    startup_functions.shift()(callclist(startup_functions));
-
-    function callclist(functions) {
-        return function() {
-            if (functions.length > 0) {
-                functions.shift()(callclist(functions));
-            }
-        };
+    var next = (startup_functions.length > 0) && startup_functions.shift();
+    if (next) {
+        try {
+            next(startup);
+        } catch(e) {
+            alert_error(e);
+        }
     }
 }
 
@@ -85,21 +97,26 @@ function init_form(next) {
                     }
                 }, function () {});
             } catch (e) {
+                alert_error(e);
             }
         }
     }
     /* Wait 10ms to force Javascript to yield so that the DOM can be
      * updated before we do other work. */
     window.setTimeout(function () {
-        expand_templated_items();
-        var first_field = document.querySelector("#the-form :invalid");
-        if (first_field) {
-            first_field.focus();
-        } else {
-            the_form[0].focus();
+        try {
+            expand_templated_items();
+            var first_field = document.querySelector("#the-form :invalid");
+            if (first_field) {
+                first_field.focus();
+            } else {
+                the_form[0].focus();
+            }
+            check_the_form_validity();
+            write_pacforms_representation();
+        } catch(e) {
+            alert_error(e);
         }
-        check_the_form_validity();
-        write_pacforms_representation();
         next();
     }, 10);
 }
@@ -218,16 +235,10 @@ function parse_form_data_text(text) {
     return fields;
 }
 
-function FormDataParseException(linenum, desc) {
-    this.name = "FormDataParseException";
-    this.linenum = linenum;
-    this.message = "Parse error on line " + linenum.toString() + ": " + desc;
-}
-
 function index_of_field_name_sep(linenum, line, startAt) {
     var idx = line.indexOf(":", startAt);
     if (idx == -1) {
-        throw new FormDataParseException(linenum, "no field name/value separator on line");
+        throw new Error("no field name/value separator in line " + linenum + " " + line);
     }
     return idx;
 }
@@ -235,7 +246,7 @@ function index_of_field_name_sep(linenum, line, startAt) {
 function index_of_field_value_start(linenum, line, startAt) {
     var idx = line.indexOf("[", startAt);
     if (idx == -1) {
-        throw new FormDataParseException(linenum, "no field value open bracket");
+        throw new Error("no field value open bracket in line " + linenum + " " + line);
     }
     return idx;
 }
@@ -1032,7 +1043,8 @@ function expand_templated_items() {
 }
 
 function get_form_data_from_div() {
-    return document.querySelector("#form-data").value;
+    var form_data = document.querySelector("#form-data");
+    return form_data ? form_data.value : "";
 }
 
 function set_form_data_div(text) {
