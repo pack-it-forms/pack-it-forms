@@ -946,6 +946,14 @@ function emptystr_if_null(argument) {
     return argument ? argument : "";
 }
 
+/* Ping the server periodically, to let it know this page has not been closed. */
+function ping() {
+    var img = new Image();
+    img.src = '/ping';
+    img = undefined;
+}
+setInterval(ping, 30000); // call ping every 30 seconds
+
 /* --- Cross-browser convenience functions --- */
 
 function fireEvent(target, evt) {

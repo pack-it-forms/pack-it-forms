@@ -6,8 +6,7 @@ for creating and displaying message with a compact representation for
 packet radio transmission of the entered data, *pack-it-forms* is a
 respectful re-implementation with a number of advantages:
 
-1. All processing is done in-browser in Javascript: No external
-   program is required for parsing the message data.
+1. Most processing is done in Javascript in a browser.
 
 2. Message encoding is derived from form markup: The field names used
    in the message text are derived from the `name` attribute of the
@@ -34,18 +33,8 @@ Using Forms
 Installation
 ------------
 
-Originally there was only a single method of using pack-it-forms
-involving the Outpost radio messenger application and PacFORMs, but
-there are now several methods, each of which is implemented their own
-repository.
-
-The Outpost+PacFORMS method is still the currently the recommended
-method, though it is hoped it will be obsolete in the near future.
-Installation instructions can be found in the
-
-[pack-it-forms outpost-pacread](https://github.com/pack-it-forms/outpost-pacread)
-
-project. As other methods are released they will be documented here.
+Installation instructions can be found in
+[Outpost for LAARES](https://github.com/jmkristian/OutpostForLAARES).
 
 Entering Data in a New Form
 ---------------------------
