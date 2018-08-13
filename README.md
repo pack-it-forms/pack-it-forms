@@ -40,8 +40,8 @@ Entering Data in a New Form
 ---------------------------
 
 To enter data in a new form, click an item in Outpost's "Forms" menu.
-Outpost executes the software you installed (see above), which expands
-server side includes in the HTML and opens the result in your web browser.
+Outpost executes the software you installed (see above),
+which opens a form in your web browser.
 It may take some time to load, during which it will display a spinner.
 Once loaded you will see a typical browser form.  Across the top of
 the page is a header bar with two buttons:
