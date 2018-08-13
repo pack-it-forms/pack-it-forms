@@ -134,13 +134,13 @@ function parse_form_data_text(text) {
         if (line.match(/^\s*$/)) {
             return;  // Ignore empty lines
         }
-        if (line.match(/^!PACF!/)) {
-            return;  // Ignore PACF line as we don't need anything from it.
-        }
         if (line.match(/^!OUTPOST! /)) {
             // Grab outpost data fields and store for substitution
             outpost_envelope = outpost_envelope_to_object(line);
             return;
+        }
+        if (line.match(/^![^!]*!\s*$/)) {
+            return;  // Ignore line as we don't need anything from it.
         }
         var idx = 0;
         if (field_name == "") {
@@ -331,7 +331,7 @@ function write_pacforms_representation() {
     });
     var msg = expand_template(
         document.querySelector("#message-header").textContent).trim();
-    msg += fldtxt + "\r\n#EOF\r\n";
+    msg += fldtxt + "\r\n";
     set_form_data_div(msg);
 }
 
