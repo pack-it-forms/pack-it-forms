@@ -1,5 +1,14 @@
 <script>
   // Cached call prefixes for expansion:
   var callprefixes = <!--#include file="cfgs/msgno-prefixes.json" -->;
+
+  /* The "environment" value comes from the server side include processor.
+     It's expected to be a JavaScript (or JSON) object literal containing:
+     msgno: the message number, e.g. "ABC-123"
+     ocall: the call sign of the originator
+     oname: the personal name of the originator
+     filename: the simple name of the top-level HTML file for this message.
+   */
+  var environment = <!--#echo var="environment" -->;
 </script>
 <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>

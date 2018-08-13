@@ -17,7 +17,6 @@
 /* Common code for handling PacFORMS forms */
 
 /* --- Commonly used global objects */
-var query_object = {};     // Cached query string parameters
 var outpost_envelope = {}; // Cached outpost envelop information
 var msgfields = {};        // Cached message field values
 var versions = {};         // Version information
@@ -70,7 +69,7 @@ contents found in one of these locations in order of preference:
 
 If no form data exists in any of these locations a new form will be
 filled with default contents.  The default data filling includes
-reading the Outpost query string parameters, which should allow for
+reading the Outpost environment variables, which should allow for
 good Outpost integration. */
 function init_form(next) {
     // Setup focus tracking within the form
@@ -85,19 +84,10 @@ function init_form(next) {
     if (text.trim().length != 0) {
         init_form_from_msg_data(text);
     } else {
-        var  msgno = query_object['msgno'];
-        if (msgno) {
-            var msg_url = "msgs/" + msgno;
-            try {
-                open_async_request("GET", msg_url, "text", function (text) {
-                    if (text.trim().length > 0) {
-                        set_form_data_div(text);
-                        init_form_from_msg_data(text);
-                    }
-                }, function () {});
-            } catch (e) {
-                alert_error(e);
-            }
+        text = emptystr_if_null(environment.message).trim();
+        if (text.length > 0) {
+            set_form_data_div(text);
+            init_form_from_msg_data(text);
         }
     }
     /* Wait 10ms to force Javascript to yield so that the DOM can be
@@ -119,67 +109,6 @@ function init_form(next) {
         next();
     }, 10);
 }
-
-/* Cross-browser resource loading w/local file handling
-
-This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
-Explorer and a regular XMLHttpRequest in other places because using
-the ActiveXObject in Internet Explorer allows a file loaded through a
-file:// uri to access other resources through a file:// uri. */
-function open_async_request(method, url, responseType, cb, err) {
-    var request;
-    if (window.ActiveXObject !== undefined) {
-        request = new ActiveXObject("Msxml2.XMLHTTP");
-        request.open(method, url, false);
-        request.onreadystatechange = function(e) {
-            if (request.readyState == 4) {
-                var text = request.responseText;
-                if (ActiveXObject_responseType_funcs.hasOwnProperty(responseType)) {
-                    cb(ActiveXObject_responseType_funcs[responseType](text));
-                }
-            }
-        };
-        request.send();
-    } else {
-        request = new XMLHttpRequest();
-        request.open(method, url, true);
-        request.responseType = responseType;
-        // Opera won't load HTML documents unless the MIME type is
-        // set to text/xml
-        var overriden = false;
-        request.onreadystatechange = function callcb(e) {
-            if (e.target.readyState == e.target.DONE) {
-                if (e.target.response) {
-                    cb(e.target.response);
-                } else if (responseType == "document" && !overriden) {
-                    request = new XMLHttpRequest();
-                    request.open(method, url, true);
-                    request.responseType = responseType;
-                    request.overrideMimeType("text/xml");
-                    overriden = true;
-                    request.onreadystatechange = callcb;
-                    request.send();
-                } else {
-                    err();
-                }
-            }
-        };
-        request.send();
-    }
-}
-
-/* Since Msxml2.XMLHTTP doesn't support proper response types, we use
-   these functions in Internet Explorer to convert text into the
-   correct types.  Currently, only text and document types are
-   supported. */
-var ActiveXObject_responseType_funcs = {
-    "text": function(result) {
-        return result;
-    },
-    "document": function(result) {
-        return new DOMParser().parseFromString(result, "text/html");
-    }
-};
 
 
 /* --- Read PacFORMS message data and insert in form */
@@ -634,7 +563,7 @@ var template_repl_func = {
     },
 
     "msgno" : function (arg) {
-        return emptystr_if_null(query_object['msgno']);
+        return emptystr_if_null(environment['msgno']);
     },
 
     "field" : field_value,
@@ -645,8 +574,8 @@ var template_repl_func = {
         return emptystr_if_null(msgfields[arg]);
     },
 
-    "query-string" : function(arg) {
-        return emptystr_if_null(query_object[arg]);
+    "environment" : function(arg) {
+        return emptystr_if_null(environment[arg]);
     },
 
     "envelope" : function(arg) {
@@ -658,8 +587,7 @@ var template_repl_func = {
     },
 
     "filename" : function (arg) {
-        var i = document.location.pathname.lastIndexOf("/")+1;
-        return document.location.pathname.substring(i);
+        return environment.filename;
     },
 
     "version": function(arg) {
@@ -897,7 +825,7 @@ function toggle_form_data_visibility() {
 This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
     var form = document.querySelector("#the-form");
-    if (query_object.mode && query_object.mode == "readonly") {
+    if (environment.mode && environment.mode == "readonly") {
         document.querySelector("#button-header").classList.add("readonly");
         document.querySelector("#opdirect-submit").hidden = "true";
         document.querySelector("#email-submit").hidden = "true";
@@ -1043,22 +971,6 @@ function outpost_envelope_to_object(line) {
     return data;
 }
 
-/* Generate an object from the query string.
-
-This should be called as an init function; it will store the result in
-the global variable query_object */
-function query_string_to_object(next) {
-    var query = {};
-    var string = window.location.search.substring(1);
-    var list = string ? string.split("&") : [];
-    list.forEach(function(element, index, array) {
-        list = element.split("=");
-        query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
-    });
-    query_object = query;
-    next();
-}
-
 function load_form_version(next) {
     versions.form = document.querySelector(".version").textContent;
     versions.includes = [];
@@ -1084,9 +996,7 @@ function startup_delay(next) {
 /* --- Registration of startup functions that run on page load */
 
 startup_functions.push(load_form_version);
-startup_functions.push(query_string_to_object);
 startup_functions.push(init_form);
-// This must come after query_string_to_object in the startup functions
 startup_functions.push(setup_view_mode);
 // These must be the last startup functions added
 //startup_functions.push(startup_delay);  // Uncomment to test loading overlay

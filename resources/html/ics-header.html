@@ -10,7 +10,7 @@
       </td><td>
         <label>My Msg #:
           <input name="MsgNo" class="no-msg-init" type="text"
-                 required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
+                 required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{environment:msgno}}}}"/>
         </label>
       </td><td>
         <label>Receiver's Msg #<span class="field-number">3</span>

@@ -105,16 +105,12 @@ another visible clue that the form is being viewed rather than being
 created.  The browser tab or window can be closed when viewing of the
 message is complete.
 
-To manually view a previously entered form you must supply some
-additional data to the form through query parameters in the browser
-URL.  There are two query parameters that matter, `msgno` and `mode`.
+When viewing a previously created message, the plain text form of the
+message is available in a JavaScript field named `environment.message`.
+The form is initialized from this string.
 
-The `msgno` query parameter is used to refer to the data that is to be
-viewed.  There must be a file in the `msgs` subdirectory of the
-installation with the name as the `msgno` parameter value.  The form
-will load the data to be viewed from this file.
-
-The `mode` parameter specifies the viewing mode.  Currently, if it is
+The JavaScript field `environment.mode` specifies the viewing mode.
+Currently, if it's
 not present the form will be editable and if it is present any value
 can be specified.  If the value specified is `readonly` then the
 presentation mode will switch to the read-only view as described for
@@ -267,10 +263,9 @@ will result in the output text:
 This is the simplest possible template value, with just the name of
 the template to use.  Some template types require additional
 information, in which case it can be supplied after the template name,
-separated by a colon.  For example, if the query string of the
-document contains a `msgno` parameter with the value `ABC001`, then:
+separated by a colon.  For example, if the message number is `ABC001`, then:
 
-        The msgno is {{query-string:msgno}}.
+        The msgno is {{environment:msgno}}.
 
 will result in the output text:
 
@@ -302,7 +297,7 @@ The following template types are available:
 | selected-fields   | css-sel    | Get list of field values returned by `css-sel`  |
 | field             | field name | Value of a field in the form                    |
 | msg-field         | field name | Value of a field in the received message        |
-| query-string      | key        | Value of query string parameter with name 'key' |
+| environment       | key        | Value of environment field named 'key'          |
 | envelope          | field name | Value of !OUTPOST! envelope field               |
 | div-id            | id value   | Text content of the named `div` element         |
 | filename          | none       | Filename of the form (final name in URI path)   |
