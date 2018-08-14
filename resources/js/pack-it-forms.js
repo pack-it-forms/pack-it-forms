@@ -952,7 +952,10 @@ function ping() {
     img.src = '/ping';
     img = undefined;
 }
-setInterval(ping, 30000); // call ping every 30 seconds
+if (environment.mode != "readonly") {
+    setInterval(ping, 30000); // call ping every 30 seconds
+    // There's no need to keep the server alive for a read-only message.
+}
 
 /* --- Cross-browser convenience functions --- */
 
