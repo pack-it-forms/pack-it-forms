@@ -6,8 +6,7 @@ for creating and displaying message with a compact representation for
 packet radio transmission of the entered data, *pack-it-forms* is a
 respectful re-implementation with a number of advantages:
 
-1. All processing is done in-browser in Javascript: No external
-   program is required for parsing the message data.
+1. Most processing is done in Javascript in a browser.
 
 2. Message encoding is derived from form markup: The field names used
    in the message text are derived from the `name` attribute of the
@@ -34,29 +33,16 @@ Using Forms
 Installation
 ------------
 
-Originally there was only a single method of using pack-it-forms
-involving the Outpost radio messenger application and PacFORMs, but
-there are now several methods, each of which is implemented their own
-repository.
-
-The Outpost+PacFORMS method is still the currently the recommended
-method, though it is hoped it will be obsolete in the near future.
-Installation instructions can be found in the
-
-[pack-it-forms outpost-pacread](https://github.com/pack-it-forms/outpost-pacread)
-
-project. As other methods are released they will be documented here.
+Installation instructions can be found in
+[Outpost for LAARES](https://github.com/jmkristian/OutpostForLAARES).
 
 Entering Data in a New Form
 ---------------------------
 
-To enter data in a new form, open the HTML file for the form in your
-web browser.  You can do this through appropriate menu entries in
-OutPost if you setup Outpost.  Otherwise you can use your normal
-operating system file browser or command line to open the file.  It
-may take a moment to load and will display a spinner to show activity
-is occurring if it takes longer than a second.
-
+To enter data in a new form, click an item in Outpost's "Forms" menu.
+Outpost executes the software you installed (see above),
+which opens a form in your web browser.
+It may take some time to load, during which it will display a spinner.
 Once loaded you will see a typical browser form.  Across the top of
 the page is a header bar with two buttons:
 
@@ -108,16 +94,12 @@ another visible clue that the form is being viewed rather than being
 created.  The browser tab or window can be closed when viewing of the
 message is complete.
 
-To manually view a previously entered form you must supply some
-additional data to the form through query parameters in the browser
-URL.  There are two query parameters that matter, `msgno` and `mode`.
+When viewing a previously created message, the plain text form of the
+message is available in a JavaScript field named `environment.message`.
+The form is initialized from this string.
 
-The `msgno` query parameter is used to refer to the data that is to be
-viewed.  There must be a file in the `msgs` subdirectory of the
-installation with the name as the `msgno` parameter value.  The form
-will load the data to be viewed from this file.
-
-The `mode` parameter specifies the viewing mode.  Currently, if it is
+The JavaScript field `environment.mode` specifies the viewing mode.
+Currently, if it's
 not present the form will be editable and if it is present any value
 can be specified.  If the value specified is `readonly` then the
 presentation mode will switch to the read-only view as described for
@@ -206,17 +188,19 @@ If your form fits the ICS standards, you will need a large number of
 fields that contain information about the way that the form was
 transmitted and who it is going to/who it is from.  *pack-it-forms*
 makes this easy to do: it is possible to include fragments of HTML
-from files in the resources/html directory.  If you create a `div`
-element that has a `data-include-html` attribute in it, the element
-will be replaced with the contents of the first `div` element in the
-file resources/html/<attribute value>.html where <attribute value>
-signifies the value of the `data-include-html` attribute.
+from files in the resources/html directory, using
+[server side includes](https://en.wikipedia.org/wiki/Server_Side_Includes).
 
 One thing that you may want to do with included HTML files is set the
-default values of included elements.  You can do that by putting a
-JSON object that maps form field names to default values for those
-fields inside the <div> that will be replaced with the included
-content.  The values are in the same format as the PacFORMS field
+default values of included elements.  You can do that by adding a
+script that calls init_form_from_fields, using form field numbers as
+JavaScript field names. For example:
+```
+<script type="text/javascript">
+    init_form_from_fields({"6c.": "checked"}).
+</script>
+```
+The values are in the same format as the PacFORMS field
 values:  a checkbox should have a value of CHECKED if it should be
 checked, and a collection of radiobuttons should have a value that
 matches one of the `name` attributes.  Text fields can be set to a
@@ -268,10 +252,9 @@ will result in the output text:
 This is the simplest possible template value, with just the name of
 the template to use.  Some template types require additional
 information, in which case it can be supplied after the template name,
-separated by a colon.  For example, if the query string of the
-document contains a `msgno` parameter with the value `ABC001`, then:
+separated by a colon.  For example, if the message number is `ABC001`, then:
 
-        The msgno is {{query-string:msgno}}.
+        The msgno is {{environment:msgno}}.
 
 will result in the output text:
 
@@ -303,7 +286,7 @@ The following template types are available:
 | selected-fields   | css-sel    | Get list of field values returned by `css-sel`  |
 | field             | field name | Value of a field in the form                    |
 | msg-field         | field name | Value of a field in the received message        |
-| query-string      | key        | Value of query string parameter with name 'key' |
+| environment       | key        | Value of environment field named 'key'          |
 | envelope          | field name | Value of !OUTPOST! envelope field               |
 | div-id            | id value   | Text content of the named `div` element         |
 | filename          | none       | Filename of the form (final name in URI path)   |
@@ -392,10 +375,10 @@ CSS file that contains styles for the form interaction elements and
 that are likely to be useful in more than one form.  This is highly
 recommended.
 
-        <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+       <!--#include file="pack-it-forms.html" -->
 
-Javascript file that contains the Javascript code to implement the
-form behavior.  This is required to have a functioning form.
+HTML file that contains Javascript code to implement the form behavior.
+This is required to have a functioning form.
 
         <title>ICS213: Message Form</title>
       </head>
@@ -417,13 +400,13 @@ without requiring any external graphics.
 The actual from itself replaces the ellipses here.  The Javascript
 requires that the id of the form have the value "the-form".
 
-        <div data-include-html="outpost_message_header"></div>
+        <!--#include file="resources/html/outpost_message_header.html" -->
 
 An include reference that is replaced with data used to format the
 outpost message header.  This is required for the Javascript to work
 properly.  It should come after the form.
 
-        <div data-include-html="submit-buttons"></div>
+        <!--#include file="resources/html/submit-buttons.html" -->
 
 An include reference that is replaced with the submit buttons and
 related markup.  This is required for the Javascript to work

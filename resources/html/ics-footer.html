@@ -1,4 +1,3 @@
-<div>
   <div class="version">0.1.0</div>
   <table id="form-row-5" class="noborder">
     <tr>
@@ -48,7 +47,7 @@
       </td><td colspan="2" class="border-left">
         <label class="label-sameline">Operator Call Sign:
           <input class="no-msg-init" name="OpCall" type="text"
-                 value="{{expand-while-null:{{envelope:ocall}},{{query-string:ocall}}}}"/>
+                 value="{{expand-while-null:{{envelope:ocall}},{{environment:ocall}}}}"/>
         </label>
       </td>
     </tr><tr class="horizontal">
@@ -65,7 +64,7 @@
       <td colspan="2" class="border-left">
         <label class="label-sameline">Operator Name:
           <input class="no-msg-init" name="OpName" type="text"
-                 value="{{expand-while-null:{{envelope:oname}},{{query-string:oname}}}}"/>
+                 value="{{expand-while-null:{{envelope:oname}},{{environment:oname}}}}"/>
         </label>
       </td>
     </tr><tr class="horizontal">
@@ -107,4 +106,3 @@
       </td><td colspan="2" class="border-left"></td>
     </tr>
   </table>
-</div>

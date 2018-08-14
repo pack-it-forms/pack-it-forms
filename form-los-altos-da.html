@@ -7,8 +7,7 @@
     <link rel="stylesheet" type="text/css" href="resources/css/ics-header.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/form-los-altos-da.css"/>
-    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
-
+    <!--#include file="pack-it-forms.html" -->
     <title>Los Altos Damage Assessment</title>
   </head>
 
@@ -16,8 +15,9 @@
     <div class="version">0.1.0</div>
     <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
     <form id="the-form" name="the-form">
-      <div data-include-html="ics-header">
-        {
+      <!--#include file="resources/html/ics-header.html" -->
+      <script type="text/javascript">
+        init_form_from_fields({
             "4.": "OTHER",
             "5.": "PRIORITY",
             "6a.": "No",
@@ -27,8 +27,8 @@
             "8.": "Planning",
             "9a.": "Los Altos EOC",
             "9b.": "{{msgno|msgno2name}}"
-        }
-      </div>
+        }, 'name');
+      </script>
       <table id="form-body" class="noborder border">
         <tr>
           <td colspan="17">
@@ -38,9 +38,9 @@
                      class="no-load-init init-on-submit"
                      value="Damage Summary for BAT(s) {{selected-fields:[name$='batnum']|remove:|sort:num|join:, }}"
                      required="required"
-                     pattern="Damage Summary for BAT\(s\) .*"
+                     pattern="Damage Summary for BAT\(s\).*"
                      title="This field must have a prefix of
-                            &quot;Damage Summary for BAT(s) &quot;"/>
+                            &quot;Damage Summary for BAT(s)&quot;"/>
             </label>
           </td>
         </tr><tr>
@@ -299,9 +299,9 @@
           <td colspan="17"><textarea name="12.10.general-notes" rows="6" cols="80"></textarea></td>
         </tr>
       </table>
-      <div data-include-html="ics-footer"></div>
+      <!--#include file="resources/html/ics-footer.html" -->
     </form>
-    <div data-include-html="outpost_message_header"></div>
-    <div data-include-html="submit-buttons"></div>
+    <!--#include file="resources/html/outpost_message_header.html" -->
+    <!--#include file="resources/html/submit-buttons.html" -->
   </body>
 </html>
