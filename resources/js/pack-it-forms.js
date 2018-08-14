@@ -56,7 +56,7 @@ function startup() {
 
 window.onload=startup;
 
-/* --- Initialize the form as required by query parameters */
+/* --- Initialize the form as required by environment values */
 
 /* Initialize a form
 
@@ -72,6 +72,9 @@ filled with default contents.  The default data filling includes
 reading the Outpost environment variables, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    if (environment.submitURL) {
+        document.querySelector("#form-data-form").action = environment.submitURL;
+    }
     // Setup focus tracking within the form
     var the_form = document.querySelector("#the-form");
     last_active_form_element = document.activeElement;
