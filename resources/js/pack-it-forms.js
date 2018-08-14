@@ -949,10 +949,10 @@ function emptystr_if_null(argument) {
 /* Ping the server periodically, to let it know this page has not been closed. */
 function ping() {
     var img = new Image();
-    img.src = '/ping';
+    img.src = environment.pingURL;
     img = undefined;
 }
-if (environment.mode != "readonly") {
+if (environment.pingURL && environment.mode != "readonly") {
     setInterval(ping, 30000); // call ping every 30 seconds
     // There's no need to keep the server alive for a read-only message.
 }
