@@ -218,16 +218,45 @@ function parse_form_data_text(text) {
     return fields;
 }
 
-function FormDataParseException(linenum, desc) {
-    this.name = "FormDataParseException";
-    this.linenum = linenum;
-    this.message = "Parse error on line " + linenum.toString() + ": " + desc;
+function FormDataParseError(linenum, desc) {
+    var msgtext = "Parse error on line " + linenum.toString() + ": " + desc;
+
+    Object.defineProperty(this, 'name', {
+        enumerable: false,
+        writable: false,
+        value: "FormDataParseError"
+    });
+
+    Object.defineProperty(this, 'linenum', {
+        enumerable: false,
+        writable: false,
+        value: linenum
+    });
+
+    Object.defineProperty(this, 'message', {
+        enumerable: false,
+        writable: true,
+        value: msgtext
+    });
+
+    if (Error.hasOwnProperty('captureStackTrace')) {
+        Error.captureStackTrace(this, FormDataParseError);
+    } else {
+        Object.defineProperty(this, 'stack', {
+            enumerable: false,
+            writable: false,
+            value: (new Error(msgtext)).stack
+        });
+    }
 }
+FormDataParseError.prototype = Object.create(Error.prototype, {
+    constructor: { value: FormDataParseError }
+});
 
 function index_of_field_name_sep(linenum, line, startAt) {
     var idx = line.indexOf(":", startAt);
     if (idx == -1) {
-        throw new FormDataParseException(linenum, "no field name/value separator on line");
+        throw new FormDataParseError(linenum, "no field name/value separator on line");
     }
     return idx;
 }
@@ -235,7 +264,7 @@ function index_of_field_name_sep(linenum, line, startAt) {
 function index_of_field_value_start(linenum, line, startAt) {
     var idx = line.indexOf("[", startAt);
     if (idx == -1) {
-        throw new FormDataParseException(linenum, "no field value open bracket");
+        throw new FormDataParseError(linenum, "no field value open bracket");
     }
     return idx;
 }
