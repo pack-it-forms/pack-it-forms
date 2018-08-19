@@ -1,5 +1,5 @@
 <div>
-  <div class="version">0.1.0</div>
+  <div class="version">0.1.1</div>
   <div id="button-header">
     <input id="show-hide-data" type="button" value="Show Data Message"
            onclick="toggle_form_data_visibility();" form="the-form"/>
@@ -9,6 +9,7 @@
            value="Submit via Email" form="the-form"  disabled="disabled"/>
     <input id="clear-form" type="button" value="Clear the form"
            onclick="clear_form();"/>
+    <div id="error-indicator">Error</div>
   </div>
   <form id="form-data-form" method="post" action="http://127.0.0.1:9334/send">
     <textarea id="form-data" name="formtext" class="hidden"></textarea>

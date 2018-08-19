@@ -1197,6 +1197,80 @@ function remove_loading_overlay(next) {
     next();
 }
 
+function loadingComplete() {
+    var el = document.querySelector("#loading");
+    return el.classList.contains("done");
+}
+
+function showErrorLog() {
+    var el = document.querySelector("#err");
+    el.classList.add("occured");
+}
+
+function hideErrorLog() {
+    var el = document.querySelector("#err");
+    el.classList.remove("occured");
+}
+
+function toggleErrorLog() {
+    var el = document.querySelector("#err");
+    if (el.classList.contains("occured")) {
+        el.classList.remove("occured");
+    } else {
+        el.classList.add("occured");
+    }
+}
+
+function showErrorIndicator() {
+    var el = document.querySelector("#error-indicator");
+    el.classList.add("occured");
+}
+
+function hideErrorIndicator() {
+    var el = document.querySelector("#error-indicator");
+    el.classList.remove("occured");
+}
+
+function setup_error_indicator(next) {
+    var el = document.querySelector("#error-indicator");
+    el.onclick = toggleErrorLog;
+    next();
+}
+
+function indicateError() {
+    if (loadingComplete()) {
+        showErrorIndicator();
+    } else {
+        showErrorLog();
+    }
+}
+
+function logError(msg) {
+    var el = document.querySelector("#error-log");
+    el.textContent = el.textContent + msg + "\n";
+    indicateError();
+}
+
+window.addEventListener('error', function(event) {
+    //if (event.hasAnyProperty('error') && event.error.hasOwnProperty('stack')) {
+    logError(event.message
+             + " ("
+             + (event.url ? event.url : "")
+             + (event.lineno ? ":" + event.lineno : "")
+             + (event.colno ? ":" + event.colno : "")
+             + ")");
+    if ("error" in event && event.error &&  "stack" in event.error) {
+        logError(event.error.stack)
+    }
+    return false;
+});
+
+/* This is for testing error logging during startup */
+function test_error(next) {
+    throw new FormDataParseError(10, "This is a test error.");
+    next();
+}
+
 /* This is for testing the loading overlay */
 function startup_delay(next) {
     window.setTimeout(function () {
@@ -1216,4 +1290,6 @@ startup_functions.push(init_form);
 startup_functions.push(setup_view_mode);
 // These must be the last startup functions added
 //startup_functions.push(startup_delay);  // Uncomment to test loading overlay
+//startup_functions.push(test_error);  // Uncomment to test startup err report
+startup_functions.push(setup_error_indicator);
 startup_functions.push(remove_loading_overlay);
