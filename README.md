@@ -411,7 +411,6 @@ Nested markup required to enable the animated loading progress bar
 without requiring any external graphics.
 
         <div id="err">
-          <div id="worried-face">&#x1F61F;</div>
           <div>
             <h1>Something went wrong.</h1>
             The following log information may help resolve the problem.
