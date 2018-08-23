@@ -236,35 +236,26 @@ td.border-left {
     position: fixed;
     top: 0px;
     left: 0px;
-    width: 96%;
+    width: 95%;
     margin-left: 2%;
     margin-right: 2%;
     margin-top: 4em;
     border: 2px solid black;
-    padding: 1ex 0 0.5em;
+    padding: 1ex 1em;
     visibility: visible;
     opacity: 1.0;
     z-index: 9999;
 }
 
 #err h1 {
-    padding-top: 14pt;
+    padding-top: 1ex;
     padding-bottom: 0;
     margin-bottom: 0;
 }
 
-#worried-face {
-    float: left;
-    font-size: 48pt;
-}
-
 #error-log {
-    clear: left;
-    margin-top: 2ex;
-    margin-left: 1em;
-    margin-right: 1em;
-    margin-bottom: 1ex;
     font-family: monospace;
+    margin: 3ex 0 0;
     padding-top: 1ex;
     font-size: 10pt;
     border-top: 1px solid #888888;
