@@ -1035,13 +1035,15 @@ function setup_view_mode(next) {
            style it and hide the textarea. */
         var textareas_to_redisplay = [];
         array_for_each(form.elements, function (el) {
-            if (el.type && el.type.substr(0,6) == "select") {
+            if (el.type == "radio"
+                || el.type == "checkbox"
+                || (el.type && el.type.startsWith("select"))) {
                 el.disabled = "true";
-            } else if (el.type && el.type.substr(0,8) == "textarea") {
-                el.readOnly = "true";
-                textareas_to_redisplay.push(el);
             } else {
                 el.readOnly = "true";
+                if (el.type && el.type.startsWith("textarea")) {
+                    textareas_to_redisplay.push(el);
+                }
             }
         });
         for (var i = 0; i < textareas_to_redisplay.length; i++) {
