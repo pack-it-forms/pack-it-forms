@@ -1036,11 +1036,11 @@ function setup_view_mode(next) {
         array_for_each(form.elements, function (el) {
             if (el.type == "radio"
                 || el.type == "checkbox"
-                || (el.type && el.type.startsWith("select"))) {
+                || (el.type && el.type.substr(0, 6) == "select")) {
                 el.disabled = "true";
             } else {
                 el.readOnly = "true";
-                if (el.type && el.type.startsWith("textarea")) {
+                if (el.type && el.type.substr(0, 8) == "textarea") {
                     textareas_to_redisplay.push(el);
                 }
             }
