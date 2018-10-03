@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="resources/css/loading.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-header.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/form-los-altos-da.css"/>
+    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+
+    <title>CERT Drill Damage Assessment</title>
+  </head>
+
+  <body>
+    <div class="version">0.1.1</div>
+    <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
+    <div id="err">
+      <div>
+        <h1>Something went wrong.</h1>
+        The following log information may help resolve the problem.
+        <div id="error-log"></div>
+      </div>
+    </div>
+    <form id="the-form" name="the-form">
+      <div data-include-html="ics-header">
+        {
+            "4.": "OTHER",
+            "5.": "PRIORITY",
+            "6a.": "No",
+            "6b.": "No",
+            "6c.": "checked",
+            "7.": "Planning",
+            "8.": "Planning",
+            "9a.": "County EOC",
+            "9b.": "{{msgno|msgno2name}}"
+        }
+      </div>
+      <table id="form-body" class="noborder border">
+        <tr>
+          <td colspan="17">
+            <label class="label-sameline">Subject:
+              <span class="field-number">10</span>
+              <input name="10.subject" type="text"
+                     class="no-load-init init-on-submit"
+                     value="Damage Assessment Form"/>
+            </label>
+          </td>
+        </tr><tr>
+          <td colspan="17">
+            <label class="label-sameline">
+              CERT
+              <span class="field-number">&nbsp;</span>
+              <input name="CERT" type="text"/>
+            </label>
+            <label class="label-sameline">
+              LOCATION
+              <span class="field-number">&nbsp;</span>
+              <input name="LOCATION" type="text"/>
+            </label>
+          </td>
+        </tr><tr>
+          <th colspan="16" class="rowspanned-header"><strong>SIZE UP</strong><br />(check if applicable)</th>  
+        </tr><tr>
+          <th colspan="2">
+            Fires
+          </th><th colspan="4">
+            Hazards
+          </th><th colspan="2">
+            Structure
+          </th><th colspan="3">
+            People
+          </th><th colspan="2">
+            Roads
+          </th><th colspan="3">
+            Animals
+          </th>
+        </tr>
+        <tr class="rotated">
+          <td><div><div>Burning</div></div></td>
+          <td><div>
+            <div>Out</div></div></td>
+          <td><div>
+            <div>Gas Leak</div></div></td>
+          <td><div>
+            <div>Water Leak</div></div></td>
+          <td><div>
+            <div>Electric</div></div></td>
+          <td><div>
+            <div>Chemical</div></div></td>
+          <td><div>
+            <div>Damaged</div></div></td>
+          <td><div>
+            <div>Collapsed</div></div></td>
+          <td><div>
+            <div>Injured</div></div></td>
+          <td><div>
+            <div>Trapped</div></div></td>
+          <td><div>
+            <div>Dead</div></div></td>
+          <td><div>
+            <div>Access</div></div></td>
+          <td><div>
+            <div>No Access</div></div></td>
+          <td><div>
+            <div>Injured</div></div></td>
+          <td><div>
+            <div>Trapped</div></div></td>
+          <td><div>
+            <div>Roaming</div></div></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <td><input name="12.0b.fires-burning" type="text" pattern="\d+"/></td>
+          <td><input name="12.0c.fires-out" type="text" pattern="\d+"/></td>
+          <td><input name="12.0d.hazards-gas" type="text" pattern="\d+"/></td>
+          <td><input name="12.0e.hazards-water" type="text" pattern="\d+"/></td>
+          <td><input name="12.0f.hazards-electric" type="text" pattern="\d+"/></td>
+          <td><input name="12.0g.hazards-chemical" type="text" pattern="\d+"/></td>
+          <td><input name="12.0h.structure-damaged" type="text" pattern="\d+"/></td>
+          <td><input name="12.0i.structure-collapsed" type="text" pattern="\d+"/></td>
+          <td><input name="12.0j.people-injured" type="text" pattern="\d+"/></td>
+          <td><input name="12.0k.people-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.0l.hazards-people-dead" type="text" pattern="\d+"/></td>
+          <td><input name="12.0m.roads-access" type="text" pattern="\d+"/></td>
+          <td><input name="12.0n.roads-noaccess" type="text" pattern="\d+"/></td>
+          <td><input name="12.0o.animals-injured" type="text" pattern="\d+"/></td>
+          <td><input name="12.0p.animals-trapped" type="text" pattern="\d+"/></td>
+          <td><input name="12.0q.animals-roaming" type="text" pattern="\d+"/></td>
+        </tr>
+        <tr class="fullsize-textfields">
+          <th colspan="17" scope="row" class="block-caption">
+              <div>
+                <div>OBSERVATIONS</div></div>
+          </th>
+        </tr><tr>
+          <td colspan="17"><textarea name="12.10.general-notes" rows="6" cols="80"></textarea></td>
+        </tr>
+      </table>
+      <div data-include-html="ics-footer"></div>
+    </form>
+    <div data-include-html="outpost_message_header"></div>
+    <div data-include-html="submit-buttons"></div>
+  </body>
+</html>
