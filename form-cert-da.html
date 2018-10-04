@@ -13,7 +13,7 @@
   </head>
 
   <body>
-    <div class="version">0.1.1</div>
+    <div class="version">0.1.2</div>
     <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
     <div id="err">
       <div>
@@ -31,36 +31,31 @@
             "6b.": "No",
             "6c.": "checked",
             "7.": "Planning",
-            "8.": "Planning",
+            "8.": "CERT",
             "9a.": "County EOC",
             "9b.": "{{msgno|msgno2name}}"
         }
       </div>
-      <table id="form-body" class="noborder border">
+      <table>
         <tr>
-          <td colspan="17">
-            <label class="label-sameline">Subject:
-              <span class="field-number">10</span>
-              <input name="10.subject" type="text"
-                     class="no-load-init init-on-submit"
-                     value="Damage Assessment Form"/>
-            </label>
-          </td>
-        </tr><tr>
-          <td colspan="17">
-            <label class="label-sameline">
+          <td>
+            <label>
               CERT
-              <span class="field-number">&nbsp;</span>
-              <input name="CERT" type="text"/>
+              <input name="20.CERT" type="text"/>
             </label>
-            <label class="label-sameline">
-              LOCATION
-              <span class="field-number">&nbsp;</span>
-              <input name="LOCATION" type="text"/>
+          </td><td>
+            <label>
+              Location of Damage
+              <input name="10.subject" type="text" required="required"/>
             </label>
           </td>
-        </tr><tr>
-          <th colspan="16" class="rowspanned-header"><strong>SIZE UP</strong><br />(check if applicable)</th>  
+        </tr>
+      </table><table>
+        <tr>
+          <th colspan="16" class="rowspanned-header block-caption" scope="row">
+            <h3>SIZE UP</h3>
+            (check if applicable)
+          </th>
         </tr><tr>
           <th colspan="2">
             Fires
@@ -127,13 +122,13 @@
           <td><input name="12.0p.animals-trapped" type="text" pattern="\d+"/></td>
           <td><input name="12.0q.animals-roaming" type="text" pattern="\d+"/></td>
         </tr>
-        <tr class="fullsize-textfields">
-          <th colspan="17" scope="row" class="block-caption">
-              <div>
-                <div>OBSERVATIONS</div></div>
+      </table><table>
+        <tr>
+          <th scope="row" class="block-caption">
+            <h3>OBSERVATIONS</h3>
           </th>
-        </tr><tr>
-          <td colspan="17"><textarea name="12.10.general-notes" rows="6" cols="80"></textarea></td>
+        </tr><tr class="fullsize-textfields">
+          <td><textarea name="12.10.observations" rows="6"></textarea></td>
         </tr>
       </table>
       <div data-include-html="ics-footer"></div>
