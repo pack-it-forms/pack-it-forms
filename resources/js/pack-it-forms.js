@@ -340,7 +340,7 @@ var init_from_msg_funcs = {
         var member = false;
         element.value = "Other";
         array_for_each(element.options, function (option) {
-            if (option.text == value) {
+            if (option.value == value) {
                 element.value = value;
                 member = true;
             }
