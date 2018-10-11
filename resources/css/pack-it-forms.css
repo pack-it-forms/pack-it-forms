@@ -83,7 +83,7 @@ form input:enabled,textarea:enabled {
     border: 1px solid #cccccc;
 }
 form input:disabled,textarea:disabled {
-    background-color; transparent;
+    background-color: transparent;
     border: 1px solid #cccccc;
 }
 form label.label-sameline input {
