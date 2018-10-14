@@ -171,10 +171,10 @@ and for the form name header in the upper left hand side of the form.
 Add Input Elements to the Form
 ------------------------------
 
-To add fields to your form, you just need to add standard html `input`
-and `textarea` elements --- just like any other HTML form.  However,
-the input elements must contain a `name` attribute formatted like
-this:
+To add fields to your form, you just need to add standard html
+`input`, `select`, and `textarea` elements --- just like any other
+HTML form. However, the input elements must contain a `name` attribute
+formatted like this:
 
    * If the element maps to a number in the form that you are trying
      to replicate, like `10`, then the value should be that number
@@ -185,6 +185,24 @@ this:
      Since the field name won't start with a number, this means that
      the whole text of the field name will be used as the reference in
      the PacFORMS output.
+
+The `select` element is used when the user should pick from a set of
+known values. It isn't required, but is generally a good practice, to
+use the same content for the `value` attribute of the child `option`
+elements and the text that is used between the open and close tag of
+that `option` element. This ensures that anyone viewing the raw message
+text will see the value they expect.
+
+Sometimes it is desirable to use a `select` elment for a pick list of
+common values and allow other arbitrary values to be used as well.
+This is supported by a pair of `select` and `input` elements of type
+`text`. The `select` element must have one `option` child element with
+a `value` attribute of "Other" and the text "Other:". The
+corresponding `input` element for arbitrary values must have the same
+`name` attribute as the `select` element with "-other" appened to it.
+It should be set to disabled by default. An example of this in the
+existing forms is the ICS Position field in the ics-header.html
+resource file.
 
 While you can use different methods for adding descriptions to
 inputs, here are a few ways that generally work well with the default CSS:
