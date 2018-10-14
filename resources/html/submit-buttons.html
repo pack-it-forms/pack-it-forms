@@ -1,14 +1,10 @@
 <div>
   <div class="version">0.1.1</div>
   <div id="button-header">
-    <input id="show-hide-data" type="button" value="Show Data Message"
-           onclick="toggle_form_data_visibility();" form="the-form"/>
-    <input id="opdirect-submit" onclick="opdirect_submit(event)" type="submit"
-           value="Submit to Outpost" form="the-form" disabled="disabled"/>
-    <input id="email-submit" onclick="email_submit(event)" type="submit"
-           value="Submit via Email" form="the-form"  disabled="disabled"/>
-    <input id="clear-form" type="button" value="Clear the form"
-           onclick="clear_form();"/>
+    <input type="button" id="show-hide-data"  value="Show Data Message" onclick="toggle_form_data_visibility(event)"/>
+    <input type="button" id="opdirect-submit" value="Submit to Outpost" onclick="opdirect_submit(event)" disabled="disabled"/>
+    <input type="button" id="email-submit"    value="Submit via Email"  onclick="email_submit(event)" disabled="disabled"/>
+    <input type="button" id="clear-form"      value="Clear the form"    onclick="clear_form(event)"/>
     <div id="error-indicator">Error</div>
   </div>
   <form id="form-data-form" method="post" action="http://127.0.0.1:9334/send">
