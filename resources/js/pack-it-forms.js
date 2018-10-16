@@ -329,12 +329,12 @@ function init_form_from_fields(fields, attribute, className) {
            functionality. It is believed that this should not cause
            issues for any existing or planned forms. */
         array_some(elem, function (element) {
-            if (element.classList.contains("no-msg-init")) {
+            if (has_class(element, "no-msg-init")) {
                 return true;
             }
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
                 if (className) {
-                    element.classList.add(className);
+                    add_class(element, className);
                 }
                 var stop = init_from_msg_funcs[element.type](element, fields[field]);
                 fireEvent(element, 'change');
@@ -439,7 +439,7 @@ function write_pacforms_representation() {
             result = null;
         } else if (pacform_representation_funcs.hasOwnProperty(element.type)) {
             result = pacform_representation_funcs[element.type](element);
-            if (element.classList.contains("init-on-submit")) {
+            if (has_class(element, "init-on-submit")) {
                 result = expand_template(result);
             }
             result = bracket_data(result);
@@ -948,11 +948,11 @@ function check_the_form_validity() {
     var email_button  = document.querySelector("#email-submit");
     var valid = document.querySelector("#the-form").checkValidity();
     if (valid) {
-        button_header.classList.add("valid");
+        add_class(button_header, "valid");
         submit_button.disabled = false;
         email_button.disabled = false;
     } else {
-        button_header.classList.remove("valid");
+        remove_class(button_header, "valid");
         submit_button.disabled = true;
         email_button.disabled = true;
     }
@@ -1063,11 +1063,11 @@ function setup_view_mode(next) {
     console_log("setup_view_mode");
     var form = document.querySelector("#the-form");
     if (query_object.mode && query_object.mode == "readonly") {
-        document.querySelector("#button-header").classList.add("readonly");
-        document.querySelector("#opdirect-submit").hidden = "true";
-        document.querySelector("#email-submit").hidden = "true";
-        document.querySelector("#show-hide-data").hidden = "true";
-        document.querySelector("#clear-form").hidden = "true";
+        add_class(document.querySelector("#button-header"), "readonly");
+        hide_element(document.querySelector("#opdirect-submit"));
+        hide_element(document.querySelector("#email-submit"));
+        hide_element(document.querySelector("#show-hide-data"));
+        hide_element(document.querySelector("#clear-form"));
         /* In view mode, we don't want to show the input control chrome.  This
            is difficult to do with textareas which might need scrollbars, etc.
            so insert a div with the same contents and use CSS to appropriately
@@ -1132,10 +1132,65 @@ function padded_int_str(num, cnt) {
 /* Create a DIV element containing the provided text */
 function create_text_div(text, className) {
     var elem = document.createElement("div");
-    elem.classList.add(className);
+    add_class(elem, className);
     var textelem = document.createTextNode(text);
     elem.appendChild(textelem);
     return elem;
+}
+
+function hide_element(element) {
+    element.hidden = "true";
+    add_class(element, "hidden");
+}
+
+function has_class(element, className) {
+    if (!element) {
+        throw new Error("has_class(" + element + ", " + className + ")");
+    }
+    if (element.classList) {
+        return element.classList.contains(className);
+    } else {
+        // Typically Internet Explorer version 9 or earlier.
+        return element.className && array_contains(element.className.split(" "), className);
+    }
+}
+
+function add_class(element, className) {
+    if (!element) {
+        throw new Error("add_class(" + element + ", " + className + ")");
+    }
+    if (element.classList) {
+        element.classList.add(className);
+    } else {
+        // Typically Internet Explorer version 9 or earlier.
+        if (!has_class(element, className)) {
+            element.className = element.className ? (element.className + " " + className) : className;
+        }
+    }
+}
+
+function remove_class(element, className) {
+    if (!element) {
+        throw new Error("remove_class(" + element + ", " + className + ")");
+    }
+    if (element.classList) {
+        element.classList.remove(className);
+    } else if (element.className) {
+        // Typically Internet Explorer version 9 or earlier.
+        var oldClasses = element.className.split(" ");
+        var newClasses = [];
+        var removed = false;
+        array_for_each(oldClasses, function(oldClass) {
+            if (oldClass == className) {
+                removed = true;
+            } else if (oldClass) {
+                newClasses.push(oldClass);
+            }
+        });
+        if (removed) {
+            element.className = newClasses.join(" ");
+        }
+    }
 }
 
 /* Make forEach() & friends easier to use on Array-like objects
@@ -1242,43 +1297,43 @@ function load_form_version(next) {
 function remove_loading_overlay(next) {
     var el = document.querySelector("#loading");
     if (el) {
-        el.classList.add("done");
+        add_class(el, "done");
     }
     next();
 }
 
 function loadingComplete() {
     var el = document.querySelector("#loading");
-    return el.classList.contains("done");
+    return has_class(el, "done");
 }
 
 function showErrorLog() {
     var el = document.querySelector("#err");
-    el.classList.add("occured");
+    add_class(el, "occured");
 }
 
 function hideErrorLog() {
     var el = document.querySelector("#err");
-    el.classList.remove("occured");
+    remove_class(el, "occured");
 }
 
 function toggleErrorLog() {
     var el = document.querySelector("#err");
-    if (el.classList.contains("occured")) {
-        el.classList.remove("occured");
+    if (has_class(el, "occured")) {
+        remove_class(el, "occured");
     } else {
-        el.classList.add("occured");
+        add_class(el, "occured");
     }
 }
 
 function showErrorIndicator() {
     var el = document.querySelector("#error-indicator");
-    el.classList.add("occured");
+    add_class(el, "occured");
 }
 
 function hideErrorIndicator() {
     var el = document.querySelector("#error-indicator");
-    el.classList.remove("occured");
+    remove_class(el, "occured");
 }
 
 function setup_error_indicator(next) {
