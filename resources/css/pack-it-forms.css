@@ -401,6 +401,8 @@ form input.init-on-submit {
     white-space: nowrap;
     transform: translate(0, 100%) rotate(-90deg);
     transform-origin: 0 0;
+    -ms-transform: none;
+    -ms-writing-mode: tb-rl;
     -webkit-transform: translate(0, 100%) rotate(-90deg);
     -webkit-transform-origin: 0 0;
 }
@@ -424,6 +426,8 @@ td.rotated:not(.not-rotated) > div > div, th.rotated:not(.not-rotated) > div > d
     white-space: nowrap;
     transform: translate(0, 100%) rotate(-90deg);
     transform-origin: 0 0;
+    -ms-transform: none;
+    -ms-writing-mode: tb-rl;
     -webkit-transform: translate(0, 100%) rotate(-90deg);
     -webkit-transform-origin: 0 0;
 }
