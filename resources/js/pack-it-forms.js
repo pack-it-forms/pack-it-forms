@@ -63,6 +63,7 @@ filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    console_log("init_form");
     // Setup focus tracking within the form
     var the_form = document.querySelector("#the-form");
     last_active_form_element = document.activeElement;
@@ -94,6 +95,7 @@ function init_form(next) {
     window.setTimeout(function () {
         expand_templated_items();
         var first_field = document.querySelector("#the-form :invalid");
+        console_log("init_form timeout first_field = " + first_field);
         if (first_field) {
             first_field.focus();
         } else {
@@ -112,6 +114,7 @@ Explorer and a regular XMLHttpRequest in other places because using
 the ActiveXObject in Internet Explorer allows a file loaded through a
 file:// uri to access other resources through a file:// uri. */
 function open_async_request(method, url, responseType, cb, err) {
+    console_log("open_async_request(" + method + ", " + url + ", " + responseType + ")");
     var request;
     if (window.ActiveXObject !== undefined) {
         request = new ActiveXObject("Msxml2.XMLHTTP");
@@ -280,6 +283,7 @@ If the optional third parameter is supplied it is the name of a class
 that should be added to the classList of the elements that are set by
 this function.*/
 function init_form_from_fields(fields, attribute, className) {
+    console_log("init_form_from_fields(" + JSON.stringify(fields) + ", " + attribute + ", " + className + ")");
     for (var field in fields) {
         var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
         /* The above CSS selector does a prefix match which can return
@@ -394,6 +398,7 @@ function unescape_pacforms_string(string) {
 A PacForm-like description of the for mfield values is written into
 the textContent of the div with ID "form-data". */
 function write_pacforms_representation() {
+    console_log("write_pacforms_representation");
     var form = document.querySelector("#the-form");
     var fldtxt = "";
     array_for_each(form.elements, function(element, index, array) {
@@ -782,6 +787,7 @@ document.querySelectorAll.  This does not have to be used on input
 elements; attribute determines what attribute will be read and
 expanded. */
 function init_text_fields(selector, attribute) {
+    console_log("init_text_fields(" + selector + ", " + attribute + ")");
     var fields = document.querySelectorAll(selector);
     array_for_each(fields, function (field) {
         field[attribute] = expand_template(field[attribute]);
@@ -1022,6 +1028,7 @@ function toggle_form_data_visibility() {
 
 This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
+    console_log("setup_view_mode");
     var form = document.querySelector("#the-form");
     if (query_object.mode && query_object.mode == "readonly") {
         document.querySelector("#button-header").classList.add("readonly");
@@ -1061,6 +1068,7 @@ function setup_view_mode(next) {
 function expand_templated_items() {
     init_text_fields(".templated", "textContent");
     init_text_fields("input:not(.no-load-init):not(.msg-value)", "value");
+    console_log("expand_templated_items complete");
 }
 
 function get_form_data_from_div() {
@@ -1068,6 +1076,7 @@ function get_form_data_from_div() {
 }
 
 function set_form_data_div(text) {
+    console_log("set_form_data_div(" + JSON.stringify(text) + ")");
     var form_data = document.querySelector("#form-data");
     form_data.value = text;
 }
@@ -1158,6 +1167,11 @@ function fireEvent(target, evt) {
     }
 }
 
+function console_log(message) {
+    if (window.console && console && console.log) {
+        console.log(message);
+    }
+}
 
 function outpost_envelope_to_object(line) {
     var data = {};
@@ -1175,6 +1189,7 @@ function outpost_envelope_to_object(line) {
 This should be called as an init function; it will store the result in
 the global variable query_object */
 function query_string_to_object(next) {
+    console_log("query_string_to_object");
     var query = {};
     var string = window.location.search.substring(1);
     var list = string ? string.split("&") : [];
@@ -1235,6 +1250,7 @@ function hideErrorIndicator() {
 }
 
 function setup_error_indicator(next) {
+    console_log("setup_error_indicator");
     var el = document.querySelector("#error-indicator");
     el.onclick = toggleErrorLog;
     next();
