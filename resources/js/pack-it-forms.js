@@ -103,6 +103,15 @@ function init_form(next) {
         last_active_form_element = ev.target;
     }, true);
     add_event_listener(the_form, "input", formChanged);
+    if (MSIE_version <= 9) {
+        add_event_listener(document, "selectionchange", function() {
+            var el = document.activeElement;
+            if (el.tagName.toLowerCase() == "textarea"
+                || (el.tagName.toLowerCase() == "input" && el.type.toLowerCase() == "text")) {
+                formChanged();
+            }
+        });
+    }
 
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
@@ -126,7 +135,7 @@ function init_form(next) {
      * updated before we do other work. */
     window.setTimeout(function () {
         expand_templated_items();
-        var first_field = document.querySelector("#the-form :invalid");
+        var first_field = document.querySelector("#the-form .invalid");
         console_log("init_form timeout first_field = " + first_field);
         if (first_field) {
             first_field.focus();
@@ -946,17 +955,103 @@ function check_the_form_validity() {
     var button_header = document.querySelector("#button-header");
     var submit_button = document.querySelector("#opdirect-submit");
     var email_button  = document.querySelector("#email-submit");
-    var valid = document.querySelector("#the-form").checkValidity();
+    var the_form = document.querySelector("#the-form");
+    var valid = true;
+    if (is_function(the_form.checkValidity)) {
+        // Use the browser to evaluate validity:
+        valid = the_form.checkValidity();
+    } else {
+        console_log("the-form.checkValidity == " + the_form.checkValidity);
+        valid = check_inputs_validity(the_form, "input")
+            & check_inputs_validity(the_form, "textarea");
+    }
     if (valid) {
+        remove_class(button_header, "invalid");
         add_class(button_header, "valid");
         submit_button.disabled = false;
         email_button.disabled = false;
     } else {
         remove_class(button_header, "valid");
+        add_class(button_header, "invalid");
         submit_button.disabled = true;
         email_button.disabled = true;
     }
     return valid;
+}
+
+function check_inputs_validity(parent, selector) {
+    var email_pattern = /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/;
+    var url_pattern = /^(?:(?:https?|HTTPS?|ftp|FTP):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-zA-Z\u00a1-\uffff0-9]-*)*[a-zA-Z\u00a1-\uffff0-9]+)(?:\.(?:[a-zA-Z\u00a1-\uffff0-9]-*)*[a-zA-Z\u00a1-\uffff0-9]+)*)(?::\d{2,5})?(?:[\/?#]\S*)?$/;
+    var all_valid = true;
+    array_some(parent.querySelectorAll(selector), function(input) {
+        var type = input.getAttribute("type") || input.nodeName.toLowerCase();
+        var name = input.getAttribute("name");
+        var isNum = type == "number" || type == "range";
+        var length = input.value.length;
+        var validity = {
+            badInput: (
+                isNum && length > 0 && !/[-+]?[0-9]/.test(input.value)),
+            patternMismatch: (
+                input.hasAttribute("pattern") && length > 0
+                    && !(new RegExp(input.getAttribute("pattern")).test(input.value))),
+            rangeOverflow:(
+                isNum && input.hasAttribute("max") && input.value > 1
+                    && parseInt(input.value, 10) > parseInt(input.getAttribute("max"), 10)),
+            rangeUnderflow: (
+                isNum && input.hasAttribute("min") && input.value > 1
+                    && parseInt(input.value, 10) < parseInt(input.getAttribute("min"), 10)),
+            stepMismatch: (
+                isNum && input.hasAttribute("step") && input.getAttribute("step") !== "any"
+                    && Number(input.value) % parseFloat(input.getAttribute("step")) !== 0),
+            tooLong: (
+                input.hasAttribute("maxLength") && input.getAttribute("maxLength") > 0
+                    && length > parseInt(input.getAttribute("maxLength"), 10)),
+            tooShort: (
+                input.hasAttribute("minLength") && input.getAttribute("minLength") > 0
+                    && length > 0 && length < parseInt(input.getAttribute("minLength"), 10)),
+            typeMismatch: (
+                length > 0
+                    && ((type == "email" && !email_pattern.test(input.value))
+                        || (type == "url" && !url_pattern.test(input.value)))),
+            valueMissing: (
+                input.hasAttribute("required")
+                    && ((type == "checkbox") ? !input.checked // seems silly
+                        : (type == "radio") ? !radio_checked(parent, input)
+                        : (type == "select") ? (input.options[input.selectedIndex].value < 1)
+                        : (input.disabled && name && string_ends_with(name, "-other")) ? false
+                        : (length < 1)))
+        };
+        var input_valid = true;
+        for (var key in validity) {
+            if (validity[key]) {
+                console_log("check_inputs_validity(" + selector + ") " + type + " " + name + " " + key);
+                input_valid = false;
+                break;
+            }
+        }
+        if (input_valid) {
+            remove_class(input, "invalid");
+            add_class(input, "valid");
+        } else {
+            remove_class(input, "valid");
+            add_class(input, "invalid");
+            all_valid = false;
+        }
+    });
+    console_log("check_inputs_validity(" + selector + ") = " + all_valid);
+    return all_valid;
+}
+
+/* Return true iff any radio input of the same name is checked. */
+function radio_checked(parent, radio) {
+    var checked = radio.checked;
+    if (!checked && radio.name) {
+        var selector = "[name=\"" + radio.getAttribute("name") + "\"]";
+        array_some(parent.querySelectorAll(selector), function(sibling) {
+            checked = checked || sibling.checked;
+        });
+    }
+    return !!checked;
 }
 
 /* Callback invoked when the form changes */

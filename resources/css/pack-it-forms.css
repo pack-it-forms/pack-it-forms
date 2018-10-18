@@ -284,8 +284,15 @@ form :invalid {
     box-shadow: 0 0 5px 1px #e86060;
     transition: box-shadow 0.5s;
 }
+form .invalid {
+    box-shadow: 0 0 5px 1px #e86060;
+    transition: box-shadow 0.5s;
+}
 
 form :valid {
+    transition: box-shadow 0.5s, background-color 0.5s;
+}
+form .valid {
     transition: box-shadow 0.5s, background-color 0.5s;
 }
 
@@ -293,12 +300,22 @@ form input:invalid,select:invalid,textarea:invalid {
     background-color: #f8ecec;
     transition: background-color 0.5s;
 }
+form input.invalid,select.invalid,textarea.invalid {
+    background-color: #f8ecec;
+    transition: background-color 0.5s;
+}
 
 form :focus:invalid {
   outline: none;
 }
+form :focus.invalid {
+  outline: none;
+}
 
 form fieldset:invalid {
+    box-shadow: none;
+}
+form fieldset.invalid {
     box-shadow: none;
 }
 
