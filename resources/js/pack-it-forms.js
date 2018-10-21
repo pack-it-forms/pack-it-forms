@@ -22,6 +22,38 @@ var outpost_envelope = {}; // Cached outpost envelop information
 var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Cached message field values
 var versions = {};         // Version information
+var MSIE_version = function(userAgent) {
+    if (!userAgent) {
+        return undefined;
+        // Not truthy. Comparison with any number yields false.
+    }
+    var match = /MSIE (\d*)/.exec(userAgent);
+    if (!match) {
+        return undefined;
+    }
+    if (match[1]) {
+        return parseInt(match[1]);
+    }
+    return 999999;
+}(navigator.userAgent);
+
+function is_function(thing) {
+    return (typeof thing) == "function";
+}
+
+function add_event_listener(target, type, listener, options) {
+    if (MSIE_version <= 9) {
+        target.addEventListener(type, function(event) {
+            if (is_function(listener)) {
+                listener.call(target, event || window.event);
+            } else {
+                listener.handleEvent(event || window.event);
+            }
+        }, options);
+    } else {
+        target.addEventListener(type, listener, options);
+    }
+}
 
 /* --- Registration for code to run after page loads
 
@@ -67,10 +99,10 @@ function init_form(next) {
     // Setup focus tracking within the form
     var the_form = document.querySelector("#the-form");
     last_active_form_element = document.activeElement;
-    the_form.addEventListener("focus", function (ev) {
+    add_event_listener(the_form, "focus", function (ev) {
         last_active_form_element = ev.target;
     }, true);
-    the_form.addEventListener("input", formChanged);
+    add_event_listener(the_form, "input", formChanged);
 
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
@@ -1270,14 +1302,18 @@ function logError(msg) {
     indicateError();
 }
 
-window.addEventListener('error', function(event) {
-    //if (event.hasAnyProperty('error') && event.error.hasOwnProperty('stack')) {
-    logError(event.message
-             + " ("
-             + (event.url ? event.url : "")
-             + (event.lineno ? ":" + event.lineno : "")
-             + (event.colno ? ":" + event.colno : "")
-             + ")");
+add_event_listener(window, 'error', function(event) {
+    if (MSIE_version <= 9) {
+        logError(JSON.stringify(window.event));
+    } else {
+        //if (event.hasAnyProperty('error') && event.error.hasOwnProperty('stack')) {
+        logError(event.message
+                 + " ("
+                 + (event.url ? event.url : "")
+                 + (event.lineno ? ":" + event.lineno : "")
+                 + (event.colno ? ":" + event.colno : "")
+                 + ")");
+    }
     if ("error" in event && event.error &&  "stack" in event.error) {
         logError(event.error.stack)
     }
