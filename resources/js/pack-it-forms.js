@@ -135,14 +135,18 @@ function init_form(next) {
      * updated before we do other work. */
     window.setTimeout(function () {
         expand_templated_items();
-        var first_field = document.querySelector("#the-form .invalid");
-        console_log("init_form timeout first_field = " + first_field);
+        check_the_form_validity();
+        var first_field = is_function(the_form.checkValidity)
+            ? document.querySelector("#the-form :invalid")
+            : document.querySelector("#the-form .invalid");
         if (first_field) {
             first_field.focus();
+            var type = first_field.getAttribute("type") || first_field.nodeName.toLowerCase();
+            var name = first_field.getAttribute("name");
+            console_log("init_form timeout first_field = " + type + " " + name);
         } else {
             the_form[0].focus();
         }
-        check_the_form_validity();
         write_pacforms_representation();
         next();
     }, 10);
