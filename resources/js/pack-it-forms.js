@@ -22,6 +22,38 @@ var outpost_envelope = {}; // Cached outpost envelop information
 var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Cached message field values
 var versions = {};         // Version information
+var MSIE_version = function(userAgent) {
+    if (!userAgent) {
+        return undefined;
+        // Not truthy. Comparison with any number yields false.
+    }
+    var match = /MSIE (\d*)/.exec(userAgent);
+    if (!match) {
+        return undefined;
+    }
+    if (match[1]) {
+        return parseInt(match[1]);
+    }
+    return 999999;
+}(navigator.userAgent);
+
+function is_function(thing) {
+    return (typeof thing) == "function";
+}
+
+function add_event_listener(target, type, listener, options) {
+    if (MSIE_version <= 9) {
+        target.addEventListener(type, function(event) {
+            if (is_function(listener)) {
+                listener.call(target, event || window.event);
+            } else {
+                listener.handleEvent(event || window.event);
+            }
+        }, options);
+    } else {
+        target.addEventListener(type, listener, options);
+    }
+}
 
 /* --- Registration for code to run after page loads
 
@@ -63,13 +95,23 @@ filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    console_log("init_form");
     // Setup focus tracking within the form
     var the_form = document.querySelector("#the-form");
     last_active_form_element = document.activeElement;
-    the_form.addEventListener("focus", function (ev) {
+    add_event_listener(the_form, "focus", function (ev) {
         last_active_form_element = ev.target;
     }, true);
-    the_form.addEventListener("input", formChanged);
+    add_event_listener(the_form, "input", formChanged);
+    if (MSIE_version <= 9) {
+        add_event_listener(document, "selectionchange", function() {
+            var el = document.activeElement;
+            if (el.tagName.toLowerCase() == "textarea"
+                || (el.tagName.toLowerCase() == "input" && el.type.toLowerCase() == "text")) {
+                formChanged();
+            }
+        });
+    }
 
     var text = get_form_data_from_div();
     if (text.trim().length != 0) {
@@ -93,13 +135,18 @@ function init_form(next) {
      * updated before we do other work. */
     window.setTimeout(function () {
         expand_templated_items();
-        var first_field = document.querySelector("#the-form :invalid");
+        check_the_form_validity();
+        var first_field = is_function(the_form.checkValidity)
+            ? document.querySelector("#the-form :invalid")
+            : document.querySelector("#the-form .invalid");
         if (first_field) {
             first_field.focus();
+            var type = first_field.getAttribute("type") || first_field.nodeName.toLowerCase();
+            var name = first_field.getAttribute("name");
+            console_log("init_form timeout first_field = " + type + " " + name);
         } else {
             the_form[0].focus();
         }
-        check_the_form_validity();
         write_pacforms_representation();
         next();
     }, 10);
@@ -112,6 +159,7 @@ Explorer and a regular XMLHttpRequest in other places because using
 the ActiveXObject in Internet Explorer allows a file loaded through a
 file:// uri to access other resources through a file:// uri. */
 function open_async_request(method, url, responseType, cb, err) {
+    console_log("open_async_request(" + method + ", " + url + ", " + responseType + ")");
     var request;
     if (window.ActiveXObject !== undefined) {
         request = new ActiveXObject("Msxml2.XMLHTTP");
@@ -280,6 +328,7 @@ If the optional third parameter is supplied it is the name of a class
 that should be added to the classList of the elements that are set by
 this function.*/
 function init_form_from_fields(fields, attribute, className) {
+    console_log("init_form_from_fields(" + JSON.stringify(fields) + ", " + attribute + ", " + className + ")");
     for (var field in fields) {
         var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
         /* The above CSS selector does a prefix match which can return
@@ -293,12 +342,12 @@ function init_form_from_fields(fields, attribute, className) {
            functionality. It is believed that this should not cause
            issues for any existing or planned forms. */
         array_some(elem, function (element) {
-            if (element.classList.contains("no-msg-init")) {
+            if (has_class(element, "no-msg-init")) {
                 return true;
             }
             if (init_from_msg_funcs.hasOwnProperty(element.type)) {
                 if (className) {
-                    element.classList.add(className);
+                    add_class(element, className);
                 }
                 var stop = init_from_msg_funcs[element.type](element, fields[field]);
                 fireEvent(element, 'change');
@@ -394,6 +443,7 @@ function unescape_pacforms_string(string) {
 A PacForm-like description of the for mfield values is written into
 the textContent of the div with ID "form-data". */
 function write_pacforms_representation() {
+    console_log("write_pacforms_representation");
     var form = document.querySelector("#the-form");
     var fldtxt = "";
     array_for_each(form.elements, function(element, index, array) {
@@ -402,7 +452,7 @@ function write_pacforms_representation() {
             result = null;
         } else if (pacform_representation_funcs.hasOwnProperty(element.type)) {
             result = pacform_representation_funcs[element.type](element);
-            if (element.classList.contains("init-on-submit")) {
+            if (has_class(element, "init-on-submit")) {
                 result = expand_template(result);
             }
             result = bracket_data(result);
@@ -782,6 +832,7 @@ document.querySelectorAll.  This does not have to be used on input
 elements; attribute determines what attribute will be read and
 expanded. */
 function init_text_fields(selector, attribute) {
+    console_log("init_text_fields(" + selector + ", " + attribute + ")");
     var fields = document.querySelectorAll(selector);
     array_for_each(fields, function (field) {
         field[attribute] = expand_template(field[attribute]);
@@ -908,17 +959,103 @@ function check_the_form_validity() {
     var button_header = document.querySelector("#button-header");
     var submit_button = document.querySelector("#opdirect-submit");
     var email_button  = document.querySelector("#email-submit");
-    var valid = document.querySelector("#the-form").checkValidity();
+    var the_form = document.querySelector("#the-form");
+    var valid = true;
+    if (is_function(the_form.checkValidity)) {
+        // Use the browser to evaluate validity:
+        valid = the_form.checkValidity();
+    } else {
+        console_log("the-form.checkValidity == " + the_form.checkValidity);
+        valid = check_inputs_validity(the_form, "input")
+            & check_inputs_validity(the_form, "textarea");
+    }
     if (valid) {
-        button_header.classList.add("valid");
+        remove_class(button_header, "invalid");
+        add_class(button_header, "valid");
         submit_button.disabled = false;
         email_button.disabled = false;
     } else {
-        button_header.classList.remove("valid");
+        remove_class(button_header, "valid");
+        add_class(button_header, "invalid");
         submit_button.disabled = true;
         email_button.disabled = true;
     }
     return valid;
+}
+
+function check_inputs_validity(parent, selector) {
+    var email_pattern = /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/;
+    var url_pattern = /^(?:(?:https?|HTTPS?|ftp|FTP):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-zA-Z\u00a1-\uffff0-9]-*)*[a-zA-Z\u00a1-\uffff0-9]+)(?:\.(?:[a-zA-Z\u00a1-\uffff0-9]-*)*[a-zA-Z\u00a1-\uffff0-9]+)*)(?::\d{2,5})?(?:[\/?#]\S*)?$/;
+    var all_valid = true;
+    array_some(parent.querySelectorAll(selector), function(input) {
+        var type = input.getAttribute("type") || input.nodeName.toLowerCase();
+        var name = input.getAttribute("name");
+        var isNum = type == "number" || type == "range";
+        var length = input.value.length;
+        var validity = {
+            badInput: (
+                isNum && length > 0 && !/[-+]?[0-9]/.test(input.value)),
+            patternMismatch: (
+                input.hasAttribute("pattern") && length > 0
+                    && !(new RegExp(input.getAttribute("pattern")).test(input.value))),
+            rangeOverflow:(
+                isNum && input.hasAttribute("max") && input.value > 1
+                    && parseInt(input.value, 10) > parseInt(input.getAttribute("max"), 10)),
+            rangeUnderflow: (
+                isNum && input.hasAttribute("min") && input.value > 1
+                    && parseInt(input.value, 10) < parseInt(input.getAttribute("min"), 10)),
+            stepMismatch: (
+                isNum && input.hasAttribute("step") && input.getAttribute("step") !== "any"
+                    && Number(input.value) % parseFloat(input.getAttribute("step")) !== 0),
+            tooLong: (
+                input.hasAttribute("maxLength") && input.getAttribute("maxLength") > 0
+                    && length > parseInt(input.getAttribute("maxLength"), 10)),
+            tooShort: (
+                input.hasAttribute("minLength") && input.getAttribute("minLength") > 0
+                    && length > 0 && length < parseInt(input.getAttribute("minLength"), 10)),
+            typeMismatch: (
+                length > 0
+                    && ((type == "email" && !email_pattern.test(input.value))
+                        || (type == "url" && !url_pattern.test(input.value)))),
+            valueMissing: (
+                input.hasAttribute("required")
+                    && ((type == "checkbox") ? !input.checked // seems silly
+                        : (type == "radio") ? !radio_checked(parent, input)
+                        : (type == "select") ? (input.options[input.selectedIndex].value < 1)
+                        : (input.disabled && name && string_ends_with(name, "-other")) ? false
+                        : (length < 1)))
+        };
+        var input_valid = true;
+        for (var key in validity) {
+            if (validity[key]) {
+                console_log("check_inputs_validity(" + selector + ") " + type + " " + name + " " + key);
+                input_valid = false;
+                break;
+            }
+        }
+        if (input_valid) {
+            remove_class(input, "invalid");
+            add_class(input, "valid");
+        } else {
+            remove_class(input, "valid");
+            add_class(input, "invalid");
+            all_valid = false;
+        }
+    });
+    console_log("check_inputs_validity(" + selector + ") = " + all_valid);
+    return all_valid;
+}
+
+/* Return true iff any radio input of the same name is checked. */
+function radio_checked(parent, radio) {
+    var checked = radio.checked;
+    if (!checked && radio.name) {
+        var selector = "[name=\"" + radio.getAttribute("name") + "\"]";
+        array_some(parent.querySelectorAll(selector), function(sibling) {
+            checked = checked || sibling.checked;
+        });
+    }
+    return !!checked;
 }
 
 /* Callback invoked when the form changes */
@@ -1022,13 +1159,14 @@ function toggle_form_data_visibility() {
 
 This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
+    console_log("setup_view_mode");
     var form = document.querySelector("#the-form");
     if (query_object.mode && query_object.mode == "readonly") {
-        document.querySelector("#button-header").classList.add("readonly");
-        document.querySelector("#opdirect-submit").hidden = "true";
-        document.querySelector("#email-submit").hidden = "true";
-        document.querySelector("#show-hide-data").hidden = "true";
-        document.querySelector("#clear-form").hidden = "true";
+        add_class(document.querySelector("#button-header"), "readonly");
+        hide_element(document.querySelector("#opdirect-submit"));
+        hide_element(document.querySelector("#email-submit"));
+        hide_element(document.querySelector("#show-hide-data"));
+        hide_element(document.querySelector("#clear-form"));
         /* In view mode, we don't want to show the input control chrome.  This
            is difficult to do with textareas which might need scrollbars, etc.
            so insert a div with the same contents and use CSS to appropriately
@@ -1061,6 +1199,7 @@ function setup_view_mode(next) {
 function expand_templated_items() {
     init_text_fields(".templated", "textContent");
     init_text_fields("input:not(.no-load-init):not(.msg-value)", "value");
+    console_log("expand_templated_items complete");
 }
 
 function get_form_data_from_div() {
@@ -1068,6 +1207,7 @@ function get_form_data_from_div() {
 }
 
 function set_form_data_div(text) {
+    console_log("set_form_data_div(" + JSON.stringify(text) + ")");
     var form_data = document.querySelector("#form-data");
     form_data.value = text;
 }
@@ -1091,10 +1231,65 @@ function padded_int_str(num, cnt) {
 /* Create a DIV element containing the provided text */
 function create_text_div(text, className) {
     var elem = document.createElement("div");
-    elem.classList.add(className);
+    add_class(elem, className);
     var textelem = document.createTextNode(text);
     elem.appendChild(textelem);
     return elem;
+}
+
+function hide_element(element) {
+    element.hidden = "true";
+    add_class(element, "hidden");
+}
+
+function has_class(element, className) {
+    if (!element) {
+        throw new Error("has_class(" + element + ", " + className + ")");
+    }
+    if (element.classList) {
+        return element.classList.contains(className);
+    } else {
+        // Typically Internet Explorer version 9 or earlier.
+        return element.className && array_contains(element.className.split(" "), className);
+    }
+}
+
+function add_class(element, className) {
+    if (!element) {
+        throw new Error("add_class(" + element + ", " + className + ")");
+    }
+    if (element.classList) {
+        element.classList.add(className);
+    } else {
+        // Typically Internet Explorer version 9 or earlier.
+        if (!has_class(element, className)) {
+            element.className = element.className ? (element.className + " " + className) : className;
+        }
+    }
+}
+
+function remove_class(element, className) {
+    if (!element) {
+        throw new Error("remove_class(" + element + ", " + className + ")");
+    }
+    if (element.classList) {
+        element.classList.remove(className);
+    } else if (element.className) {
+        // Typically Internet Explorer version 9 or earlier.
+        var oldClasses = element.className.split(" ");
+        var newClasses = [];
+        var removed = false;
+        array_for_each(oldClasses, function(oldClass) {
+            if (oldClass == className) {
+                removed = true;
+            } else if (oldClass) {
+                newClasses.push(oldClass);
+            }
+        });
+        if (removed) {
+            element.className = newClasses.join(" ");
+        }
+    }
 }
 
 /* Make forEach() & friends easier to use on Array-like objects
@@ -1158,6 +1353,11 @@ function fireEvent(target, evt) {
     }
 }
 
+function console_log(message) {
+    if (window.console && console && console.log) {
+        console.log(message);
+    }
+}
 
 function outpost_envelope_to_object(line) {
     var data = {};
@@ -1175,6 +1375,7 @@ function outpost_envelope_to_object(line) {
 This should be called as an init function; it will store the result in
 the global variable query_object */
 function query_string_to_object(next) {
+    console_log("query_string_to_object");
     var query = {};
     var string = window.location.search.substring(1);
     var list = string ? string.split("&") : [];
@@ -1195,46 +1396,47 @@ function load_form_version(next) {
 function remove_loading_overlay(next) {
     var el = document.querySelector("#loading");
     if (el) {
-        el.classList.add("done");
+        add_class(el, "done");
     }
     next();
 }
 
 function loadingComplete() {
     var el = document.querySelector("#loading");
-    return el.classList.contains("done");
+    return has_class(el, "done");
 }
 
 function showErrorLog() {
     var el = document.querySelector("#err");
-    el.classList.add("occured");
+    add_class(el, "occured");
 }
 
 function hideErrorLog() {
     var el = document.querySelector("#err");
-    el.classList.remove("occured");
+    remove_class(el, "occured");
 }
 
 function toggleErrorLog() {
     var el = document.querySelector("#err");
-    if (el.classList.contains("occured")) {
-        el.classList.remove("occured");
+    if (has_class(el, "occured")) {
+        remove_class(el, "occured");
     } else {
-        el.classList.add("occured");
+        add_class(el, "occured");
     }
 }
 
 function showErrorIndicator() {
     var el = document.querySelector("#error-indicator");
-    el.classList.add("occured");
+    add_class(el, "occured");
 }
 
 function hideErrorIndicator() {
     var el = document.querySelector("#error-indicator");
-    el.classList.remove("occured");
+    remove_class(el, "occured");
 }
 
 function setup_error_indicator(next) {
+    console_log("setup_error_indicator");
     var el = document.querySelector("#error-indicator");
     el.onclick = toggleErrorLog;
     next();
@@ -1254,14 +1456,18 @@ function logError(msg) {
     indicateError();
 }
 
-window.addEventListener('error', function(event) {
-    //if (event.hasAnyProperty('error') && event.error.hasOwnProperty('stack')) {
-    logError(event.message
-             + " ("
-             + (event.url ? event.url : "")
-             + (event.lineno ? ":" + event.lineno : "")
-             + (event.colno ? ":" + event.colno : "")
-             + ")");
+add_event_listener(window, 'error', function(event) {
+    if (MSIE_version <= 9) {
+        logError(JSON.stringify(window.event));
+    } else {
+        //if (event.hasAnyProperty('error') && event.error.hasOwnProperty('stack')) {
+        logError(event.message
+                 + " ("
+                 + (event.url ? event.url : "")
+                 + (event.lineno ? ":" + event.lineno : "")
+                 + (event.colno ? ":" + event.colno : "")
+                 + ")");
+    }
     if ("error" in event && event.error &&  "stack" in event.error) {
         logError(event.error.stack)
     }
