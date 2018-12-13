@@ -1035,6 +1035,9 @@ function setup_view_mode(next) {
            style it and hide the textarea. */
         var textareas_to_redisplay = [];
         array_for_each(form.elements, function (el) {
+            if (el.placeholder) {
+                el.placeholder = '';
+            }
             if (el.type == "radio"
                 || el.type == "checkbox"
                 || (el.type && el.type.substr(0, 6) == "select")) {
