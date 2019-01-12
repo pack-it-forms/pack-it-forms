@@ -441,8 +441,30 @@ td.rotated:not(.not-rotated) > div > div::after, th.rotated:not(.not-rotated) > 
    }
    textarea {
        resize: none;
+       overflow: hidden !important;
+       -ms-overflow-style: none;
+       scrollbar-width: none;
    }
-   #the-form :placeholder-shown {
-       visibility: hidden;
+   ::-webkit-scrollbar {
+       display: none;
+       width: 0 !important;
+   }
+   ::-webkit-input-placeholder {
+       color: transparent;
+   }
+   :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+       color: transparent;
+   }
+   ::-moz-placeholder { /* Mozilla Firefox 19+ */
+       color: transparent;
+   }
+   :-ms-input-placeholder { /* Internet Explorer 10+ */
+       color: transparent;
+   }
+   ::-ms-input-placeholder { /* Microsoft Edge */
+       color: transparent;
+   }
+   ::placeholder { /* Most modern browsers */
+       color: transparent;
    }
 }
