@@ -899,8 +899,20 @@ function load_callprefix(next) {
 
 /* Clear the form to original contents */
 function clear_form() {
-    document.querySelector("#the-form").reset();
-    set_form_data_div("");
+    var the_form = document.getElementById("the-form");
+    the_form.reset();
+    array_for_each(the_form.elements, function(element) {
+        element.classList.remove("msg-value");
+        if (element.type == "textarea") {
+            // Make Internet Explorer re-evaluate whether it's valid:
+            var oldValue = element.value;
+            element.value = oldValue + ".";
+            element.value = oldValue;
+        }
+    });
+    set_form_default_values();
+    expand_templated_items();
+    formChanged();
 }
 
 /* Check whether the form is valid */
@@ -922,7 +934,7 @@ function check_the_form_validity() {
 }
 
 /* Callback invoked when the form changes */
-function formChanged(event) {
+function formChanged() {
     write_pacforms_representation();
     check_the_form_validity();
 }
@@ -953,11 +965,6 @@ function email_submit(e) {
                           + "&body=" + encodeURIComponent(pacforms_rep);
     }
     return false;
-}
-
-/* Function invoked to clear the form */
-function clear_form(e) {
-    document.location.reload();
 }
 
 /* Enable or disable a different control based on onChange values
