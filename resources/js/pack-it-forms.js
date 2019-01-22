@@ -903,11 +903,17 @@ function clear_form() {
     the_form.reset();
     array_for_each(the_form.elements, function(element) {
         element.classList.remove("msg-value");
-        if (element.type == "textarea") {
-            // Make Internet Explorer re-evaluate whether it's valid:
-            var oldValue = element.value;
-            element.value = oldValue + ".";
-            element.value = oldValue;
+        if (element.type) {
+            if (element.type.substr(0, 8) == "textarea") {
+                // Make Internet Explorer re-evaluate whether it's valid:
+                var oldValue = element.value;
+                element.value = oldValue + ".";
+                element.value = oldValue;
+            } else if (element.type == "checkbox" ||
+                       element.type.substr(0, 6) == "select") {
+                // Trigger any side-effects:
+                fireEvent(element, "change");
+            }
         }
     });
     set_form_default_values();
