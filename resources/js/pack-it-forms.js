@@ -1054,6 +1054,39 @@ function setup_view_mode(next) {
             var textNode = create_text_div(el.value,"view-mode-textarea");
             el.parentNode.insertBefore(textNode, el);
         }
+    } else { // not readonly
+        array_for_each(form.elements, function (el) {
+            if (el.classList.contains("cardinal-number")) {
+                if (!el.pattern) {
+                    el.pattern = "[0-9]*";
+                }
+            } else if (el.classList.contains("real-number")) {
+                if (!el.pattern) {
+                    el.pattern = "[-+]?[0-9]+(\.[0-9]+)?";
+                }
+            } else if (el.classList.contains("phone-number")) {
+                if (!el.placeholder) {
+                    el.placeholder = "000-000-0000";
+                }
+                if (!el.pattern) {
+                    el.pattern = "([0-9]{3})?[ -]?[0-9]{3}[ -]?[0-9]{4}"
+                }
+            } else if (el.classList.contains("date")) {
+                if (!el.placeholder) {
+                    el.placeholder = "mm/dd/yyyy";
+                }
+                if (!el.pattern) {
+                    el.pattern = "(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[1-2][0-9][0-9][0-9]";
+                }
+            } else if (el.classList.contains("time")) {
+                if (!el.placeholder) {
+                    el.placeholder = "hh:mm";
+                }
+                if (!el.pattern) {
+                    el.pattern = "([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?";
+                }
+            }
+        });
     }
     next();
 }
