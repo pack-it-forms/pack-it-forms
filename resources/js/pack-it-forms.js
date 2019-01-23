@@ -1018,11 +1018,38 @@ function toggle_form_data_visibility() {
     }
 }
 
+function setup_input_elem_from_class(next) {
+    if (query_object.mode != "readonly") {
+        var setup = {
+            "date": {pattern: "(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[1-2][0-9][0-9][0-9]",
+                     placeholder: "mm/dd/yyyy"},
+            "time": {pattern: "([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?",
+                     placeholder: "hh:mm"},
+            "phone-number": {pattern: "([0-9]{3})?[ -]?[0-9]{3}[ -]?[0-9]{4}",
+                             placeholder: "000-000-0000"},
+            "cardinal-number": {pattern: "[0-9]*"},
+            "real-number": {pattern: "[-+]?[0-9]+(\.[0-9]+)?"}
+        };
+        array_for_each(document.querySelector("#the-form").elements, function (el) {
+            for (var s in setup) {
+                if (el.classList.contains(s)) {
+                    if (!el.pattern && setup[s].pattern != undefined) {
+                        el.pattern = setup[s].pattern;
+                    }
+                    if (!el.placeholder && setup[s].placeholder != undefined) {
+                        el.placeholder = setup[s].placeholder;
+                    }
+                }
+            }
+        });
+    }
+    next();
+}
+
 /* Handle the readonly view mode
 
 This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
-    var form = document.querySelector("#the-form");
     if (query_object.mode && query_object.mode == "readonly") {
         document.querySelector("#button-header").classList.add("readonly");
         document.querySelector("#opdirect-submit").hidden = "true";
@@ -1034,7 +1061,7 @@ function setup_view_mode(next) {
            so insert a div with the same contents and use CSS to appropriately
            style it and hide the textarea. */
         var textareas_to_redisplay = [];
-        array_for_each(form.elements, function (el) {
+        array_for_each(document.querySelector("#the-form").elements, function (el) {
             if (el.placeholder) {
                 el.placeholder = '';
             }
@@ -1054,39 +1081,6 @@ function setup_view_mode(next) {
             var textNode = create_text_div(el.value,"view-mode-textarea");
             el.parentNode.insertBefore(textNode, el);
         }
-    } else { // not readonly
-        array_for_each(form.elements, function (el) {
-            if (el.classList.contains("cardinal-number")) {
-                if (!el.pattern) {
-                    el.pattern = "[0-9]*";
-                }
-            } else if (el.classList.contains("real-number")) {
-                if (!el.pattern) {
-                    el.pattern = "[-+]?[0-9]+(\.[0-9]+)?";
-                }
-            } else if (el.classList.contains("phone-number")) {
-                if (!el.placeholder) {
-                    el.placeholder = "000-000-0000";
-                }
-                if (!el.pattern) {
-                    el.pattern = "([0-9]{3})?[ -]?[0-9]{3}[ -]?[0-9]{4}"
-                }
-            } else if (el.classList.contains("date")) {
-                if (!el.placeholder) {
-                    el.placeholder = "mm/dd/yyyy";
-                }
-                if (!el.pattern) {
-                    el.pattern = "(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[1-2][0-9][0-9][0-9]";
-                }
-            } else if (el.classList.contains("time")) {
-                if (!el.placeholder) {
-                    el.placeholder = "hh:mm";
-                }
-                if (!el.pattern) {
-                    el.pattern = "([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?";
-                }
-            }
-        });
     }
     next();
 }
@@ -1325,6 +1319,7 @@ startup_functions.push(process_html_includes);
 startup_functions.push(query_string_to_object);
 startup_functions.push(load_callprefix);
 startup_functions.push(init_form);
+startup_functions.push(setup_input_elem_from_class);
 // This must come after query_string_to_object in the startup functions
 startup_functions.push(setup_view_mode);
 // These must be the last startup functions added

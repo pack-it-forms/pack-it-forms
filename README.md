@@ -186,6 +186,18 @@ formatted like this:
      the whole text of the field name will be used as the reference in
      the PacFORMS output.
 
+You can give an `input` a standard style, validation pattern and placeholder
+by adding one of these classes to its class attribute:
+
+* date
+* time
+* phone-number
+* cardinal-number
+* real-number
+
+You can override the standard style, pattern and/or placeholder with
+HTML attributes, as usual.
+
 The `select` element is used when the user should pick from a set of
 known values. It isn't required, but is generally a good practice, to
 use the same content for the `value` attribute of the child `option`
