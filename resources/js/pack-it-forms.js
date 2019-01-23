@@ -22,6 +22,7 @@ var outpost_envelope = {}; // Cached outpost envelop information
 var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Cached message field values
 var versions = {};         // Version information
+var formDefaultValues;     // Initial values for form inputs.
 
 /* --- Registration for code to run after page loads
 
@@ -63,6 +64,7 @@ filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    set_form_default_values();
     // Setup focus tracking within the form
     var the_form = document.querySelector("#the-form");
     last_active_form_element = document.activeElement;
@@ -103,6 +105,14 @@ function init_form(next) {
         write_pacforms_representation();
         next();
     }, 10);
+}
+
+function set_form_default_values() {
+    if (formDefaultValues) {
+        for (var f = formDefaultValues.length - 1; f >= 0; f--) {
+            init_form_from_fields(formDefaultValues[f], "name");
+        }
+    }
 }
 
 /* Cross-browser resource loading w/local file handling
@@ -850,7 +860,10 @@ function process_html_includes(next) {
             // accumulated and initialized at the end.
             process_html_includes(function() {
                 if (defaults) {
-                    init_form_from_fields(JSON.parse(defaults), 'name');
+                    if (!formDefaultValues) {
+                        formDefaultValues = [];
+                    }
+                    formDefaultValues.push(JSON.parse(defaults));
                 }
                 next();
             });
