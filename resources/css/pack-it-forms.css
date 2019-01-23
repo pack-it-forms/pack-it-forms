@@ -47,6 +47,29 @@ td.label{
   white-space: nowrap;
 }
 
+table.layout {
+    border: none;
+    border-collapse: collapse;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+table.layout>tr>th, table.layout>tbody>tr>th {
+    border: none;
+    margin: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    width: 1px;
+}
+table.layout>tr>td, table.layout>tbody>tr>td {
+    border: none;
+    margin: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
 label {
     font-weight: bold;
 }
