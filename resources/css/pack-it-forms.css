@@ -65,12 +65,14 @@ form input {
     display: block;
 }
 form input[type="text"] {
+    font-weight: bold;
     width: 100%;
 }
 form select {
     border: 1px solid #cccccc;
     padding: 1px;
     background: #ffffff;
+    font-weight: bold;
 }
 form textarea {
     display: block;
@@ -87,7 +89,7 @@ form input:disabled,textarea:disabled {
     background-color: transparent;
     border: 1px solid #cccccc;
 }
-form label.label-sameline input {
+form label.label-sameline input, form label.label-sameline select {
     display: inline;;
     margin-left: 1em;
 }
