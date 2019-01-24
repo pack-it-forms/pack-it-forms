@@ -325,7 +325,28 @@ form input.init-on-submit {
     background-color: transparent;
     border-color: transparent;
 }
-
+form input.call-sign {
+    width: 6em;
+}
+form input.cardinal-number {
+    text-align: right;
+    width: 4em;
+}
+form input.real-number {
+    text-align: right;
+}
+form input.phone-number {
+    width: 8em;
+}
+form input.date {
+    width: 6em;
+}
+form input.time {
+    width: 6em;
+}
+form input.message-number {
+    width: 7em;
+}
 
 /* Prevent things from getting overly wide or narrow */
 #the-form {

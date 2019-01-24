@@ -1,8 +1,3 @@
-#the-form input[name="1a.date"] { width: 8em; }
-#the-form input[name="1b.time"] { width: 8em; }
-#the-form input[name="MsgNo"] { width: 7em; }
-#the-form input[name="2.txmsgno"] { width: 7em; }
-#the-form input[name="3.rxmsgno"] { width: 7em; }
 #the-form input[name="6d.reply-by"] { width: 8em; }
 #the-form input[name="7.to-ics-position-other"] { width: 10em; }
 #the-form input[name="8.from-ics-position-other"] { width: 10em; }
