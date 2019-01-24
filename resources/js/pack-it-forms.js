@@ -23,6 +23,7 @@ var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Cached message field values
 var versions = {};         // Version information
 var outpost_message_footer = "#EOF\r\n";
+var formDefaultValues;     // Initial values for form inputs.
 
 /* --- Registration for code to run after page loads
 
@@ -64,6 +65,7 @@ filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    set_form_default_values();
     // Setup focus tracking within the form
     var the_form = document.querySelector("#the-form");
     last_active_form_element = document.activeElement;
@@ -104,6 +106,14 @@ function init_form(next) {
         write_pacforms_representation();
         next();
     }, 10);
+}
+
+function set_form_default_values() {
+    if (formDefaultValues) {
+        for (var f = formDefaultValues.length - 1; f >= 0; f--) {
+            init_form_from_fields(formDefaultValues[f], "name");
+        }
+    }
 }
 
 /* Cross-browser resource loading w/local file handling
@@ -861,7 +871,10 @@ function process_html_includes(next) {
             // accumulated and initialized at the end.
             process_html_includes(function() {
                 if (defaults) {
-                    init_form_from_fields(JSON.parse(defaults), 'name');
+                    if (!formDefaultValues) {
+                        formDefaultValues = [];
+                    }
+                    formDefaultValues.push(JSON.parse(defaults));
                 }
                 next();
             });
@@ -910,8 +923,26 @@ function load_callprefix(next) {
 
 /* Clear the form to original contents */
 function clear_form() {
-    document.querySelector("#the-form").reset();
-    set_form_data_div("");
+    var the_form = document.getElementById("the-form");
+    the_form.reset();
+    array_for_each(the_form.elements, function(element) {
+        element.classList.remove("msg-value");
+        if (element.type) {
+            if (element.type.substr(0, 8) == "textarea") {
+                // Make Internet Explorer re-evaluate whether it's valid:
+                var oldValue = element.value;
+                element.value = oldValue + ".";
+                element.value = oldValue;
+            } else if (element.type == "checkbox" ||
+                       element.type.substr(0, 6) == "select") {
+                // Trigger any side-effects:
+                fireEvent(element, "change");
+            }
+        }
+    });
+    set_form_default_values();
+    expand_templated_items();
+    formChanged();
 }
 
 /* Check whether the form is valid */
@@ -933,7 +964,7 @@ function check_the_form_validity() {
 }
 
 /* Callback invoked when the form changes */
-function formChanged(event) {
+function formChanged() {
     write_pacforms_representation();
     check_the_form_validity();
 }
@@ -964,11 +995,6 @@ function email_submit(e) {
                           + "&body=" + encodeURIComponent(pacforms_rep);
     }
     return false;
-}
-
-/* Function invoked to clear the form */
-function clear_form(e) {
-    document.location.reload();
 }
 
 /* Enable or disable a different control based on onChange values
