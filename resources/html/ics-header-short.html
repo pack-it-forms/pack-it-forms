@@ -1,0 +1,58 @@
+<div>
+  <div class="version">0.1.0</div>
+  <table id="form-row-1" class="noborder">
+    <tr>
+      <td>
+        <label class="label-sameline">Sender's Msg #
+          <input name="2.txmsgno" class="message-number" type="text" tabindex="-1"
+                 value="{{query-string:txmsgno}}"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">My Msg #
+          <input name="MsgNo" class="message-number no-msg-init" type="text" tabindex="1"
+                 required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">Receiver's Msg #
+          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"/>
+        </label>
+      </td>
+    </tr>
+  </table><table id="form-row-2">
+    <tr>
+      <td>
+        <label class="label-sameline">Date:
+          <input name="1a.date" type="text" tabindex="2"
+                 required="required" class="date" value="{{date}}"/>
+        </label>
+      </td><td rowspan="2">
+        <fieldset>
+          <legend>Situation Severity:</legend>
+          <select name="4.severity" tabindex="4"
+                  onchange="on_value(this, ['EMERGENCY'], {'5.handling': {onMatch: {value: 'IMMEDIATE'}}})">
+            <option value="EMERGENCY">Emergency</option>
+            <option value="URGENT">Urgent</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </fieldset>
+      </td><td rowspan="2">
+        <fieldset>
+          <legend>Msg Handling Order:</legend>
+          <select name="5.handling" tabindex="5">
+            <option value="IMMEDIATE">Immediate</option>
+            <option value="PRIORTY">Priority</option>
+            <option value="ROUTINE">Routine</option>
+          </select>
+        </fieldset>
+      </td><td name="9.note" rowspan="2" style="white-space:normal;">
+      </td>
+    </tr><tr>
+      <td>
+        <label class="label-sameline">Time:
+          <input name="1b.time" type="text" tabindex="3"
+                 required="required" class="time" value="{{time}}"/>
+        </label>
+      </td>
+    </tr>
+  </table>
+</div>
