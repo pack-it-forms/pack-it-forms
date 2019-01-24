@@ -27,6 +27,11 @@ h1 {
     vertical-align: top;
     margin-top: 0
 }
+footer {
+    display: none;
+    font-weight: bold;
+    text-align: center;
+}
 table {
     border-collapse: collapse;
     width: 90%;
@@ -45,6 +50,29 @@ td {
 td.label{
   width: 1px;
   white-space: nowrap;
+}
+
+table.layout {
+    border: none;
+    border-collapse: collapse;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+table.layout>tr>th, table.layout>tbody>tr>th {
+    border: none;
+    margin: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    width: 1px;
+}
+table.layout>tr>td, table.layout>tbody>tr>td {
+    border: none;
+    margin: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 label {
@@ -74,6 +102,7 @@ form select {
     border: 1px solid #cccccc;
     padding: 1px;
     background: #ffffff;
+    font-size: 9pt;
     font-family: consolas,monaco,profont,monospace;
     font-weight: bold;
 }
@@ -460,6 +489,9 @@ td.rotated:not(.not-rotated) > div > div::after, th.rotated:not(.not-rotated) > 
    }
    #loading,#message-header,#button-header,#form-data-form {
        display: none;
+   }
+   footer {
+       display: block;
    }
    table {
       width: 100%;

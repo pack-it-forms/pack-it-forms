@@ -8,11 +8,22 @@
     <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/form-ics213.css"/>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
-    <title>ICS213: Message Form</title>
+    <script type="text/javascript">
+      add_startup_function(function(next) {
+          document.getElementById('header-title').innerHTML =
+              '<div style="font-size:166%;font-weight:bold;padding-bottom:0.5ex;">EOC Message Form</div>'
+              + '6/28/2007; (PR-4.4-4.3, 05/02/18)';
+          document.getElementById('button-header').innerHTML +=
+              '<input type="button" id="show-PDF-form" value="Show PDF"'
+              + ' onclick="window.open(\'resources/pdf/ICS-213_SCC_Message_Form_06-28-07_Fillable.pdf\', \'_blank\')"/>';
+          next();
+      }, setup_view_mode);
+      </script>
+    <title>XSC EOC Message Form</title>
   </head>
 
   <body>
-    <div class="version">0.1.1</div>
+    <div class="version">05/02/18</div>
     <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
     <div id="err">
       <div>
@@ -22,27 +33,34 @@
       </div>
     </div>
     <form id="the-form" name="the-form">
-      <div data-include-html="ics-header"></div>
+      <div data-include-html="ics-header">
+        {
+            "4.": "OTHER",
+            "5.": "ROUTINE",
+            "6a.": "No",
+            "6b.": "No"
+        }
+      </div>
       <table id="form-body" class="noborder border">
         <tr>
           <td>
             <label class="label-sameline">Subject:
               <span class="field-number">10</span>
-              <input name="10.subject" type="text" required/>
+              <input name="10.subject" type="text" required tabindex="20"/>
             </label>
           </td>
         </tr><tr>
           <td>
-            <label class="label-sameline">
-              Reference (e.g. Number of earlier msg.)
+            <label class="label-sameline">Reference:
               <span class="field-number">11</span>
-              <input name="11.reference" type="text"/>
+              <input name="11.reference" type="text" tabindex="21"
+                     placeholder="e.g. Number of earlier msg."/>
             </label>
           </td>
         </tr><tr>
           <td>
-            <label>Message<span class="field-number">12</span>
-              <textarea name="12.message" rows="6" cols="80" wrap="hard"></textarea>
+            <label>Message:<span class="field-number">12</span>
+              <textarea name="12.message" rows="6" cols="80" wrap="hard" required tabindex="22"></textarea>
             </label>
           </td>
         </tr>

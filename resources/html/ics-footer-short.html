@@ -1,0 +1,35 @@
+<div>
+  <div class="version">0.1.0</div>
+  <table class="noborder" style="width:auto;">
+    <tr class="horizontal">
+      <td>
+        <select name="Rec-Sent" tabindex="506">
+          <option value="Sent">Sent</option>
+          <option value="Received">Received</option>
+        </select>
+        <label>via</label>
+        <select name="Method" tabindex="507">
+          <option value="Packet">Packet</option>
+          <option value="Voice">Voice</option>
+        </select>
+        <label class="label-sameline">by</label>
+        <input name="OpCall" type="text" tabindex="508"
+               class="no-msg-init" style="width:6em;"
+               placeholder="call sign"
+               value="{{expand-while-null:{{envelope:ocall}},{{query-string:ocall}}}}"/>
+        <input name="OpName" type="text" tabindex="509"
+               class="no-msg-init" style="width:12em;"
+               placeholder="operator name"
+               value="{{expand-while-null:{{envelope:oname}},{{query-string:oname}}}}"/>
+        <label class="label-sameline">on</label>
+        <input name="OpDate" type="text"
+               class="no-msg-init init-on-submit" style="width:6em;"
+               value="{{expand-while-null:{{envelope:ordate}},{{open-tmpl}}date{{close-tmpl}}}}" disabled="disabled"/>
+        <label class="label-sameline">at</label>
+        <input name="OpTime" type="text"
+               class="no-msg-init init-on-submit" style="width:6em;"
+               value="{{expand-while-null:{{envelope:ortime}},{{open-tmpl}}time{{close-tmpl}}}}" disabled="disabled"/>
+      </td>
+    </tr>
+  </table>
+</div>

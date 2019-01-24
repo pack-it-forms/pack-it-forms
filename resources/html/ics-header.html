@@ -2,42 +2,43 @@
   <div class="version">0.1.0</div>
   <table id="form-row-1">
     <tr>
-      <td><h1 class="templated">{{title}}</h1></td>
+      <td id="header-title"><h1 class="templated">{{title}}</h1></td>
       <td>
         <label>Sender's Msg #<span class="field-number">2</span>
-          <input name="2.txmsgno" class="" type="text"
+          <input name="2.txmsgno" class="message-number" type="text" tabindex="-1"
                  value="{{query-string:txmsgno}}"/>
         </label>
       </td><td>
-        <label>My Msg #:
-          <input name="MsgNo" class="no-msg-init" type="text"
+        <label>My Msg #<span class="field-number"> </span>
+          <input name="MsgNo" class="message-number no-msg-init" type="text" tabindex="1"
                  required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
         </label>
       </td><td>
         <label>Receiver's Msg #<span class="field-number">3</span>
-          <input name="3.rxmsgno" class="no-msg-init" type="text"/>
+          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"/>
         </label>
       </td>
     </tr>
   </table><table id="form-row-2">
     <tr>
       <td>
-        <label>Date<span class="field-number">1a</span>
-          <input name="1a.date" class="date" type="text"
+        <label>Date:<span class="field-number">1a</span>
+          <input name="1a.date" class="date" type="text" size="10" tabindex="2"
                  required="required"
                  value="{{date}}"/>
         </label>
       </td><td rowspan="2">
         <fieldset>
-          <legend>Severity:<span class="field-number">4</span></legend>
+          <legend>Severity<span class="field-number">4</span></legend>
           <label title="Life Threat">
-            <input name="4.severity" type="radio"
+            <input name="4.severity" type="radio" tabindex="4"
+                   onchange="if (this.checked) set_properties({'5.handling': {value: 'IMMEDIATE'}})"
                    required="required" value="EMERGENCY"/> Emergency
           </label><label title="Property Threat">
-            <input name="4.severity" type="radio"
+            <input name="4.severity" type="radio" tabindex="4"
                    required="required" value="URGENT"/> Urgent
           </label><label>
-            <input name="4.severity" type="radio"
+            <input name="4.severity" type="radio" tabindex="4"
                    required="required" value="OTHER"/> Other
           </label>
         </fieldset>
@@ -47,13 +48,13 @@
             <span class="field-number">5</span>
           </legend>
           <label title="As soon as possible">
-            <input name="5.handling" type="radio"
+            <input name="5.handling" type="radio" tabindex="5"
                    required="required" value="IMMEDIATE"/> Immediate
           </label><label title="Less than one hour">
-            <input name="5.handling" type="radio"
+            <input name="5.handling" type="radio" tabindex="5"
                    required="required" value="PRIORITY"/> Priority
           </label><label title="More than one hour">
-            <input name="5.handling" type="radio"
+            <input name="5.handling" type="radio" tabindex="5"
                    required="required" value="ROUTINE"/> Routine
           </label>
         </fieldset>
@@ -65,34 +66,34 @@
           <fieldset class="horizontal">
             <legend>Take action</legend>
             <label>
-              <input name="6a.take-action" type="radio" value="Yes"/> Yes
+              <input name="6a.take-action" type="radio" value="Yes" tabindex="6"/> Yes
             </label><label>
-              <input name="6a.take-action" type="radio" value="No"/> No
+              <input name="6a.take-action" type="radio" value="No" tabindex="6"/> No
             </label>
           </fieldset>
           <fieldset class="horizontal">
             <legend>Reply</legend>
-            <!-- <label> -->
-            <!--   <label> -->
-            <!--     <input name="6b.reply" type="radio" value="Yes"/> Yes -->
-            <!--   </label> -->
-            <!--   by: <input name="6c.reply-by" type="text" size="12"/> -->
-            <!-- </label> -->
-            <label><input name="6b.reply" type="radio" value="Yes"/>Yes,</label>
-            <label>by: <input name="6d.reply-by" type="text"/></label>
             <label>
-              <input name="6b.reply" type="radio" value="No"/> No
+              <input name="6b.reply" type="radio" value="Yes" tabindex="7"
+                     onchange="if (this.checked) set_properties({'6d.reply-by': {disabled: false}});"/>
+              Yes, by
+            </label>
+            <input name="6d.reply-by" type="text" tabindex="-1"/>
+            <label>
+              <input name="6b.reply" type="radio" value="No" tabindex="7"
+                     onchange="if (this.checked) set_properties({'6d.reply-by': {disabled: true, value: ''}});"/>
+              No
             </label>
           </fieldset>
           <label>
-            <input name="6c.fyi" type="checkbox"/>For your information (no action)
+            <input name="6c.fyi" type="checkbox" tabindex="-1"/>For your information (no action)
           </label>
         </fieldset>
       </td>
     </tr><tr>
       <td>
         <label>Time:<span class="field-number">1b</span>
-          <input name="1b.time" class="time" type="text"
+          <input name="1b.time" class="time" type="text" tabindex="3"
                  required="required"
                  value="{{time}}"/>
         </label>
@@ -105,7 +106,7 @@
       </td><td>
         <fieldset>
           <legend>ICS Position:<span class="field-number">7</span></legend>
-          <select name="7.to-ics-position" onchange="combobox_other_manager(this);" required="required">
+          <select name="7.to-ics-position" onchange="combobox_other_manager(this);" required="required" tabindex="10">
             <option value="" disabled="disabled" selected="selected">Select one...</option>
             <option value="Incident Commander">Incident Commander</option>
             <option value="Operations">Operations</option>
@@ -123,8 +124,8 @@
         From:
       </td><td>
         <fieldset>
-          <legend>ICS Position<span class="field-number">8</span></legend>
-          <select name="8.from-ics-position" onchange="combobox_other_manager(this);" required="required">
+          <legend>ICS Position:<span class="field-number">8</span></legend>
+          <select name="8.from-ics-position" onchange="combobox_other_manager(this);" required="required" tabindex="15">
             <option value="" disabled="disabled" selected="selected">Select one...</option>
             <option value="Incident Commander">Incident Commander</option>
             <option value="Operations">Operations</option>
@@ -141,32 +142,32 @@
       </td>
     </tr><tr>
       <td>
-        <label>Location<span class="field-number">9a</span>
-          <input name="9a.to-location" type="text" required="required"/>
+        <label>Location:<span class="field-number">9a</span>
+          <input name="9a.to-location" type="text" required="required" tabindex="11"/>
         </label>
       </td><td>
-        <label>Location<span class="field-number">9b</span>
-          <input name="9b.from-location" type="text" required="required"/>
+        <label>Location:<span class="field-number">9b</span>
+          <input name="9b.from-location" type="text" required="required" tabindex="16"/>
         </label>
       </td>
     </tr><tr>
       <td>
         <label>Name:
-          <input name="ToName" type="text"/>
+          <input name="ToName" type="text" tabindex="12"/>
         </label>
       </td><td>
         <label>Name:
-          <input name="FmName" type="text"/>
+          <input name="FmName" type="text" tabindex="17"/>
         </label>
       </td>
     </tr><tr>
       <td>
         <label>Telephone #:
-          <input name="ToTel" type="text"/>
+          <input name="ToTel" type="text" tabindex="13"/>
         </label>
       </td><td>
         <label>Telephone #:
-          <input name="FmTel" type="text"/>
+          <input name="FmTel" type="text" tabindex="18"/>
         </label>
       </td>
     </tr>

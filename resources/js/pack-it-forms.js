@@ -18,12 +18,14 @@
 
 /* --- Commonly used global objects */
 var query_object = {};     // Cached query string parameters
-var outpost_envelope = {}; // Cached outpost envelop information
+var outpost_envelope = {
+    subject: "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}_{{title|split:: |nth:0}}_{{field:10.subject|expandtmpl}}"
+};
 var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Cached message field values
 var versions = {};         // Version information
-var outpost_message_footer = "#EOF\r\n";
 var formDefaultValues;     // Initial values for form inputs.
+var outpost_message_footer = "#EOF\r\n";
 
 /* --- Registration for code to run after page loads
 
@@ -213,7 +215,10 @@ function parse_form_data_text(text) {
         }
         if (line.match(/^!OUTPOST! /)) {
             // Grab outpost data fields and store for substitution
-            outpost_envelope = outpost_envelope_to_object(line);
+            var fromOutpost = outpost_envelope_to_object(line);
+            for (var key in fromOutpost) {
+                outpost_envelope[key] = fromOutpost[key];
+            }
             return;
         }
         if (line.match(/^!.*!/)) {
@@ -987,44 +992,95 @@ function email_submit(e) {
     e.preventDefault();
     if (check_the_form_validity()) {
         var pacforms_rep = document.querySelector("#form-data").value;
-        // Use the subject line of the generated form, like outpost does
-        var subject = pacforms_rep.slice(6).split('\n',1)[0];
+        // Use the same subject as Outpost
+        var subject = expand_template(outpost_envelope.subject);
         document.location = "mailto:?to="
-                          + "&Content-Type=application/pack-it-forms"
+                          + "&Content-Type=text/plain"
                           + "&Subject=" + encodeURIComponent(subject)
                           + "&body=" + encodeURIComponent(pacforms_rep);
     }
     return false;
 }
-
-/* Enable or disable a different control based on onChange values
-
-This is a callback function to be used in the onChange handler of a
-select. It enables the form element with name 'target_name' when the
-value of the element on which it is add is in the list
-'enabledValues'. When the value is not in that list, then target
-element is disabled and the targets balue is set to
-'target_disabled_value'. */
-function value_based_enabler(e, enabledValues, target_name, target_disabled_value) {
-    var target = document.querySelector("[name=\""+target_name+"\"]");
-    if (array_contains(enabledValues, e.value)) {
-        target.disabled = false;
-    } else {
-        target.value = target_disabled_value;
-        target.disabled = true;
-    }
-    fireEvent(target, 'input');
-    check_the_form_validity();
-}
-
 /* Disable "other" controls when not in use
 
 This is a callback function to be used in the onChange handler of a
 combobox; it will enable the relevant -other field if and only if the
 combobox is set to "Other". */
-function combobox_other_manager(e) {
-    value_based_enabler(e, ["Other"], e.name + "-other", "");
+function combobox_other_manager(source) {
+    var targetActions = {};
+    targetActions[source.name + "-other"] = {enable: true, require: true, otherwise: {value: ""}};
+    return on_value(source, ["Other"], targetActions);
 }
+
+function on_value(source, valuesToMatch, targetActions) {
+    return on_match(array_contains(valuesToMatch, source.value), targetActions);
+}
+
+function on_checked(checkbox, targetActions) {
+    return on_match(checkbox.checked, targetActions);
+}
+
+/** For each targetName in targetActions, call
+    set_properties(targetActions[targetName][match ? "onMatch" : "otherwise"].
+    Use (match XOR targetActions[targetName].require) as the default value of required.
+    Use !(match XOR targetActions[targetName].enable) as the default value of disabled.
+    @return match
+*/
+function on_match(match, targetActions) {
+    var targetProperties = {};
+    for (var targetName in targetActions) {
+        var actions = targetActions[targetName];
+        var properties = actions[match ? "onMatch" : "otherwise"] || {};
+        if (actions.enable !== undefined &&
+            properties.disabled === undefined) {
+            properties.disabled = !(match ? actions.enable : !actions.enable);
+        }
+        if (actions.require !== undefined &&
+            properties.required === undefined) {
+            properties.required = match ? actions.require : !actions.require;
+        }
+        targetProperties[targetName] = properties;
+    }
+    set_properties(targetProperties);
+    return match;
+}
+
+/** For each targetName in targetProperties,
+    copy targetProperties[targetName] into all elements of that name.
+    Fire an input event for each changed value,
+    and call check_the_form_validity if any value changed.
+*/
+function set_properties(targetProperties) {
+    var changed = false;
+    if (targetProperties) {
+        for (var targetName in targetProperties) {
+            var properties = targetProperties[targetName];
+            array_for_each(document.getElementsByName(targetName), function(target) {
+                for (var p in properties) {
+                    if (properties[p] !== undefined) {
+                        if (p == "value" && target.type == "radio") {
+                            if (target.value == properties.value &&
+                                !target.checked) {
+                                target.checked = true;
+                                changed = true;
+                            }
+                        } else if (target[p] != properties[p]) {
+                            target[p] = properties[p];
+                            changed = true;
+                            if (p == "value") {
+                                fireEvent(target, "input");
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+    if (changed) {
+        check_the_form_validity();
+    }
+}
+
 
 /* Handle form data message visibility */
 var last_active_form_element;
@@ -1087,21 +1143,24 @@ function setup_input_elem_from_class(next) {
 
 This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
+    var form = document.querySelector("#the-form");
     if (query_object.mode && query_object.mode == "readonly") {
         document.querySelector("#button-header").classList.add("readonly");
         hide_element(document.querySelector("#opdirect-submit"));
         hide_element(document.querySelector("#email-submit"));
         hide_element(document.querySelector("#show-hide-data"));
         hide_element(document.querySelector("#clear-form"));
+        hide_element(document.querySelector("#show-PDF-form"));
         /* In view mode, we don't want to show the input control chrome.  This
            is difficult to do with textareas which might need scrollbars, etc.
            so insert a div with the same contents and use CSS to appropriately
            style it and hide the textarea. */
         var textareas_to_redisplay = [];
-        array_for_each(document.querySelector("#the-form").elements, function (el) {
+        array_for_each(form.elements, function (el) {
             if (el.placeholder) {
                 el.placeholder = '';
             }
+            el.tabIndex = "-1"; // Don't tab to this element.
             if (el.type == "radio"
                 || el.type == "checkbox"
                 || (el.type && el.type.substr(0, 6) == "select")) {
@@ -1165,8 +1224,10 @@ function create_text_div(text, className) {
 }
 
 function hide_element(element) {
-    element.hidden = "true";
-    element.classList.add("hidden");
+    if (element) {
+        element.hidden = "true";
+        element.classList.add("hidden");
+    }
 }
 
 /* Make forEach() & friends easier to use on Array-like objects
@@ -1353,6 +1414,14 @@ function startup_delay(next) {
     }, 10000);
 }
 
+function add_startup_function(toAdd, before) {
+    var index = before ? startup_functions.indexOf(before) : -1;
+    if (index < 0) {
+        startup_functions.push(toAdd);
+    } else {
+        startup_functions.splice(index, 0, toAdd);
+    }
+}
 
 /* --- Registration of startup functions that run on page load */
 

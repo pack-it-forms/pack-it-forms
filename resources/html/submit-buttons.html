@@ -1,15 +1,15 @@
 <div>
   <div class="version">0.1.1</div>
   <div id="button-header">
-    <input type="button" id="opdirect-submit" disabled="disabled"
+    <input type="button" id="opdirect-submit" tabindex="600" disabled="disabled"
            value="Submit to Outpost" onclick="opdirect_submit(event)"/>
-    <input type="button" id="show-hide-data"
+    <input type="button" id="show-hide-data" tabindex="601"
            value="Show Data Message"
            onclick="toggle_form_data_visibility(event)"/>
-    <input type="button" id="email-submit" disabled="disabled"
+    <input type="button" id="email-submit" tabindex="602" disabled="disabled"
            value="Submit via Email"  onclick="email_submit(event)"/>
-    <input type="button" id="clear-form"
-           value="Clear the form" onclick="clear_form(event)"/>
+    <input type="button" id="clear-form" tabindex="603"
+           value="Reset Form" onclick="clear_form(event)"/>
     <div id="error-indicator">Error</div>
   </div>
   <form id="form-data-form" method="post" action="http://127.0.0.1:9334/send">

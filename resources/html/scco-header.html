@@ -1,0 +1,54 @@
+<div>
+  <div class="version">0.1.0</div>
+  <table id="form-row-1" class="noborder">
+    <tr>
+      <td>
+        <label class="label-sameline">Sender's Msg #
+          <input name="2.txmsgno" class="message-number" type="text" tabindex="-1"
+                 value="{{query-string:txmsgno}}"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">My Msg #
+          <input name="MsgNo" class="message-number no-msg-init" type="text" tabindex="1"
+                 required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">Receiver's Msg #
+          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"/>
+        </label>
+      </td>
+    </tr>
+  </table><table id="form-row-2">
+    <tr>
+      <td>
+        <fieldset>
+          <legend>Situation Severity:</legend>
+          <select name="4.severity" tabindex="4"
+                  onchange="on_value(this, ['EMERGENCY'], {'5.handling': {onMatch: {value: 'IMMEDIATE'}}})">
+            <option value="EMERGENCY">Emergency (e.g. life threat)</option>
+            <option value="URGENT">Urgent (e.g. property threat)</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </fieldset>
+      </td><td>
+        <fieldset>
+          <legend>Msg Handling Order:</legend>
+          <select name="5.handling" tabindex="5">
+            <option value="IMMEDIATE">Immediate (as soon as possible)</option>
+            <option value="PRIORTY">Priority (less than one hour)</option>
+            <option value="ROUTINE">Routine (more than one hour)</option>
+          </select>
+        </fieldset>
+      </td><td style="white-space:normal;">
+        <label>Message Requests You to:
+          <fieldset>
+            <input name="6b.reply" type="checkbox" value="Yes" tabindex="-1"
+                   onchange="on_checked(this, {'6d.reply-by': {enable: true, otherwise: {value: ''}}})"/>
+            reply by:
+            <input name="6d.reply-by" type="text" style="width:10em;" disabled="disabled"/>
+          </fieldset>
+        </label>
+      </td>
+    </tr>
+  </table>
+</div>
