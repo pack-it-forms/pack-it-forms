@@ -22,6 +22,7 @@ var outpost_envelope = {}; // Cached outpost envelop information
 var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Cached message field values
 var versions = {};         // Version information
+var outpost_message_footer = "#EOF\r\n";
 
 /* --- Registration for code to run after page loads
 
@@ -432,7 +433,7 @@ function write_pacforms_representation() {
     });
     var msg = expand_template(
         document.querySelector("#message-header").textContent).trim();
-    msg += fldtxt + "\r\n#EOF\r\n";
+    msg += fldtxt + "\r\n" + outpost_message_footer;
     set_form_data_div(msg);
 }
 
