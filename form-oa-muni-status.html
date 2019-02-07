@@ -23,12 +23,10 @@
           actions[comment_name] = {enable: true, require: true, otherwise: {value: ""}};
           on_value(element, ["Problem", "Failure"], actions);
       }
+      link_to_PDF("resources/pdf/XSC_OA_MuniStatus_v20130101.pdf");
       add_startup_function(function(next) {
           outpost_envelope.subject = "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}"
           + "_Municipal Status_{{field:21.municipality}}";
-          document.getElementById('button-header').innerHTML +=
-              '<input type="button" id="show-PDF-form" value="Show PDF"'
-              + ' onclick="window.open(\'resources/pdf/XSC_OA_MuniStatus_v20130101.pdf\', \'_blank\')"/>';
           next();
       }, setup_view_mode);
     </script>

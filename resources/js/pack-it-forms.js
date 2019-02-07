@@ -51,6 +51,15 @@ function startup() {
 
 window.onload=startup;
 
+function link_to_PDF(URL) {
+    after_integration("load_configuration", function(next) {
+        document.getElementById("button-header").innerHTML +=
+            '<input type="button" id="show-PDF-form" value="Show PDF"'
+            + ' onclick="window.open(\'' + URL + '\', \'_blank\')"/>';
+        next();
+    });
+}
+
 /* --- Initialize the form as required by query parameters */
 
 /* Initialize a form
@@ -1423,12 +1432,39 @@ function add_startup_function(toAdd, before) {
     }
 }
 
+/** Customize integration[joinPoint] so it calls advice first.  */
+function before_integration(joinPoint, advice) {
+    var oldFunction = integration[joinPoint];
+    integration[joinPoint] = function(next) {
+        advice(function() {
+            oldFunction(next);
+        });
+    };
+}
+
+/** Customize integration[joinPoint] so it calls advice afterward. */
+function after_integration(joinPoint, advice) {
+    var oldFunction = integration[joinPoint];
+    integration[joinPoint] = function(next) {
+        oldFunction(function() {
+            advice(next);
+        });
+    };
+}
+
 /* --- Registration of startup functions that run on page load */
 
+startup_functions.push(function(next) {
+    integration.on_load(next);
+});
 startup_functions.push(load_form_version);
-startup_functions.push(process_html_includes);
+startup_functions.push(function(next) {
+    integration.expand_includes(next);
+});
 startup_functions.push(query_string_to_object);
-startup_functions.push(load_callprefix);
+startup_functions.push(function(next) {
+    integration.load_configuration(next);
+});
 startup_functions.push(init_form);
 startup_functions.push(setup_input_elem_from_class);
 // This must come after query_string_to_object in the startup functions
@@ -1437,4 +1473,32 @@ startup_functions.push(setup_view_mode);
 //startup_functions.push(startup_delay);  // Uncomment to test loading overlay
 //startup_functions.push(test_error);  // Uncomment to test startup err report
 startup_functions.push(setup_error_indicator);
+startup_functions.push(function(next) {
+    integration.after_load(next);
+});
 startup_functions.push(remove_loading_overlay);
+
+/** Integration points.
+    Each function must either call next() or throw an exception.
+    An integration will typically customize some of them,
+    using before_integration or after_integration.
+ */
+var integration = {
+
+    /** Called shortly after window.onload. */
+    on_load: function(next) {
+        next();
+    },
+
+    /** Assemble included files into a single HTML document. */
+    expand_includes: process_html_includes,
+
+
+    /** Load configuration data. */
+    load_configuration: load_callprefix,
+
+    /** Called immediately before revealing the loaded page. */
+    after_load: function(next) {
+        next();
+    },
+};

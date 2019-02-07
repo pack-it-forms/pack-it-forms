@@ -30,12 +30,7 @@
           });
           next();
       });
-      add_startup_function(function(next) {
-          document.getElementById('button-header').innerHTML +=
-              '<input type="button" id="show-PDF-form" value="Show PDF"'
-              + ' onclick="window.open(\'resources/pdf/SCCo_RACES_MA_Req_v181212.pdf\', \'_blank\')"/>';
-          next();
-      }, setup_view_mode);
+      link_to_PDF("resources/pdf/SCCo_RACES_MA_Req_v181212.pdf");
     </script>
     <title>SCCo RACES Mutual Aid Request</title>
   </head>

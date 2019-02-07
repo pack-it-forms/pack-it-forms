@@ -391,6 +391,18 @@ with a large variety of screen sizes.  However, if your form requires
 some specific styling, create the file resources/css/<form name>.css
 and put any form-specific styling in it.
 
+Link to PDF form
+----------------
+
+To link from the form to a PDF version (suitable for printing),
+check the PDF into the resources/pdf folder
+and add a little Javascript to the form, like this:
+
+    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript">
+      link_to_PDF("resources/pdf/PDF_File_Name.pdf");
+    </script>
+
 Explanation of the Form Boilerplate
 -----------------------------------
 
