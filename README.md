@@ -239,15 +239,15 @@ makes this easy to do: it is possible to include fragments of HTML
 from files in the resources/html directory.  If you create a `div`
 element that has a `data-include-html` attribute in it, the element
 will be replaced with the contents of the first `div` element in the
-file resources/html/<attribute value>.html where <attribute value>
+file resources/html/\<attribute value\>.html where \<attribute value\>
 signifies the value of the `data-include-html` attribute.
 
 One thing that you may want to do with included HTML files is set the
 default values of included elements.  You can do that by putting a
 JSON object that maps form field names to default values for those
-fields inside the <div> that will be replaced with the included content.
+fields inside the \<div\> that will be replaced with the included content.
 Most default values are in the same format as HTML.
-For a <select>, the default value should match one of the option values.
+For a \<select\>, the default value should match one of the option values.
 For a collection of radio buttons, the default value should match
 the value of one of the buttons.
 
@@ -338,7 +338,7 @@ Adjust Layout and Styling
 Forms written using the above guidelines should be styled to look like
 paper forms, and to have a fairly responsive layout that will work
 with a large variety of screen sizes.  However, if your form requires
-some specific styling, create the file resources/css/<form name>.css
+some specific styling, create the file resources/css/\<form name\>.css
 and put any form-specific styling in it.
 
 Link to PDF form
