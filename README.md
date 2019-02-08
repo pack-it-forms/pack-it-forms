@@ -245,12 +245,11 @@ signifies the value of the `data-include-html` attribute.
 One thing that you may want to do with included HTML files is set the
 default values of included elements.  You can do that by putting a
 JSON object that maps form field names to default values for those
-fields inside the <div> that will be replaced with the included
-content.  The values are in the same format as the PacFORMS field
-values:  a checkbox should have a value of CHECKED if it should be
-checked, and a collection of radiobuttons should have a value that
-matches one of the `name` attributes.  Text fields can be set to a
-template, which will be expanded (see the next section).
+fields inside the <div> that will be replaced with the included content.
+Most default values are in the same format as HTML.
+For a <select>, the default value should match one of the option values.
+For a collection of radio buttons, the default value should match
+the value of one of the buttons.
 
 If an input element represents a field that should have different
 values in a receiver's copy of a form than the senders, give the field
@@ -265,36 +264,31 @@ fragments provide good examples of this.
 Setup Default and On-submit Behavior on Fields
 ----------------------------------------------
 
-Default field values can be specified using the normal HTML form
-mechanisms.  For text fields, however, there a template system
-provides additional flexibility in establishing the defaults.
+Some fields have a normal value which the operator rarely edits,
+and some fields have a value that cannot be edited.
+These default values can be specified in HTML, as usual.
+Also, a `<select>` may have a `data-default-value` attribute,
+whose value matches the value of the default `<option>`.
+A collection of radio buttons may have a data-default-value
+attribute on any one of the buttons, whose value matches
+the value of the default button.
+A checkbox may have a data-default-value, in which case it will
+be checked by default if and only if the data-default-value is
+[truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy).
 
-Template expansion will be performed on the `value` attribute of all
-input elements with a `type` attribute value of "text" when the
-document is loaded.  This will establish default values for form
-fields that the user can later edit.
-
-The one exception to the expansion when the document is loaded is
-those elements with the class `no-load-init`, which prevents the
-expansion.  Typically, these elements also have the class
-`init-on-submit`, which indicates that template expansion should occur
-at the time the form is submitted.  In this case, when the form is
-initially displayed the template value will be shown in the field to
-provide an indication that something will be filled in later.  Since
-these fields aren't usually intended to be edited by the user they
-are usually `disabled`.
-
+Any of these default values may be a template.
 A template begins with "$" and continues with a Javascript expression.
 For example, on January 15th, 2020, the template:
 
         $'The date is: ' + date()
 
-will result in the output text:
+will expand to:
 
         The date is: 01/15/2020
 
 A simple string that begins with "$" can be represented by a template
 that begins with "$$". For example, "$$etc" represents "$etc".
+The string "$" alone is not a template; it simply means "$".
 
 Objects that are often used in templates include:
 
@@ -304,13 +298,26 @@ Objects that are often used in templates include:
 | time()                         | Current local time string in hh:mm:ss format    |
 | viewer                         | Either "sender" or "receiver"                   |
 | envelope.readOnly              | The form should not be edit-able (boolean)      |
-| envelope.sender.*              | Information about the sender of the message     |
-| envelope.receiver.*            | Information about the receiver of the message   |
+| envelope.sender                | Information about the sender of the message     |
+| envelope.receiver              | Information about the receiver of the message   |
 | envelope[viewer].ocall         | Call sign of the sender or receiver             |
 | envelope[viewer].oname         | Name of the sender or receiver                  |
 | envelope[viewer].ordate        | Date when the message was sent or received      |
 | envelope[viewer].ortime        | Time when the message was sent or received      |
 | msg_field(fieldName)           | Value of a field from the received message      |
+
+When the form is loaded, template expansion will be performed on
+the `value` property of input elements with `type="text"`,
+the `innerHTML` property of elements with a `templated` class,
+and any data-default-value.
+The same templates will be expanded when the form is reset.
+However, templates in elements with the class `no-load-init` will
+not be expanded when the form is loaded or reset.
+
+If a form field has the class `init-on-submit`, its value is considered
+a template, whose expanded value will be submitted to Outpost.
+Such a field usually also has the class no-load-init, so the template will
+be shown to the operator, to suggest that something will be filled in later.
 
 You might also want to add some amount of validation to your custom
 form fields.  *pack-it-forms* uses normal HTML5 form validation for
@@ -320,7 +327,7 @@ whether or not the form is fully valid.  Here are a few tips to get
 you started with HTML5 form validation of this type:
 
    * If you have a field that must have some input in it, add the
-     attribute `required`
+     attribute `required`.
    * If the contents of the field has to be in a certain format, add a
      `pattern` attribute: the value should be a regular expression
      that will match values of the desired format.
@@ -338,13 +345,13 @@ Link to PDF form
 ----------------
 
 To link from the form to a PDF version (suitable for printing),
-check the PDF into the resources/pdf folder
-and add a little Javascript to the form, like this:
+check the PDF into the resources/pdf folder and add a little
+Javascript to the form, like this:
 
     ...
     <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
-      link_to_PDF("resources/pdf/PDF_File_Name.pdf");
+      link_to_PDF("resources/pdf/File_Name.pdf");
     </script>
 
 Explanation of the Form Boilerplate

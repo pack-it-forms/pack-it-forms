@@ -70,13 +70,6 @@
                 img = undefined;
             }, 30000); // call ping every 30 seconds
         }
-        // Show Rec-Sent based on whether we received this message:
-        init_form_from_fields({'Rec-Sent': (viewer == 'sender') ? 'Sent' : 'Received'}, 'name');
-        array_for_each(document.getElementsByName('Rec-Sent'), function(recSent) {
-            recSent.disabled = true; // Don't include it in transmitted messages.
-            recSent.classList.add('no-msg-init'); // Ignore it in received messages.
-            // That is, init_form_from_fields won't affect this element any more.
-        });
         next();
     };
 

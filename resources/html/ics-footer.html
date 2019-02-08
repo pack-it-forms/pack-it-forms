@@ -38,11 +38,14 @@
         <span class="bold">
           How
           <label class="intext">
-            Received <input name="Rec-Sent" type="radio" tabindex="506" value="Received"/>
+            Received <input name="Rec-Sent" value="Received" type="radio" tabindex="506"
+                            class="no-msg-init" disabled="disabled"
+                            data-default-value="$(viewer=='sender') ? 'Sent' : 'Received'"/>
           </label>
           or
           <label class="intext">
-            Sent <input name="Rec-Sent" type="radio" tabindex="506" value="Sent"/>
+            Sent <input name="Rec-Sent" value="Sent" type="radio" tabindex="506"
+                        class="no-msg-init" disabled="disabled"/>
           </label>
         </span>
       </td><td colspan="2" class="border-left">

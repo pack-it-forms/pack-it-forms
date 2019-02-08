@@ -38,7 +38,7 @@ var envelope = {
 var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Field names and values from a message from Outpost.
 var versions = {};         // Version information
-var formDefaultValues;     // Initial values for form inputs.
+var formDefaultValues;     // Initial values for form inputs. May contain templates.
 var EOL = "\r\n";
 
 /* --- Registration for code to run after page loads
@@ -90,7 +90,9 @@ filled with default contents.  The default data filling includes
 reading the Outpost query string parameters, which should allow for
 good Outpost integration. */
 function init_form(next) {
+    find_default_values();
     set_form_default_values();
+
     // Setup focus tracking within the form
     var the_form = document.querySelector("#the-form");
     last_active_form_element = document.activeElement;
@@ -99,11 +101,9 @@ function init_form(next) {
     }, true);
     the_form.addEventListener("input", formChanged);
 
-    init_form_from_fields(msgfields, "name", "msg-value");
     /* Wait 10ms to force Javascript to yield so that the DOM can be
      * updated before we do other work. */
     window.setTimeout(function () {
-        expand_templated_items();
         var first_field = document.querySelector("#the-form :invalid");
         if (first_field) {
             first_field.focus();
@@ -118,17 +118,16 @@ function init_form(next) {
 
 function add_form_default_values(values) {
     if (!formDefaultValues) {
-        formDefaultValues = [];
+        formDefaultValues = {};
     }
-    formDefaultValues.push(values);
+    for (fieldName in values) {
+        formDefaultValues[short_name(fieldName)] = values[fieldName];
+    }
 }
 
 function set_form_default_values() {
-    if (formDefaultValues) {
-        for (var f = formDefaultValues.length - 1; f >= 0; f--) {
-            init_form_from_fields(formDefaultValues[f], "name");
-        }
-    }
+    init_form_from_fields(formDefaultValues);
+    init_form_from_fields(msgfields, true);
 }
 
 var oldMessage = { // a namespace
@@ -244,37 +243,35 @@ function index_of_field_value_start(linenum, line, startAt) {
     return idx;
 }
 
-/* Initialize form from dictionary of settings
-
-This function sets up a form with the contents of a fields object; it
-determines which fields should be initialized by matching the
-beginning of attribute againt the name of each field.
-
-If the optional third parameter is supplied it is the name of a class
-that should be added to the classList of the elements that are set by
-this function.*/
-function init_form_from_fields(fields, attribute, className) {
-    for (var field in fields) {
-        var elem = document.querySelectorAll("["+attribute+"^=\""+field+"\"]");
-        /* The above CSS selector does a prefix match which can return
-           multiple elements. This is intentionally done to support a
-           special case for compatibility with the PacFORMs ICS213
-           form which uses a value from either a select element or, if
-           that select element has the value "Other", a corresponding
-           text input element instead with both using the same field
-           name in the PacFORMs representation. This means that the
-           value "Other" for a select element triggers additional
-           functionality. It is believed that this should not cause
-           issues for any existing or planned forms. */
-        array_some(elem, function (element) {
-            if (element.classList.contains("no-msg-init")) {
+/** Set the values of form fields and <span> elements.
+    The object "fields" is {"field-name": fieldValue, ...}.
+    The boolean "fromMessage" means "fields" was extracted from
+    a message received from Outpost, in which case the values
+    are not templates and will not be stored into elements
+    with class="no-msg-init".
+*/
+function init_form_from_fields(fields, fromMessage) {
+    if (!fields) return;
+    for (var fieldName in fields) {
+        var selected = document.querySelectorAll("[name^=\""+fieldName+"\"]");
+        /* This CSS selector is a prefix match, which selects fields
+           with short_name(element.name) == fieldName.
+           Also, it may select a pair of elements, a <select> and
+           an <input type="text"> with name = select.name + "-other",
+           which offer the operator some convenient options plus
+           a place to type in something else.
+        */
+        array_some(selected, function (element) {
+            if (fromMessage && element.classList.contains("no-msg-init")) {
                 return true;
             }
-            if (init_from_msg_funcs.hasOwnProperty(element.type)) {
-                if (className) {
-                    element.classList.add(className);
+            var init = get_init_function(element);
+            if (init) {
+                var value = fields[fieldName];
+                if (!fromMessage) {
+                    value = expand_template(value);
                 }
-                var stop = init_from_msg_funcs[element.type](element, fields[field]);
+                var stop = init(element, value);
                 fireEvent(element, 'change');
                 return stop;
             } else {
@@ -284,15 +281,33 @@ function init_form_from_fields(fields, attribute, className) {
     }
 }
 
-/* Functions to set form fields to values
+function get_init_function(element) {
+    var name = element.tagName.toUpperCase();
+    if (init_from_msg_funcs.hasOwnProperty(name)) {
+        return init_from_msg_funcs[name];
+    }
+    name = element.type;
+    if (init_from_msg_funcs.hasOwnProperty(name)) {
+        return init_from_msg_funcs[name];
+    }
+    return null;
+}
 
-These functions are used when reading the values from a PacForms-type
-text back into the form.  In general, they might be called multiple
-times with the same value argument, as some things require setting
-multiple elements, like radiobuttons.  A return value of true means
-that the caller should stop processing; any other return means that
-the caller should continue. */
+/** Functions to set the value of an element. These are used to set
+    a default value or a value extracted from a received message.
+    They return true if the caller should not set the value of
+    any other elements with the same name.
+*/
 var init_from_msg_funcs = {
+    "SPAN": function(element, value) {
+        try {
+            element.innerHTML = value;
+        } catch(err) {
+            throw(element.name + ".innerHTML = " + JSON.stringify(value)
+                  + ": " + err);
+        }
+        return true;
+    },
     "text": function(element, value) {
         element.value = value;
         return true;
@@ -326,8 +341,9 @@ var init_from_msg_funcs = {
         return member;
     },
     "checkbox": function (element, value) {
-        /* PacForms will only send a checkbox if it is checked */
-        element.checked = true;
+        // A value from a received message will be "checked" (or absent).
+        // A value from a data-default-value template may also be boolean.
+        element.checked = (value != "false") && !!value;
         return true;
     }
 };
@@ -408,7 +424,7 @@ var newMessage = { // a namespace
                 result = null;
             }
             if (result) {
-                fldtxt += shorten_field_name(element.name) + ": " + result + EOL;
+                fldtxt += short_name(element.name) + ": " + result + EOL;
             }
         });
         return fldtxt;
@@ -448,7 +464,7 @@ function _toString(arg) {
     }
 }
 
-function shorten_field_name(name) {
+function short_name(name) {
     var numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(name);
     if (numberMatch) {
         return numberMatch[1];
@@ -516,18 +532,18 @@ function field_value(field_name) {
     For example, expand_template("$$ etc.") = "$ etc.".
  */
 function expand_template(tmpl_str) {
-    var final_str = tmpl_str;
-    if (tmpl_str && tmpl_str.length > 1 && tmpl_str.substr(0, 1) == "$") {
-        final_str = tmpl_str.substr(1);
-        if (final_str.substr(0, 1) != "$") { // not a literal "$"
+    var result = tmpl_str;
+    if (result && result.substr(0, 1) == "$" && result != "$") {
+        result = result.substr(1);
+        if (result.substr(0, 1) != "$") { // not a literal "$"
             try {
-                final_str = eval(final_str);
+                result = eval(result);
             } catch(err) {
-                throw "eval(" + JSON.stringify(final_str) + "): " + err;
+                throw "eval(" + JSON.stringify(result) + "): " + err;
             }
         }
     }
-    return final_str;
+    return result;
 }
 
 function date() {
@@ -585,17 +601,25 @@ function msgno2name(orig_value) {
     return name || "";
 }
 
-/* Initialize text fields to default values through template expansion
-
-The selection of text fields to use is determined by the "selector"
-argument, which is a selector suitable to be passed to
-document.querySelectorAll.  This does not have to be used on input
-elements; attribute determines what attribute will be read and
-expanded. */
-function init_text_fields(selector, attribute) {
+/** Find form text fields whose value is a template.
+    "selector" (a CSS selector) specifies which fields to examine.
+    "property" names the property that may be a template.
+*/
+function find_templated_text(selector, property) {
     var fields = document.querySelectorAll(selector);
     array_for_each(fields, function (field) {
-        field[attribute] = expand_template(field[attribute]);
+        if (!field.classList.contains("no-load-init")) {
+            name = short_name(field.name);
+            if (formDefaultValues[name] == undefined) {
+                value = field[property];
+                if (value && value.length > 1 &&
+                    value.substr(0, 1) == "$" &&
+                    value.substr(0, 2) != "$$") {
+                    // It's a template.
+                    formDefaultValues[name] = value;
+                }
+            }
+        }
     });
 }
 
@@ -607,7 +631,6 @@ function clear_form() {
     var the_form = document.getElementById("the-form");
     the_form.reset();
     array_for_each(the_form.elements, function(element) {
-        element.classList.remove("msg-value");
         if (element.type) {
             if (element.type.substr(0, 8) == "textarea") {
                 // Make Internet Explorer re-evaluate whether it's valid:
@@ -622,7 +645,6 @@ function clear_form() {
         }
     });
     set_form_default_values();
-    expand_templated_items();
     formChanged();
 }
 
@@ -858,13 +880,18 @@ function setup_view_mode(next) {
 
 /* --- Misc. utility functions */
 
-function expand_templated_items() {
-    init_text_fields(".templated", "textContent");
-    init_text_fields("input:not(.no-load-init):not(.msg-value)", "value");
-}
-
-function get_form_data_from_div() {
-    return document.querySelector("#form-data").value;
+function find_default_values() {
+    if (!formDefaultValues) {
+        formDefaultValues = {};
+    }
+    array_for_each(document.querySelectorAll("[data-default-value]"), function(field) {
+        var name = short_name(field.name);
+        if (formDefaultValues[name] == undefined) {
+            formDefaultValues[name] = field.getAttribute("data-default-value");
+        }
+    });
+    find_templated_text(".templated", "innerHTML");
+    find_templated_text("input", "value");
 }
 
 function set_form_data_div(text) {

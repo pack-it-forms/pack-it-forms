@@ -27,7 +27,6 @@
       link_to_PDF("resources/pdf/XSC_OA_MuniStatus_v20130101.pdf");
       newMessage.subjectSuffix = function() {
           return '_Municipal Status_' + field('21.municipality');
-          next();
       };
     </script>
     <title>Santa Clara OA Municipal Status</title>
@@ -44,24 +43,10 @@
       </div>
     </div>
     <form id="the-form" name="the-form">
-      <table class="block-caption noborder">
-        <tr>
-          <td width="20%" rowspan="2" style="border:none;"></td>
-          <td style="border:none;color:blue;font-weight:bold;text-align:center;">
-            County of Santa Clara Emergency Operations Center
-          </td>
-          <td width="20%" rowspan="2"
-              style="border:none;text-align:right;vertical-align:bottom;font-weight:normal;">
-            Version 20130101<br/>(PR-4.4-1.9, 06/29/18)
-          </td>
-        </tr><tr>
-          <td style="border:none;color:blue;font-size:133%;font-weight:bold;text-align:center;">
-            SCC OA Municipal Status
-          </td>
-        </tr>
-      </table>
       <div data-include-html="scco-header">
         {
+            "header-title": "SCC OA Municipal Status",
+            "header-version": "Version 20130101&lt;br/&gt;(PR-4.4-1.9, 06/29/18)",
             "4.": "OTHER",
             "5.": "ROUTINE"
         }

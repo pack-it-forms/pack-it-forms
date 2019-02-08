@@ -11,13 +11,11 @@
     <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
       link_to_PDF("resources/pdf/ICS-213_SCC_Message_Form_06-28-07_Fillable.pdf");
-      after_integration("load_configuration", function(next) {
-          document.getElementById('header-title').innerHTML =
-              '<div style="font-size:166%;font-weight:bold;padding-bottom:0.5ex;">EOC Message Form</div>'
-              + '6/28/2007; (PR-4.4-4.3, 05/02/18)';
-          next();
-      });
-      </script>
+      var icsHeaderTitle = // It would be awkward to write this in JSON inside HTML.
+          '<div style="font-size:166%;font-weight:bold;padding-bottom:0.5ex;">'
+          + 'EOC Message Form</div>'
+          + '6/28/2007; (PR-4.4-4.3, 05/02/18)';
+    </script>
     <title>XSC EOC Message Form</title>
   </head>
 
@@ -34,6 +32,7 @@
     <form id="the-form" name="the-form">
       <div data-include-html="ics-header">
         {
+            "header-title": "$icsHeaderTitle",
             "4.": "OTHER",
             "5.": "ROUTINE",
             "6a.": "No",

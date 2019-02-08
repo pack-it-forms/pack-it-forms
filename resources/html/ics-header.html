@@ -2,8 +2,10 @@
   <div class="version">0.1.0</div>
   <table id="form-row-1">
     <tr>
-      <td id="header-title"><h1 class="templated">$document.title</h1></td>
       <td>
+        <span name="header-title" class="templated no-msg-init"
+              >$'&lt;h1&gt;' + document.title + '&lt;/h1&gt;'</span>
+      </td><td>
         <label>Sender's Msg #<span class="field-number">2</span>
           <input name="2.txmsgno" class="message-number" type="text" tabindex="-1"
                  value="$(viewer=='sender') ? '' : (msg_field('MsgNo') || envelope.sender.msgno)"/>

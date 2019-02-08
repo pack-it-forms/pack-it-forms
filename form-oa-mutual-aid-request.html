@@ -21,10 +21,9 @@
       newMessage.subjectSuffix = function() {
           return '_RACES_MAR_' + field('15.agency');
       };
+      var icsHeaderNote = // It would be awkward to write this in JSON inside HTML.
+          '<b>To: </b>SCCo ARES/RACES/ACS Mutual Aid Coordinator (SCCo CRO)';
       after_integration("after_load", function(next) {
-          array_for_each(document.getElementsByName('9.note'), function(element) {
-              element.innerHTML = '<b>To: </b>SCCo ARES/RACES/ACS Mutual Aid Coordinator (SCCo CRO)';
-          });
           ['4.severity', '5.handling'].forEach(function(name) {
               array_for_each(document.getElementsByName(name), function(element) {
                   element.disabled = 'true';
@@ -63,6 +62,7 @@
       </table>
       <div data-include-html="ics-header-short">
         {
+            "header-note": "$icsHeaderNote",
             "4.": "OTHER",
             "5.": "ROUTINE",
             "6b.": "No"
