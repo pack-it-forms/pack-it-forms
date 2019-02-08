@@ -25,13 +25,14 @@
       }
     </style>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
       link_to_PDF("resources/pdf/XSC_EOC-213RR_v1706.pdf");
-      add_startup_function(function(next) {
+      after_integration("load_configuration", function(next) {
           outpost_envelope.subject = "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}"
           + "_Municipal Status_{{field:21.municipality}}";
           next();
-      }, setup_view_mode);
+       });
     </script>
     <title>EOC Resource Request</title>
   </head>

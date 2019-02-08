@@ -8,14 +8,15 @@
     <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/form-ics213.css"/>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
       link_to_PDF("resources/pdf/ICS-213_SCC_Message_Form_06-28-07_Fillable.pdf");
-      add_startup_function(function(next) {
+      after_integration("load_configuration", function(next) {
           document.getElementById('header-title').innerHTML =
               '<div style="font-size:166%;font-weight:bold;padding-bottom:0.5ex;">EOC Message Form</div>'
               + '6/28/2007; (PR-4.4-4.3, 05/02/18)';
           next();
-      }, setup_view_mode);
+      });
       </script>
     <title>XSC EOC Message Form</title>
   </head>

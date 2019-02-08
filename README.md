@@ -398,7 +398,8 @@ To link from the form to a PDF version (suitable for printing),
 check the PDF into the resources/pdf folder
 and add a little Javascript to the form, like this:
 
-    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    ...
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
       link_to_PDF("resources/pdf/PDF_File_Name.pdf");
     </script>
@@ -435,9 +436,10 @@ that are likely to be useful in more than one form.  This is highly
 recommended.
 
         <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
-
-Javascript file that contains the Javascript code to implement the
-form behavior.  This is required to have a functioning form.
+        <script type="text/javascript" src="resources/integration/integration.js"></script>
+ 
+Javascript files that contain code to implement the form's behavior.
+These are required to have a functioning form.
 
         <title>ICS213: Message Form</title>
       </head>

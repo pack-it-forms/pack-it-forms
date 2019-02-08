@@ -16,8 +16,9 @@
       }
     </style>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
-      add_startup_function(function(next) {
+      after_integration("after_load", function(next) {
           outpost_envelope.subject = "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}"
           + "_RACES_MAR_{{field:15.agency}}";
           array_for_each(document.getElementsByName('9.note'), function(element) {
