@@ -38,17 +38,17 @@
         <span class="bold">
           How
           <label class="intext">
-            Received <input name="Rec-Sent" type="radio" value="Received" tabindex="506"/>
+            Received <input name="Rec-Sent" type="radio" tabindex="506" value="Received"/>
           </label>
           or
           <label class="intext">
-            Sent <input name="Rec-Sent" type="radio" value="Sent" tabindex="506"/>
+            Sent <input name="Rec-Sent" type="radio" tabindex="506" value="Sent"/>
           </label>
         </span>
       </td><td colspan="2" class="border-left">
         <label class="label-sameline">Operator Call Sign:
-          <input class="no-msg-init" name="OpCall" type="text" tabindex="508"
-                 value="{{expand-while-null:{{envelope:ocall}},{{query-string:ocall}}}}"/>
+          <input class="call-sign no-msg-init" name="OpCall" type="text" tabindex="508"
+                 value="$msg_viewer_field('OpCall', 'ocall')"/>
         </label>
       </td>
     </tr><tr class="horizontal">
@@ -65,7 +65,7 @@
       <td colspan="2" class="border-left">
         <label class="label-sameline">Operator Name:
           <input class="no-msg-init" name="OpName" type="text" tabindex="509"
-                 value="{{expand-while-null:{{envelope:oname}},{{query-string:oname}}}}"/>
+                 value="$msg_viewer_field('OpName', 'oname')"/>
         </label>
       </td>
     </tr><tr class="horizontal">
@@ -97,13 +97,13 @@
         </label>
       </td><td class="border-left">
         <label class="label-sameline">Date:
-          <input name="OpDate" class="no-msg-init init-on-submit" type="text" tabindex="510"
-                 value="{{expand-while-null:{{envelope:ordate}},{{open-tmpl}}date{{close-tmpl}}}}" disabled="disabled"/>
+          <input name="OpDate" class="date no-msg-init init-on-submit" type="text" tabindex="510"
+                 value="$envelope[viewer].ordate || '$date()'" disabled="disabled"/>
         </label>
       </td><td>
         <label class="label-sameline">Time:
-          <input name="OpTime" class="no-msg-init init-on-submit" type="text" tabindex="511"
-                 value="{{expand-while-null:{{envelope:ortime}},{{open-tmpl}}time{{close-tmpl}}}}" disabled="disabled"/>
+          <input name="OpTime" class="time no-msg-init init-on-submit" type="text" tabindex="511"
+                 value="$envelope[viewer].ortime || '$time()'" disabled="disabled"/>
         </label>
       </td>
     </tr>

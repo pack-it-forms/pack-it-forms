@@ -25,11 +25,10 @@
           on_value(element, ["Problem", "Failure"], actions);
       }
       link_to_PDF("resources/pdf/XSC_OA_MuniStatus_v20130101.pdf");
-      after_integration("load_configuration", function(next) {
-          outpost_envelope.subject = "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}"
-          + "_Municipal Status_{{field:21.municipality}}";
+      newMessage.subjectSuffix = function() {
+          return '_Municipal Status_' + field('21.municipality');
           next();
-      });
+      };
     </script>
     <title>Santa Clara OA Municipal Status</title>
   </head>
@@ -86,10 +85,10 @@
               <div data-include-html="select-municipality"></div>
               &nbsp;&nbsp;Date:
               <input name="1a.date" type="text"
-                     required="required" class="date" value="{{date}}"/>
+                     required="required" class="date" value="$date()"/>
               &nbsp;&nbsp;Time:
               <input name="1b.time" type="text"
-                     required="required" class="time" value="{{time}}"/>
+                     required="required" class="time" value="$time()"/>
             </td>
           </tr>
         </table>
@@ -517,7 +516,6 @@
       <br/>
       <div data-include-html="ics-footer-short"></div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
     <footer><br/>Page 2 of 2</footer>
   </body>

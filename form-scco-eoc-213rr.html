@@ -28,11 +28,9 @@
     <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
       link_to_PDF("resources/pdf/XSC_EOC-213RR_v1706.pdf");
-      after_integration("load_configuration", function(next) {
-          outpost_envelope.subject = "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}"
-          + "_Municipal Status_{{field:21.municipality}}";
-          next();
-       });
+      newMessage.subjectSuffix = function() {
+          return '_Resource Request_' + field('21.incident-name');
+      };
     </script>
     <title>EOC Resource Request</title>
   </head>
@@ -79,12 +77,12 @@
           </td><td style="width:1px;">
             <label>Date Initiated<span class="field-number">2</span>
               <input type="text" name="1a.date" required="required" tabindex="-1"
-                     class="date" value="{{date}}"/>
+                     class="date" value="$date()"/>
             </label>
           </td><td style="width:1px;">
             <label>Time Initiated<span class="field-number">3</span>
               <input type="text" name="1b.time" required="required" tabindex="-1"
-                     class="time" value="{{time}}"/>
+                     class="time" value="$time()"/>
             </label>
           </td><td style="width:1px;">
             <label>Tracking Number<span class="field-number">4</span>
@@ -294,7 +292,6 @@
         <div data-include-html="ics-footer-short"></div>
       </div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>

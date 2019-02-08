@@ -87,9 +87,9 @@ first invalid field in form since this is typically the first field
 you'll want to enter.  You can navigate between fields as usual using
 the mouse pointer and standard keyboard shortcuts.
 
-Some form fields may be disabled with contents that looks like one or
-more words surrounded by curly braces.  For example `"{{date}}"`.  These
-are placeholders that indicate values that will be automatically
+Some form fields may be disabled with content that looks like
+a Javascript expression.  For example `$date()` or `$time()`.
+These are placeholders that indicate values that will be automatically
 substituted when the form is submitted.  If you show the data message
 content you will see that the placeholders are replaced in this output
 and continuously as you change the form.  In this way the data message
@@ -282,92 +282,35 @@ at the time the form is submitted.  In this case, when the form is
 initially displayed the template value will be shown in the field to
 provide an indication that something will be filled in later.  Since
 these fields aren't usually intended to be edited by the user they
-usually have their `disabled` attribute set to "true".
+are usually `disabled`.
 
-Regular text in templates is copied from the template to the resulting
-string.  The difference comes when placeholder values that are
-surrounded by double curly braces are encountered.  To give an
-example, on January 1st, 2020, the template:
+A template begins with "$" and continues with a Javascript expression.
+For example, on January 15th, 2020, the template:
 
-        The date is: {{date}}.
+        $'The date is: ' + date()
 
 will result in the output text:
 
-        The date is 01/20/2020.
+        The date is: 01/15/2020
 
-This is the simplest possible template value, with just the name of
-the template to use.  Some template types require additional
-information, in which case it can be supplied after the template name,
-separated by a colon.  For example, if the query string of the
-document contains a `msgno` parameter with the value `ABC001`, then:
+A simple string that begins with "$" can be represented by a template
+that begins with "$$". For example, "$$etc" represents "$etc".
 
-        The msgno is {{query-string:msgno}}.
+Objects that are often used in templates include:
 
-will result in the output text:
-
-        The msgno is ABC001.
-
-Finally, the output of template expansion can be further modified by
-filters.  Filters are separated from the template type by a vertical
-bar character.  Filters can also take an argument separated by a
-colon.  Assuming again that the date is January 1st, 2020, an example
-of a filter is:
-
-        The month is: {{date|truncate:2}}
-
-will result in the output text:
-
-        The month is: 01
-
-because "01" is the first two characters of the date string that would
-be substituted without the filter.  Multiple filters can be chained
-together one after another, each separated by a vertical bar.
-
-The following template types are available:
-
-| Name              | Argument   | Description                                     |
-|-------------------|------------|-------------------------------------------------|
-| date              | none       | Current date string in "mm/dd/yyyy" format      |
-| time              | none       | Current local time string in hh:mm:ss format    |
-| msgno             | none       | Message number for this message as a string     |
-| selected-fields   | css-sel    | Get list of field values returned by `css-sel`  |
-| field             | field name | Value of a field in the form                    |
-| msg-field         | field name | Value of a field in the received message        |
-| query-string      | key        | Value of query string parameter with name 'key' |
-| envelope          | field name | Value of !OUTPOST! envelope field               |
-| div-id            | id value   | Text content of the named `div` element         |
-| filename          | none       | Filename of the form (final name in URI path)   |
-| title             | none       | Title of the HTML document                      |
-| expand-while-null | templates  | Comma separated templates (\, escapes)          |
-| open-brace        | none       | Insert a single '{' character                   |
-| close-brace       | none       | Insert a single '}' character                   |
-| open-tmpl         | none       | Insert a template open string ('{{')            |
-| close-tmpl        | none       | Insert a template close string ('}}')           |
-
-The difference between `field` and `msg-field` is subtle but
-important.  The `field` type retrieves the value of the form field
-with the given name.  If the field exists in the form it will always
-get the current contents of that form element in the DOM.  The
-`msg-field` type retrieves the value of a form field that was sent in
-a received message.  When creating a new form, all msg-field fields
-will have a value that is the empty string.  This distinction is
-important because some form fields have different values in the sender
-and receiver version of the form.
-
-The following filters are available:
-
-| Name       | Argument  | Description                                        |
-|------------|-----------|----------------------------------------------------|
-| truncate   | length    | Truncate string to max of `length` characters      |
-| split      | fld delim | Split into list by `fld delim` string              |
-| join       | separator | Join list with `separator` between elements        |
-| remove     | value     | Remove elements matching `value` from list         |
-| sort       | type      | Sort list, if `type` is 'num', numeric, else text  |
-| re_search  | regexp    | Match regexp match, returning text or capture list |
-| nth        | index     | Return the nth list item or character              |
-| trim       | none      | Remove whitespace at start and end of string       |
-| msgno2name | msgno     | Expand message number to station                   |
-| expandtmpl | none      | Apply another layer of template expansion          |
+| Name                           | Description                                     |
+|--------------------------------|-------------------------------------------------|
+| date()                         | Current date string in "mm/dd/yyyy" format      |
+| time()                         | Current local time string in hh:mm:ss format    |
+| viewer                         | Either "sender" or "receiver"                   |
+| envelope.readOnly              | The form should not be edit-able (boolean)      |
+| envelope.sender.*              | Information about the sender of the message     |
+| envelope.receiver.*            | Information about the receiver of the message   |
+| envelope[viewer].ocall         | Call sign of the sender or receiver             |
+| envelope[viewer].oname         | Name of the sender or receiver                  |
+| envelope[viewer].ordate        | Date when the message was sent or received      |
+| envelope[viewer].ortime        | Time when the message was sent or received      |
+| msg_field(fieldName)           | Value of a field from the received message      |
 
 You might also want to add some amount of validation to your custom
 form fields.  *pack-it-forms* uses normal HTML5 form validation for
@@ -377,7 +320,7 @@ whether or not the form is fully valid.  Here are a few tips to get
 you started with HTML5 form validation of this type:
 
    * If you have a field that must have some input in it, add the
-     attribute `required="true"`
+     attribute `required`
    * If the contents of the field has to be in a certain format, add a
      `pattern` attribute: the value should be a regular expression
      that will match values of the desired format.
@@ -471,12 +414,6 @@ execution so that they can be presented to the user appropriately.
 
 The actual from itself replaces the ellipses here.  The Javascript
 requires that the id of the form have the value "the-form".
-
-        <div data-include-html="outpost_message_header"></div>
-
-An include reference that is replaced with data used to format the
-outpost message header.  This is required for the Javascript to work
-properly.  It should come after the form.
 
         <div data-include-html="submit-buttons"></div>
 

@@ -17,15 +17,29 @@
 /* Common code for handling PacFORMS forms */
 
 /* --- Commonly used global objects */
-var query_object = {};     // Cached query string parameters
-var outpost_envelope = {
-    subject: "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}_{{title|split:: |nth:0}}_{{field:10.subject|expandtmpl}}"
+var viewer = "sender"; // or "receiver"
+var envelope = {
+    readOnly: false, // whether to show a read-only form.
+    sender: {
+        msgno: "",
+        ocall: "",
+        oname: "",
+        ordate: "",
+        ortime: ""
+    },
+    receiver: {
+        msgno: "",
+        ocall: "",
+        oname: "",
+        ordate: "",
+        ortime: ""
+    }
 };
 var callprefixes = {};     // Cached call prefixes for expansion
-var msgfields = {};        // Cached message field values
+var msgfields = {};        // Field names and values from a message from Outpost.
 var versions = {};         // Version information
 var formDefaultValues;     // Initial values for form inputs.
-var outpost_message_footer = "#EOF\r\n";
+var EOL = "\r\n";
 
 /* --- Registration for code to run after page loads
 
@@ -85,24 +99,7 @@ function init_form(next) {
     }, true);
     the_form.addEventListener("input", formChanged);
 
-    var text = get_form_data_from_div();
-    if (text.trim().length != 0) {
-        init_form_from_msg_data(text);
-    } else {
-        var  msgno = query_object['msgno'];
-        if (msgno) {
-            var msg_url = "msgs/" + msgno;
-            try {
-                open_async_request("GET", msg_url, "text", function (text) {
-                    if (text.trim().length > 0) {
-                        set_form_data_div(text);
-                        init_form_from_msg_data(text);
-                    }
-                }, function () {});
-            } catch (e) {
-            }
-        }
-    }
+    init_form_from_fields(msgfields, "name", "msg-value");
     /* Wait 10ms to force Javascript to yield so that the DOM can be
      * updated before we do other work. */
     window.setTimeout(function () {
@@ -134,132 +131,67 @@ function set_form_default_values() {
     }
 }
 
-/* Cross-browser resource loading w/local file handling
+var oldMessage = { // a namespace
 
-This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
-Explorer and a regular XMLHttpRequest in other places because using
-the ActiveXObject in Internet Explorer allows a file loaded through a
-file:// uri to access other resources through a file:// uri. */
-function open_async_request(method, url, responseType, cb, err) {
-    var request;
-    if (window.ActiveXObject !== undefined) {
-        request = new ActiveXObject("Msxml2.XMLHTTP");
-        request.open(method, url, false);
-        request.onreadystatechange = function(e) {
-            if (request.readyState == 4) {
-                var text = request.responseText;
-                if (ActiveXObject_responseType_funcs.hasOwnProperty(responseType)) {
-                    cb(ActiveXObject_responseType_funcs[responseType](text));
-                }
+    /** Analyze the headers of the given message and store any data they contain.
+        Return the body of the message, with headers and footers removed.
+        May be replaced by an integration.
+    */
+    unwrap: function(message) {
+        var body = "";
+        for_each_line(message, function (linenum, line) {
+            if (line.charAt(0) == "#") {
+                return;  // Ignore "comments"
             }
-        };
-        request.send();
-    } else {
-        request = new XMLHttpRequest();
-        request.open(method, url, true);
-        request.responseType = responseType;
-        // Opera won't load HTML documents unless the MIME type is
-        // set to text/xml
-        var overriden = false;
-        request.onreadystatechange = function callcb(e) {
-            if (e.target.readyState == e.target.DONE) {
-                if (e.target.response) {
-                    cb(e.target.response);
-                } else if (responseType == "document" && !overriden) {
-                    request = new XMLHttpRequest();
-                    request.open(method, url, true);
-                    request.responseType = responseType;
-                    request.overrideMimeType("text/xml");
-                    overriden = true;
-                    request.onreadystatechange = callcb;
-                    request.send();
-                } else {
-                    err();
-                }
+            if (line.match(/^\s*$/)) {
+                return;  // Ignore empty lines
             }
-        };
-        request.send();
-    }
-}
-
-/* Since Msxml2.XMLHTTP doesn't support proper response types, we use
-   these functions in Internet Explorer to convert text into the
-   correct types.  Currently, only text and document types are
-   supported. */
-var ActiveXObject_responseType_funcs = {
-    "text": function(result) {
-        return result;
+            if (line.match(/^!OUTPOST! /)) {
+                // Grab outpost data fields and store for substitution
+                var fromOutpost = outpost_envelope_to_object(line);
+                for (var key in fromOutpost) {
+                    envelope[viewer][key] = fromOutpost[key];
+                }
+                return;
+            }
+            if (line.match(/^!.*!/)) {
+                return;  // Ignore line as we don't need anything from it.
+            }
+            body += line + EOL;
+        });
+        return body;
     },
-    "document": function(result) {
-        return new DOMParser().parseFromString(result, "text/html");
+
+    /** Return the fields from the given message body,
+        in the form of an object {"fieldName": "fieldValue", ...}.
+        May be replaced by an integration.
+    */
+    get_fields: function(body) {
+        var fields = {};
+        var field_name = "";
+        var field_value = "";
+        for_each_line(body, function (linenum, line) {
+            var idx = 0;
+            if (field_name == "") {
+                idx = index_of_field_name_sep(linenum, line, idx);
+                field_name = line.substring(0, idx);
+                idx = index_of_field_value_start(linenum, line, idx) + 1;
+            }
+            var end_idx = line.indexOf("]", idx);
+            if (end_idx == -1) {
+                // Field continues on next line
+                field_value += line.substring(idx);
+            } else {
+                // Field is complete on this line
+                field_value += line.substring(idx, end_idx);
+                fields[field_name] = field_value;
+                field_name = "";
+                field_value = "";
+            }
+        });
+        return fields;
     }
 };
-
-
-/* --- Read PacFORMS message data and insert in form */
-
-/* Parse form field data from packet message and initialize fields.
-
-This function sets up a form with the contents of an already existing
-form data message, which is passed in as text.  It is implemented as a
-wrapper around init_form_from_fields. */
-function init_form_from_msg_data(text) {
-    msgfields = parse_form_data_text(text);
-    if (msgfields.MsgNo) {
-        var status = query_object.message_status;
-        if (status == 'new' || status == 'draft' || status == 'ready' || status == 'sent') {
-            // I sent this message.
-            query_object.msgno = msgfields.MsgNo; // show My Msg #
-        } else {
-            // I received this message.
-            query_object.txmsgno = msgfields.MsgNo; // show the Sender's Msg #
-        }
-    }
-    init_form_from_fields(msgfields, "name", "msg-value");
-}
-
-function parse_form_data_text(text) {
-    var fields = {};
-    var field_name = "";
-    var field_value = "";
-    for_each_line(text, function (linenum, line) {
-        if (line.charAt(0) == "#") {
-            return;  // Ignore "comments"
-        }
-        if (line.match(/^\s*$/)) {
-            return;  // Ignore empty lines
-        }
-        if (line.match(/^!OUTPOST! /)) {
-            // Grab outpost data fields and store for substitution
-            var fromOutpost = outpost_envelope_to_object(line);
-            for (var key in fromOutpost) {
-                outpost_envelope[key] = fromOutpost[key];
-            }
-            return;
-        }
-        if (line.match(/^!.*!/)) {
-            return;  // Ignore line as we don't need anything from it.
-        }
-        var idx = 0;
-        if (field_name == "") {
-            idx = index_of_field_name_sep(linenum, line, idx);
-            field_name = line.substring(0, idx);
-            idx = index_of_field_value_start(linenum, line, idx) + 1;
-        }
-        var end_idx = line.indexOf("]", idx);
-        if (end_idx == -1) {
-            // Field continues on next line
-            field_value += line.substring(idx);
-        } else {
-            // Field is complete on this line
-            field_value += line.substring(idx, end_idx);
-            fields[field_name] = field_value;
-            field_name = "";
-            field_value = "";
-        }
-    });
-    return fields;
-}
 
 function FormDataParseError(linenum, desc) {
     var msgtext = "Parse error on line " + linenum.toString() + ": " + desc;
@@ -429,43 +361,100 @@ function unescape_pacforms_string(string) {
 }
 
 
-/* --- Generate PacFORMS message data from form fields */
+/* --- Generate a message from form fields */
 
-/* Generate PacForms-compatible representation of the form data
-
-A PacForm-like description of the for mfield values is written into
-the textContent of the div with ID "form-data". */
 function write_pacforms_representation() {
-    var form = document.querySelector("#the-form");
-    var fldtxt = "";
-    array_for_each(form.elements, function(element, index, array) {
-        var result;
-        if (element.disabled) {
-            result = null;
-        } else if (pacform_representation_funcs.hasOwnProperty(element.type)) {
-            result = pacform_representation_funcs[element.type](element);
-            if (element.classList.contains("init-on-submit")) {
-                result = expand_template(result);
-            }
-            result = bracket_data(result);
-        } else {
-            result = null;
-        }
-        if (result) {
-            var numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(element.name);
-            var resultText;
-            if (numberMatch) {
-                resultText = numberMatch[1]+": "+result;
+    set_form_data_div(newMessage.text());
+}
+
+var newMessage = { // a namespace
+
+    /** Construct a plain text message to submit to Outpost. */
+    text: function() {
+        return _toString(newMessage.header)
+            + _toString(newMessage.body)
+            + _toString(newMessage.footer);
+    },
+
+    /** Construct the header. May be replaced by an integration.
+    */
+    header: function() {
+        var path = document.location.pathname;
+        return '!PACF! ' + _toString(newMessage.subject)
+            + EOL + "# " + document.title
+            + EOL + "# JS-ver. PR-3.9-2.6, 08/11/13,"
+            + EOL + "# FORMFILENAME: " + path.substr(path.lastIndexOf("/") + 1)
+            + EOL + "# FORMVERSION: " + formVersion()
+            + EOL;
+    },
+
+    footer: "#EOF\r\n",
+
+    /** Construct the body. May be replaced by an integration. */
+    body: function() {
+        var form = document.querySelector("#the-form");
+        var fldtxt = "";
+        array_for_each(form.elements, function(element, index, array) {
+            var result;
+            if (element.disabled) {
+                result = null;
+            } else if (pacform_representation_funcs.hasOwnProperty(element.type)) {
+                result = pacform_representation_funcs[element.type](element);
+                if (element.classList.contains("init-on-submit")) {
+                    result = expand_template(result);
+                }
+                result = bracket_data(result);
             } else {
-                resultText = element.name+": "+result;
+                result = null;
             }
-            fldtxt += "\r\n"+resultText;
-        }
-    });
-    var msg = expand_template(
-        document.querySelector("#message-header").textContent).trim();
-    msg += fldtxt + "\r\n" + outpost_message_footer;
-    set_form_data_div(msg);
+            if (result) {
+                fldtxt += shorten_field_name(element.name) + ": " + result + EOL;
+            }
+        });
+        return fldtxt;
+    },
+
+    /** Construct the subject. May be replaced by an integration. */
+    subject: function() {
+        return newMessage.subjectPrefix() + newMessage.subjectSuffix();
+    },
+
+    /** Construct the SCCo standard prefix of the subject.
+        May be replaced by an integration.
+    */
+    subjectPrefix: function() {
+        return field("MsgNo")
+            + "_" + field("4.severity").substr(0, 1)
+            + "/" + field("5.handling").substr(0, 1);
+    },
+
+    /** Construct the suffix of the subject of a SCCo ICS-213 message.
+        May be replaced by an integration.
+    */
+    subjectSuffix: function() {
+        return "_" + document.title.split(": ")[0]
+            + "_" + field("10.subject");
+    }
+};
+
+function _toString(arg) {
+    switch(typeof arg) {
+    case "string":
+        return arg;
+    case "function":
+        return _toString(arg());
+    default:
+        return (arg == null) ? "" : arg + "";
+    }
+}
+
+function shorten_field_name(name) {
+    var numberMatch = /((?:[0-9]+[a-z]?\.)+).*/.exec(name);
+    if (numberMatch) {
+        return numberMatch[1];
+    } else {
+        return name;
+    }
 }
 
 var pacform_representation_funcs = {
@@ -520,300 +509,80 @@ function field_value(field_name) {
 
 /* --- Template expansion */
 
-/* Expand template string by replacing placeholders
-
-Plain text included in the template is copied to the expanded output.
-Placeholders are enclosed in square brackets.  There are six possible
-forms of the placeholders:
-
-   1. {{<type_name>}}
-   2. {{<type_name>|<filter_name>}}
-   3. {{<type_name>|<filter_name>:<filter_arg>}}
-   4. {{<type_name>:<type_arg>}}
-   5. {{<type_name>:<type_arg>|<filter_name>}}
-   6. {{<type_name>:<type_arg>|<filter_name>:<filter_arg>}}
-
-In form #1, the placeholder function named by <type_name> is called
-and the result it returns is substituted.  There is a type_name if "{"
-to allow inserting consecutive open braces is required.
-
-In form #2, the placeholder function named by <type_name> is called
-and the result it returns is passed to the filter function named by
-<filter_name>.  The result returned from the filter function is
-substituted.
-
-Form #3 is like form #2 except the <filter_arg> text is passed to the
-filter function as well.  The interpretation of the <filter_arg> text
-is determined by the filter function and the argument may be complete
-ignored.
-
-Form #4 is like form #1 except the <type_arg> text passed to the
-placeholder function as well.  The interpretation of the <type_arg>
-text is determined by the placeholder function and the arguement may
-be complete ignored.
-
-Form #5 is the combination of #2 and #4.
-
-Form #6 is the combination of #3 and #5.
-
-Additionally, multiple filters can be chained one after another in the
-manner of unix pipelines.  Each filter may take an optional argument,
-which may be ignored. */
+/** Expand a template string.
+    A template starts with "$" and continues with a Javascript expression;
+    this function returns the value of that expression.
+    To simply define a string that starts with "$", insert another "$".
+    For example, expand_template("$$ etc.") = "$ etc.".
+ */
 function expand_template(tmpl_str) {
-    var final_str = "";
-    var tokens = tokenize_template(tmpl_str);
-    tokens.forEach(function (t) {
-        if (t[0] == "literal") {
-            final_str += t[1];
-        } else if (t[0] == "template") {
-            var stages = split_with_escape_tokenized(t[1], "|");
-            var a = stages.shift().split(":");
-            var fname = a.shift();
-            var farg = a.join(":");
-            var value = template_repl_func[fname](farg);
-            stages.forEach(function (f) {
-                var a = f.split(":");
-                var fname = a.shift();
-                var farg = a.join(":");
-                if (template_filter_func.hasOwnProperty(fname)) {
-                    value = template_filter_func[fname](farg, value);
-                } else {
-                    throw new TemplateException("Unknown filter function");
-                }
-            });
-            final_str += value;
-        } else {
-            throw new TemplateException("Unknown template token type");
+    var final_str = tmpl_str;
+    if (tmpl_str && tmpl_str.length > 1 && tmpl_str.substr(0, 1) == "$") {
+        final_str = tmpl_str.substr(1);
+        if (final_str.substr(0, 1) != "$") { // not a literal "$"
+            try {
+                final_str = eval(final_str);
+            } catch(err) {
+                throw "eval(" + JSON.stringify(final_str) + "): " + err;
+            }
         }
-    });
+    }
     return final_str;
 }
 
-function tokenize_template(tmpl_str) {
-    var result = [];
-    var stack = [];
-    var frag = tmpl_str.split("{{");
-    frag = frag.map(function (e) { return e.split("}}"); });
-    result.push([ "literal", frag[0].join("}}")]);
-    for (var i = 1; i < frag.length; i++) {
-        stack.push(frag[i][0]);
-        for (var j = 1; j < frag[i].length; j++) {
-            // Closing previously opened
-            if (stack.length > 1) {
-                var top = stack.pop();
-                var next = stack.pop();
-                stack.push(next + "{{" + top + "}}" + frag[i][j]);
-            } else if (stack.length == 1) {
-                result.push(["template", stack.pop()]);
-                result.push(["literal", frag[i][j]]);
-            } else {
-                result.push(["literal", "}}" + frag[i][j]]);
-            }
-        }
+function date() {
+    var now = new Date();
+    return (padded_int_str(now.getMonth()+1, 2) + "/"
+            + padded_int_str(now.getDate(), 2) + "/"
+            + padded_int_str(now.getFullYear(), 4));
+}
+
+function time() {
+    var now = new Date();
+    return (padded_int_str(now.getHours(), 2) + ":"
+            + padded_int_str(now.getMinutes(), 2) + ":"
+            + padded_int_str(now.getSeconds(), 2));
+}
+
+function field(name) {
+    var result = "";
+    var fields = document.getElementsByName(name);
+    if (fields && fields.length > 0) {
+        result = fields[0].value || "";
     }
     return result;
 }
 
-function split_with_escape(str, sep, limit) {
-    var cnt = 0;
-    var a = Array();
-    str.split(sep).forEach(function (c) {
-        if (a.length == 0) {
-            a.push(c);
-        } else {
-            var v = a.pop();
-            if (limit > 0 && cnt >= limit) {
-                a.push(v + sep + c);
-            } else if (string_ends_with(v, "\\\\")) {
-                a.push(v.substring(0, v.length-1));
-                a.push(c);
-                cnt++;
-            } else if (string_ends_with(v, "\\")) {
-                a.push(v.substring(0, v.length-1) + sep + c);
-            } else {
-                a.push(v);
-                a.push(c);
-                cnt++;
-            }
-        }
-    });
-    return a;
+function msg_field(arg) {
+    return (msgfields && msgfields[arg]) || "";
 }
 
-function split_with_escape_tokenized(str, sep) {
-    var result = [];
-    var tokens = tokenize_template(str);
-    tokens.forEach(function (t) {
-        var v = "";
-        if (result.length > 0) {
-            v = result.pop();
-        }
-        if (t[0] == "literal") {
-            var elements = split_with_escape(t[1], sep, 0);
-            result.push(v + elements.shift());
-            elements.forEach(function (e) {
-                result.push(e);
-            });
-        } else if (t[0] == "template") {
-            result.push(v + "{{" + t[1] + "}}");
-        } else {
-            throw new TemplateException("Unknown template token type");
-        }
-    });
-    return result;
+/** Return msg_field(msgFieldName) if the viewer sent the message,
+    otherwise eturn return envelope[viewer][viewerFieldName].
+    This is useful in footers that show what happened at this station;
+    for example the name and call sign of either the operator who
+    sent the message from this station or received it at this station.
+ */
+function msg_viewer_field(msgFieldName, viewerFieldName) {
+    return (viewer == "sender" && envelope.readOnly && msg_field(msgFieldName))
+        || envelope[viewer][viewerFieldName];
 }
 
+function msg_viewer_number(msgFieldName) {
+    return (viewer == "sender" && msg_field(msgFieldName))
+        || envelope[viewer].msgno;
+}
 
-var template_repl_func = {
-    "open-brace" : function (arg) {
-        return "{";
-    },
+function formVersion() {
+    var includes = versions.includes.map(function(i) {
+        return i.name + "=" + i.version;
+    }).join(", ");
+    return versions.form + "; " + includes;
+}
 
-    "close-brace" : function (arg) {
-        return "}";
-    },
-
-    "open-tmpl" : function (arg) {
-        return "{{";
-    },
-
-    "close-tmpl" : function (arg) {
-        return "}}";
-    },
-
-    "date" : function (arg) {
-        var now = new Date();
-        return (padded_int_str(now.getMonth()+1, 2) + "/"
-                + padded_int_str(now.getDate(), 2) + "/"
-                + padded_int_str(now.getFullYear(), 4));
-    },
-
-    "time" : function (arg) {
-        var now = new Date();
-        return (padded_int_str(now.getHours(), 2) + ":"
-                + padded_int_str(now.getMinutes(), 2) + ":"
-                + padded_int_str(now.getSeconds(), 2));
-    },
-
-    "msgno" : function (arg) {
-        return emptystr_if_null(query_object['msgno']);
-    },
-
-    "field" : field_value,
-
-    "selected-fields" : selected_field_values,
-
-    "msg-field" : function(arg) {
-        return emptystr_if_null(msgfields[arg]);
-    },
-
-    "query-string" : function(arg) {
-        return emptystr_if_null(query_object[arg]);
-    },
-
-    "envelope" : function(arg) {
-        return emptystr_if_null(outpost_envelope[arg]);
-    },
-
-    "div-id" : function(arg) {
-        return document.querySelector("#"+arg).textContent;
-    },
-
-    "filename" : function (arg) {
-        var i = document.location.pathname.lastIndexOf("/")+1;
-        return document.location.pathname.substring(i);
-    },
-
-    "version": function(arg) {
-        var includes = versions.includes.map(function(i) {
-            return i.name + "=" + i.version;
-        }).join(", ");
-        return versions.form + "; " + includes;
-    },
-
-    "title" : function (arg) {
-        return document.title;
-    },
-
-    "expand-while-null" : function (arg) {
-        var templates = split_with_escape_tokenized(arg, ",");
-        var value = expand_template(templates.shift());
-        while (templates.length  > 0 && value.length == 0) {
-            value = expand_template(templates.shift());
-        }
-        return value;
-    }
-};
-
-var template_filter_func = {
-    "truncate" : function (arg, orig_value) {
-        return orig_value.substr(0, arg);
-    },
-
-    "split" : function (arg, orig_value) {
-        return orig_value.split(arg);
-    },
-
-    "join" : function (arg, orig_value) {
-        return orig_value.join(arg);
-    },
-
-    "remove" : function (arg, orig_value) {
-        var result = [];
-        orig_value.forEach(function(elem, index, array) {
-            if (elem != arg) {
-                result.push(elem);
-            }
-        });
-        return result;
-    },
-
-    "sort" : function (arg, orig_value) {
-        if (arg == "num") {
-            return orig_value.sort(function (a,b) { return a-b; });
-        } else {
-            return orig_value.sort();
-        }
-    },
-
-    "re_search" : function (arg, orig_value) {
-        var re = new RegExp(arg);
-        var match = re.exec(orig_value);
-        if (match.length == 1) {
-            return match[0];
-        } else {
-            return match;
-        }
-    },
-
-    "nth" : function (arg, orig_value) {
-        last = orig_value.length - 1
-        if (last < 0) {
-            return undefined;
-        }
-        if (arg > last) {
-            arg = last
-        }
-        return orig_value[arg];
-    },
-
-    "trim" : function (arg, orig_value) {
-        return orig_value.trim();
-    },
-
-    "msgno2name" : function(arg, orig_value) {
-        var name = callprefixes[orig_value.split('-')[0]];
-        return name ? name : "";
-    },
-
-    "expandtmpl" : function(arg, orig_value) {
-        return expand_template(orig_value);
-    }
-};
-
-function TemplateException(desc) {
-    this.name = "TemplateException";
-    this.message = desc;
+function msgno2name(orig_value) {
+    var name = callprefixes[orig_value.split('-')[0]];
+    return name || "";
 }
 
 /* Initialize text fields to default values through template expansion
@@ -894,20 +663,18 @@ function opdirect_submit(e) {
 
 /* Function invoked when form is sent over email */
 function email_submit(e) {
-    write_pacforms_representation();
     hide_form_data();
     e.preventDefault();
     if (check_the_form_validity()) {
-        var pacforms_rep = document.querySelector("#form-data").value;
         // Use the same subject as Outpost
-        var subject = expand_template(outpost_envelope.subject);
         document.location = "mailto:?to="
                           + "&Content-Type=text/plain"
-                          + "&Subject=" + encodeURIComponent(subject)
-                          + "&body=" + encodeURIComponent(pacforms_rep);
+                          + "&Subject=" + encodeURIComponent(newMessage.subject())
+                          + "&body=" + encodeURIComponent(newMessage.text());
     }
     return false;
 }
+
 /* Disable "other" controls when not in use
 
 This is a callback function to be used in the onChange handler of a
@@ -1019,7 +786,7 @@ function toggle_form_data_visibility() {
 }
 
 function setup_input_elem_from_class(next) {
-    if (query_object.mode != "readonly") {
+    if (envelope.readOnly) {
         var setup = {
             "date": {pattern: "(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[1-2][0-9][0-9][0-9]",
                      placeholder: "mm/dd/yyyy"},
@@ -1051,7 +818,7 @@ function setup_input_elem_from_class(next) {
 This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
     var form = document.querySelector("#the-form");
-    if (query_object.mode && query_object.mode == "readonly") {
+    if (envelope.readOnly) {
         document.querySelector("#button-header").classList.add("readonly");
         hide_element(document.querySelector("#opdirect-submit"));
         hide_element(document.querySelector("#email-submit"));
@@ -1168,13 +935,19 @@ The supplied function will be called with two arguments, the line
 number of the line being processed and a string with the text of the
 line. */
 function for_each_line(str, func) {
+    if (str == null) {
+        return;
+    }
     var linenum = 1;
     var last_idx = 0;
-    var idx = str.indexOf("\n", last_idx);
-    while (idx >= 0) {
-        func(linenum++, str.substring(last_idx, idx));
+    var idx;
+    while ((idx = str.indexOf("\n", last_idx)) >= 0) {
+        var end = idx;
+        if (end > 0 && str.substring(end - 1, end) == "\r") {
+            end--;
+        }
+        func(linenum++, str.substring(last_idx, end));
         last_idx = idx + 1;
-        idx = str.indexOf("\n", last_idx);
     }
     if (last_idx < str.length) {
         func(linenum, str.substring(last_idx));
@@ -1210,19 +983,24 @@ function outpost_envelope_to_object(line) {
     return data;
 }
 
-/* Generate an object from the query string.
-
-This should be called as an init function; it will store the result in
-the global variable query_object */
+/* Initialize envelope from the query string. */
 function query_string_to_object(next) {
-    var query = {};
     var string = window.location.search.substring(1);
     var list = string ? string.split("&") : [];
-    list.forEach(function(element, index, array) {
-        list = element.split("=");
-        query[list[0]] = decodeURIComponent(list[1].replace("+", "%20"));
+    list.forEach(function(element) {
+        var pair = element.split("=");
+        var name = decodeURIComponent(pair[0].replace("+", "%20"));
+        var value = decodeURIComponent(pair[1].replace("+", "%20"));
+        switch(name) {
+        case "mode":
+            if (value == "readonly") {
+                envelope.readOnly = true;
+            }
+            break;
+        default:
+            envelope[viewer][name] = value;
+        }
     });
-    query_object = query;
     next();
 }
 
@@ -1323,6 +1101,9 @@ function startup_delay(next) {
 
 /** Customize integration[joinPoint] so it calls advice first.  */
 function before_integration(joinPoint, advice) {
+    if ((typeof advice) != "function") {
+        throw advice + " can't advise integration." + joinPoint + ".";
+    }
     var oldFunction = integration[joinPoint];
     if ((typeof oldFunction) != "function") {
         throw jointPoint + " is not an integration function.";
@@ -1336,6 +1117,9 @@ function before_integration(joinPoint, advice) {
 
 /** Customize integration[joinPoint] so it calls advice afterward. */
 function after_integration(joinPoint, advice) {
+    if ((typeof advice) != "function") {
+        throw advice + " can't advise integration." + joinPoint + ".";
+    }
     var oldFunction = integration[joinPoint];
     if ((typeof oldFunction) != "function") {
         throw jointPoint + " is not an integration function.";
@@ -1359,6 +1143,9 @@ startup_functions.push(function(next) {
 startup_functions.push(query_string_to_object);
 startup_functions.push(function(next) {
     integration.load_configuration(next);
+});
+startup_functions.push(function(next) {
+    integration.get_old_message(next);
 });
 startup_functions.push(init_form);
 startup_functions.push(setup_input_elem_from_class);
@@ -1392,6 +1179,14 @@ var integration = {
 
     /** Load configuration data. */
     load_configuration: function(next) {
+        next();
+    },
+
+    /** Fetch and analyze the text message received from Outpost,
+        store the message field names and values into msgfields,
+        and possibly change other configuration data.
+     */
+    get_old_message: function(next) {
         next();
     },
 

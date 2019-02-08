@@ -98,11 +98,9 @@
           }
       }
       link_to_PDF("resources/pdf/XSC_OA_ShelterStatus_v20130814.pdf");
-      after_integration("load_configuration", function(next) {
-          outpost_envelope.subject = "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}"
-          + "_Shelter Status_{{field:21.municipality}}";
-          next();
-      });
+      newMessage.subjectSuffix = function() {
+          return '_Shelter Status_' + field('21.municipality');
+      };
     </script>
     <title>Santa Clara OA Shelter Status</title>
   </head>
@@ -158,10 +156,10 @@
             </td><td style="white-space:normal;">
               <div data-include-html="select-municipality"></div>
               <label class="label-sameline">Date:
-                <input type="text" name="1a.date" class="date" value="{{date}}" required="required"/>
+                <input type="text" name="1a.date" class="date" value="$date()" required="required"/>
               </label>
               <label class="label-sameline">Time:
-                <input type="text" name="1b.time" class="time" value="{{time}}" required="required"/>
+                <input type="text" name="1b.time" class="time" value="$time()" required="required"/>
               </label>
             </td>
           </tr>
@@ -362,7 +360,6 @@
       <br/>
       <div data-include-html="ics-footer-short"></div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>

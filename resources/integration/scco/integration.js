@@ -1,66 +1,96 @@
 (function() {
     var message = {{message}};
-    var envelopeDefaults = {{envelopeDefaults}};
-    var queryDefaults = {{queryDefaults}};
-    before_integration("load_configuration", function(next) {
-        set_form_data_div(message || '# A new message will go here.');
-        for (var e in envelopeDefaults) {
-            if (!(e in outpost_envelope)) {
-                outpost_envelope[e] = envelopeDefaults[e];
+    var environment = {{environment}};
+    var status = environment.message_status;
+
+    var setDateTime = function(into, from) {
+        if (!from) return;
+        var found = /(\S+)\s*(.*)/.exec(from);
+        if (found) {
+            into.ordate = found[1];
+            into.ortime = found[2];
+            found = /(\d+):(\d+)(:\d+)?([^\d]*)/.exec(into.ortime);
+            if (found) {
+                // convert to 24 hour time
+                var hour = parseInt(found[1], 10);
+                var min = found[2];
+                var sec = found[3];
+                var PM  = found[4].trim().toLowerCase() == 'pm';
+                if (hour == 12) {
+                    if (!PM) {
+                        hour = 0;
+                    }
+                } else if (PM) {
+                    hour += 12;
+                } else if (hour < 10) {
+                    hour = '0' + hour;
+                }
+                into.ortime = hour + ':' + min + (sec ? sec : '');
             }
         }
-        for (var q in queryDefaults) {
-            if (!(q in query_object)) {
-                query_object[q] = queryDefaults[q];
-            }
+    };
+
+    var getOldMessage = function(next) {
+        viewer = (status == 'read' || status == 'unread') ? 'receiver' : 'sender';
+        envelope.readOnly = (environment.mode == 'readonly');
+        if (environment.MSG_NUMBER == '-1') { // a sentinel value
+            delete environment.MSG_NUMBER;
         }
-        if (query_object.submitURL) {
-            document.querySelector('#form-data-form').action = query_object.submitURL;
+        if (environment.MSG_LOCAL_ID == '-1') { // a sentinel value
+            delete environment.MSG_LOCAL_ID;
         }
-        if (query_object.pingURL && query_object.mode != 'readonly') {
+        envelope.sender.msgno = environment.MSG_NUMBER || '';
+        envelope.receiver.msgno = environment.MSG_LOCAL_ID || '';
+        envelope[viewer].ocall = environment.SETUP_ID_ACTIVE_CALL || '';
+        envelope[viewer].oname = environment.SETUP_ID_ACTIVE_NAME || '';
+        setDateTime(envelope.sender, environment.MSG_DATETIME_OP_SENT);
+        setDateTime(envelope.receiver, environment.MSG_DATETIME_OP_RCVD);
+
+        // Change the message header from PACF format to ADDON format:
+        newMessage.header = function() {
+            return '!' + environment.addon_name + '!'
+                + EOL + '# ' + document.title
+                + EOL + '# JS-ver. PR-3.9-2.6, 08/11/13,'
+                + EOL + '# FORMFILENAME: ' + environment.ADDON_MSG_TYPE
+                + EOL + '# FORMVERSION: ' + formVersion()
+                + EOL + '# SUBJECT: ' + newMessage.subject()
+                + EOL;
+        };
+        newMessage.footer = '!/ADDON!\r\n';
+        msgfields = oldMessage.get_fields(oldMessage.unwrap(message));
+
+        if (environment.pingURL && !envelope.readOnly) {
             // Ping the server periodically, to keep it alive while the form is open.
             // But not for a read-only message.
             var ping_sequence = 0;
             setInterval(function() {
                 var img = new Image();
                 // To discourage caching, use a new query string for each ping.
-                img.src = query_object.pingURL + '?i=' + (ping_sequence++);
+                img.src = environment.pingURL + '?i=' + (ping_sequence++);
                 img = undefined;
             }, 30000); // call ping every 30 seconds
         }
-        var status = query_object.message_status;
         // Show Rec-Sent based on whether we received this message:
-        init_form_from_fields({'Rec-Sent': (status == 'unread' || status == 'read') ? 'Received' : 'Sent'}, 'name');
+        init_form_from_fields({'Rec-Sent': (viewer == 'sender') ? 'Sent' : 'Received'}, 'name');
         array_for_each(document.getElementsByName('Rec-Sent'), function(recSent) {
             recSent.disabled = true; // Don't include it in transmitted messages.
             recSent.classList.add('no-msg-init'); // Ignore it in received messages.
             // That is, init_form_from_fields won't affect this element any more.
         });
-        // Change the message header from PACF format to ADDON format:
-        var messageHeader = document.getElementById('message-header');
-        var header = messageHeader.textContent;
-        // The subject comes after !PACF! in the first line:
-        var foundSubject = /^\s*![^!\r\n]*![ \t]*([^\r\n]*)/.exec(header);
-        if (foundSubject) {
-            // Add the subject in a comment:
-            header = header.replace(/\s*$/, '\r\n# SUBJECT: ' + foundSubject[1]);
-            // Replace that first line:
-            header = header.replace(/^\s*![^\r\n]*([\r\n])/,
-                                    '!' + query_object.addon_name + '!$1');
+        next();
+    };
+
+    var afterLoad = function(next) {
+        if (environment.submitURL) {
+            document.querySelector('#form-data-form').action = environment.submitURL;
         }
-        // Correct FORMFILENAME:
-        header = header.replace(/([\r\n]#[ \t]*FORMFILENAME[ \t]*:)[^\r\n]*/,
-                                '$1 ' + query_object.filename);
-        messageHeader.textContent = header;
-        outpost_message_footer = '!/ADDON!\r\n';
         if (status == 'manual') {
             var submitButton = document.getElementById('opdirect-submit');
             if (submitButton) {
                 submitButton.value = 'Create Message';
             }
         }
-        if ((status == 'new' || status == 'draft') &&
-            query_object.mode == 'readonly') {
+        if ((status == 'new' || status == 'draft') && envelope.readOnly) {
             // This message was just submitted to Outpost. Let the operator know:
             var div = document.createElement('div');
             div.style="position:absolute;height:20pt;top:50%;margin-top:-10pt;margin-left:5pt;font-weight:bold;";
@@ -70,5 +100,8 @@
             document.getElementById('button-header').appendChild(div);
         }
         next();
-    });
+    };
+
+    after_integration("get_old_message", getOldMessage);
+    after_integration("after_load", afterLoad);
 })();

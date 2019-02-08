@@ -4,17 +4,18 @@
     <tr>
       <td>
         <label class="label-sameline">Sender's Msg #
-          <input name="2.txmsgno" class="message-number" type="text" tabindex="-1"
-                 value="{{query-string:txmsgno}}"/>
+          <input name="2.txmsgno" class="message-number no-msg-init" type="text" tabindex="-1"
+                 value="$(viewer=='sender') ? '' : (msg_field('MsgNo') || envelope.sender.msgno)"/>
         </label>
       </td><td>
         <label class="label-sameline">My Msg #
           <input name="MsgNo" class="message-number no-msg-init" type="text" tabindex="1"
-                 required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
+                 value="$msg_viewer_number('MsgNo')" required="required"/>
         </label>
       </td><td>
         <label class="label-sameline">Receiver's Msg #
-          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"/>
+          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"
+                 value="$(viewer=='receiver') ? '' : envelope.receiver.msgno"/>
         </label>
       </td>
     </tr>
@@ -23,7 +24,7 @@
       <td>
         <label class="label-sameline">Date:
           <input name="1a.date" type="text" tabindex="2"
-                 required="required" class="date" value="{{date}}"/>
+                 required="required" class="date" value="$date()"/>
         </label>
       </td><td rowspan="2">
         <fieldset>
@@ -50,7 +51,7 @@
       <td>
         <label class="label-sameline">Time:
           <input name="1b.time" type="text" tabindex="3"
-                 required="required" class="time" value="{{time}}"/>
+                 required="required" class="time" value="$time()"/>
         </label>
       </td>
     </tr>

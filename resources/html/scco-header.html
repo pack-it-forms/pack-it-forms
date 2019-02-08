@@ -5,16 +5,17 @@
       <td>
         <label class="label-sameline">Sender's Msg #
           <input name="2.txmsgno" class="message-number" type="text" tabindex="-1"
-                 value="{{query-string:txmsgno}}"/>
+                 value="$(viewer=='sender') ? '' : (msg_field('MsgNo') || envelope.sender.msgno)"/>
         </label>
       </td><td>
         <label class="label-sameline">My Msg #
           <input name="MsgNo" class="message-number no-msg-init" type="text" tabindex="1"
-                 required="required" value="{{expand-while-null:{{envelope:RCVNUM}},{{query-string:msgno}}}}"/>
+                 value="$msg_viewer_number('MsgNo')" required="required"/>
         </label>
       </td><td>
         <label class="label-sameline">Receiver's Msg #
-          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"/>
+          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"
+                 value="$(viewer=='receiver') ? '' : envelope.receiver.msgno"/>
         </label>
       </td>
     </tr>

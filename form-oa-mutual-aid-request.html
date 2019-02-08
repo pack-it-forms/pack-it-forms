@@ -18,9 +18,10 @@
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
     <script type="text/javascript" src="resources/integration/integration.js"></script>
     <script type="text/javascript">
+      newMessage.subjectSuffix = function() {
+          return '_RACES_MAR_' + field('15.agency');
+      };
       after_integration("after_load", function(next) {
-          outpost_envelope.subject = "{{field:MsgNo}}_{{field:4.severity|truncate:1}}/{{field:5.handling|truncate:1}}"
-          + "_RACES_MAR_{{field:15.agency}}";
           array_for_each(document.getElementsByName('9.note'), function(element) {
               element.innerHTML = '<b>To: </b>SCCo ARES/RACES/ACS Mutual Aid Coordinator (SCCo CRO)';
           });
@@ -249,7 +250,7 @@
               <tr>
                 <td style="width:1px;">Date:</td>
                 <td><input type="text" name="26a.agency-approved-date" tabindex="43" required
-                           class="date" value="{{date}}"/></td>
+                           class="date" value="$date()"/></td>
               </tr>
             </table>
           </td><td style="width:10em;">
@@ -257,7 +258,7 @@
               <tr>
                 <td style="width:1px;">Time:</td>
                 <td><input type="text" name="26b.agency-approved-time" tabindex="44" required
-                           class="time" value="{{time}}"/></td>
+                           class="time" value="$time()"/></td>
               </tr>
             </table>
           </td>
@@ -371,7 +372,6 @@
       <br/>
       <div data-include-html="ics-footer-short"></div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>

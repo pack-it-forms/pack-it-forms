@@ -14,21 +14,21 @@
         </select>
         <label class="label-sameline">by</label>
         <input name="OpCall" type="text" tabindex="508"
-               class="no-msg-init" style="width:6em;"
+               class="call-sign no-msg-init"
                placeholder="call sign"
-               value="{{expand-while-null:{{envelope:ocall}},{{query-string:ocall}}}}"/>
+               value="$msg_viewer_field('OpCall', 'ocall')"/>
         <input name="OpName" type="text" tabindex="509"
                class="no-msg-init" style="width:12em;"
                placeholder="operator name"
-               value="{{expand-while-null:{{envelope:oname}},{{query-string:oname}}}}"/>
+               value="$msg_viewer_field('OpName', 'oname')"/>
         <label class="label-sameline">on</label>
         <input name="OpDate" type="text"
-               class="no-msg-init init-on-submit" style="width:6em;"
-               value="{{expand-while-null:{{envelope:ordate}},{{open-tmpl}}date{{close-tmpl}}}}" disabled="disabled"/>
+               class="date no-msg-init init-on-submit"
+               value="$envelope[viewer].ordate || '$date()'" disabled="disabled"/>
         <label class="label-sameline">at</label>
         <input name="OpTime" type="text"
-               class="no-msg-init init-on-submit" style="width:6em;"
-               value="{{expand-while-null:{{envelope:ortime}},{{open-tmpl}}time{{close-tmpl}}}}" disabled="disabled"/>
+               class="time no-msg-init init-on-submit"
+               value="$envelope[viewer].ortime || '$time()'" disabled="disabled"/>
       </td>
     </tr>
   </table>

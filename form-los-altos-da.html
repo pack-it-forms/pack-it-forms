@@ -9,7 +9,16 @@
     <link rel="stylesheet" type="text/css" href="resources/css/form-los-altos-da.css"/>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
     <script type="text/javascript" src="resources/integration/integration.js"></script>
-
+    <script type="text/javascript">
+      function listOfBATs() {
+          var bats = [];
+          array_for_each(selected_field_values("[name$='batnum']"), function(value) {
+              if (value) bats.push(parseInt(value));
+          });
+          bats.sort(function(a, b) {return a - b;});
+          return bats.join(', ');
+      }
+    </script>
     <title>Los Altos Damage Assessment</title>
   </head>
 
@@ -31,20 +40,20 @@
             "6a.": "No",
             "6b.": "No",
             "6c.": "checked",
-            "7.": "Planning",
-            "8.": "Planning",
+            "7.": "Operations",
+            "8.": "Other",
             "9a.": "Los Altos EOC",
-            "9b.": "{{msgno|msgno2name}}"
+            "9b.": "$msgno2name(envelope.sender.msgno)"
         }
       </div>
       <table id="form-body" class="noborder border">
         <tr>
           <td colspan="17">
-            <label class="label-sameline">Subject:
+            <label>Subject:
               <span class="field-number">10</span>
-              <input name="10.subject" type="text"
+              <input name="10.subject" type="text" tabindex="-1"
                      class="no-load-init init-on-submit"
-                     value="Damage Summary for BAT(s) {{selected-fields:[name$='batnum']|remove:|sort:num|join:, }}"
+                     value="$'Damage Summary for BAT(s) '+listOfBATs()"
                      required="required"
                      pattern="Damage Summary for BAT\(s\) .*"
                      title="This field must have a prefix of
@@ -53,10 +62,10 @@
           </td>
         </tr><tr>
           <td colspan="17">
-            <label class="label-sameline">
+            <label>
               Reference (e.g. Number of earlier msg.)
               <span class="field-number">11</span>
-              <input name="11.reference" type="text"/>
+              <input name="11.reference" type="text" tabindex="-1"/>
             </label>
           </td>
         </tr><tr>
@@ -91,7 +100,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.0a.batnum" type="text"/>
+            <input name="12.0a.batnum" type="text" class="cardinal-number" tabindex="21"/>
           </td>
           <td><input name="12.0b.ok" type="checkbox"/></td>
           <td><input name="12.0c.people-minor" type="text" pattern="\d+"/></td>
@@ -112,7 +121,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.1a.batnum" type="text"/>
+            <input name="12.1a.batnum" type="text" class="cardinal-number" tabindex="22"/>
           </td>
           <td><input name="12.1b.ok" type="checkbox"/></td>
           <td><input name="12.1c.people-minor" type="text" pattern="\d+"/></td>
@@ -133,7 +142,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.2a.batnum" type="text"/>
+            <input name="12.2a.batnum" type="text" class="cardinal-number" tabindex="23"/>
           </td>
           <td><input name="12.2b.ok" type="checkbox"/></td>
           <td><input name="12.2c.people-minor" type="text" pattern="\d+"/></td>
@@ -154,7 +163,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.3a.batnum" type="text"/>
+            <input name="12.3a.batnum" type="text" class="cardinal-number" tabindex="24"/>
           </td>
           <td><input name="12.3b.ok" type="checkbox"/></td>
           <td><input name="12.3c.people-minor" type="text" pattern="\d+"/></td>
@@ -175,7 +184,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.4a.batnum" type="text"/>
+            <input name="12.4a.batnum" type="text" class="cardinal-number" tabindex="25"/>
           </td>
           <td><input name="12.4b.ok" type="checkbox"/></td>
           <td><input name="12.4c.people-minor" type="text" pattern="\d+"/></td>
@@ -196,7 +205,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.5a.batnum" type="text"/>
+            <input name="12.5a.batnum" type="text" class="cardinal-number" tabindex="26"/>
           </td>
           <td><input name="12.5b.ok" type="checkbox"/></td>
           <td><input name="12.5c.people-minor" type="text" pattern="\d+"/></td>
@@ -217,7 +226,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.6a.batnum" type="text"/>
+            <input name="12.6a.batnum" type="text" class="cardinal-number" tabindex="27"/>
           </td>
           <td><input name="12.6b.ok" type="checkbox"/></td>
           <td><input name="12.6c.people-minor" type="text" pattern="\d+"/></td>
@@ -238,7 +247,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.7a.batnum" type="text"/>
+            <input name="12.7a.batnum" type="text" class="cardinal-number" tabindex="28"/>
           </td>
           <td><input name="12.7b.ok" type="checkbox"/></td>
           <td><input name="12.7c.people-minor" type="text" pattern="\d+"/></td>
@@ -259,7 +268,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.8a.batnum" type="text"/>
+            <input name="12.8a.batnum" type="text" class="cardinal-number" tabindex="29"/>
           </td>
           <td><input name="12.8b.ok" type="checkbox"/></td>
           <td><input name="12.8c.people-minor" type="text" pattern="\d+"/></td>
@@ -280,7 +289,7 @@
         </tr>
         <tr class="fullsize-textfields">
           <td style="width:10%;">
-            <input name="12.9a.batnum" type="text"/>
+            <input name="12.9a.batnum" type="text" class="cardinal-number" tabindex="30"/>
           </td>
           <td><input name="12.9b.ok" type="checkbox"/></td>
           <td><input name="12.9c.people-minor" type="text" pattern="\d+"/></td>
@@ -304,12 +313,12 @@
               <div><div>Notes</div></div>
           </th>
         </tr><tr>
-          <td colspan="17"><textarea name="12.10.general-notes" rows="6" cols="80"></textarea></td>
+          <td colspan="17"><textarea name="12.10.general-notes" tabindex="40"
+                                     rows="6" cols="80"></textarea></td>
         </tr>
       </table>
       <div data-include-html="ics-footer"></div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>

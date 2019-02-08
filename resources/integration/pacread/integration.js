@@ -1,5 +1,66 @@
 // Customize pack-it-forms for use in outpost-pacread <https://github.com/pack-it-forms/outpost-pacread>.
 
+/* Cross-browser resource loading w/local file handling
+
+This function uses an Msxml2.XMLHTTP ActiveXObject on Internet
+Explorer and a regular XMLHttpRequest in other places because using
+the ActiveXObject in Internet Explorer allows a file loaded through a
+file:// uri to access other resources through a file:// uri. */
+function open_async_request(method, url, responseType, cb, err) {
+    var request;
+    if (window.ActiveXObject !== undefined) {
+        request = new ActiveXObject("Msxml2.XMLHTTP");
+        request.open(method, url, false);
+        request.onreadystatechange = function(e) {
+            if (request.readyState == 4) {
+                var text = request.responseText;
+                if (ActiveXObject_responseType_funcs.hasOwnProperty(responseType)) {
+                    cb(ActiveXObject_responseType_funcs[responseType](text));
+                }
+            }
+        };
+        request.send();
+    } else {
+        request = new XMLHttpRequest();
+        request.open(method, url, true);
+        request.responseType = responseType;
+        // Opera won't load HTML documents unless the MIME type is
+        // set to text/xml
+        var overriden = false;
+        request.onreadystatechange = function callcb(e) {
+            if (e.target.readyState == e.target.DONE) {
+                if (e.target.response) {
+                    cb(e.target.response);
+                } else if (responseType == "document" && !overriden) {
+                    request = new XMLHttpRequest();
+                    request.open(method, url, true);
+                    request.responseType = responseType;
+                    request.overrideMimeType("text/xml");
+                    overriden = true;
+                    request.onreadystatechange = callcb;
+                    request.send();
+                } else {
+                    err();
+                }
+            }
+        };
+        request.send();
+    }
+}
+
+/* Since Msxml2.XMLHTTP doesn't support proper response types, we use
+   these functions in Internet Explorer to convert text into the
+   correct types.  Currently, only text and document types are
+   supported. */
+var ActiveXObject_responseType_funcs = {
+    "text": function(result) {
+        return result;
+    },
+    "document": function(result) {
+        return new DOMParser().parseFromString(result, "text/html");
+    }
+};
+
 /* Insert HTML include content in document
 
 This function process all of the HTML elements with an attribute named
@@ -102,5 +163,24 @@ function load_callprefix(next) {
     }
 }
 
+function get_old_message(next) {
+    var msgno = envelope.sender.msgno;
+    if (!msgno) {
+        viewer = "sender";
+        msgfields = {};
+        next();
+    } else {
+        var msg_url = "msgs/" + msgno;
+        open_async_request("GET", msg_url, "text", function(message) {
+            viewer = (message && message.trim()) ? "receiver" : "sender";
+            msgfields = oldMessage.get_fields(oldMessage.unwrap(message));
+            next();
+        }, function() {
+            throw("GET " + msg_url + " failed");
+        });
+    }
+};
+
 after_integration("expand_includes", process_html_includes);
 after_integration("load_configuration", load_callprefix);
+after_integration("get_old_message", get_old_message);
