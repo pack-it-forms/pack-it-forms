@@ -678,7 +678,9 @@ function opdirect_submit(e) {
     hide_form_data();
     e.preventDefault();
     if (check_the_form_validity()) {
-        document.querySelector("#form-data-form").submit();
+        integration.before_submit(function() {
+            document.querySelector("#form-data-form").submit();
+        });
     }
     return false;
 }
@@ -1126,7 +1128,10 @@ function startup_delay(next) {
     }, 10000);
 }
 
-/** Customize integration[joinPoint] so it calls advice first.  */
+/** Customize integration[joinPoint] so it calls advice first.
+    advice must either call its first parameter (a function)
+    or throw an exception.
+ */
 function before_integration(joinPoint, advice) {
     if ((typeof advice) != "function") {
         throw advice + " can't advise integration." + joinPoint + ".";
@@ -1142,7 +1147,10 @@ function before_integration(joinPoint, advice) {
     };
 }
 
-/** Customize integration[joinPoint] so it calls advice afterward. */
+/** Customize integration[joinPoint] so it calls advice afterward.
+    advice must either call its first parameter (a function)
+    or throw an exception.
+ */
 function after_integration(joinPoint, advice) {
     if ((typeof advice) != "function") {
         throw advice + " can't advise integration." + joinPoint + ".";
@@ -1219,6 +1227,11 @@ var integration = {
 
     /** Called immediately before revealing the loaded page. */
     after_load: function(next) {
+        next();
+    },
+
+    /** Called immediately before submitting a message to Outpost. */
+    before_submit: function(next) {
         next();
     }
 };
