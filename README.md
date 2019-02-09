@@ -308,8 +308,9 @@ Objects that are often used in templates include:
 
 When the form is loaded, template expansion will be performed on
 the `value` property of input elements with `type="text"`,
-the `innerHTML` property of elements with a `templated` class,
+the `innerHTML` property of \<span\> elements with a `templated` class,
 and any data-default-value.
+The elements must have names.
 The same templates will be expanded when the form is reset.
 However, templates in elements with the class `no-load-init` will
 not be expanded when the form is loaded or reset.
