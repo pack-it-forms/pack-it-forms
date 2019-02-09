@@ -534,7 +534,7 @@ function field_value(field_name) {
  */
 function expand_template(tmpl_str) {
     var result = tmpl_str;
-    if (result && result.substr(0, 1) == "$" && result != "$") {
+    if (is_a_template(result)) {
         result = result.substr(1);
         if (result.substr(0, 1) != "$") { // not a literal "$"
             try {
@@ -545,6 +545,10 @@ function expand_template(tmpl_str) {
         }
     }
     return result;
+}
+
+function is_a_template(value) {
+    return value && value.substr(0, 1) == "$" && value != "$";
 }
 
 function date() {
@@ -612,8 +616,7 @@ function find_templated_text(selector, property) {
         if (!field.classList.contains("no-load-init")) {
             var name = field.name || field.getAttribute("name");
             var value = field[property];
-            if (value && value.length > 1 && value.substr(0, 1) == "$") {
-                // It's a template.
+            if (is_a_template(value)) {
                 if (!name) {
                     logError(field + " can't be initialized with " + value
                              + ", because it doesn't have a name.");
