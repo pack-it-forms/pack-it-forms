@@ -820,7 +820,7 @@ function toggle_form_data_visibility() {
 }
 
 function setup_input_elem_from_class(next) {
-    if (envelope.readOnly) {
+    if (!envelope.readOnly) {
         var setup = {
             "date": {pattern: "(0[1-9]|1[012])/(0[1-9]|1[0-9]|2[0-9]|3[01])/[1-2][0-9][0-9][0-9]",
                      placeholder: "mm/dd/yyyy"},
