@@ -181,6 +181,6 @@ function get_old_message(next) {
     }
 };
 
-after_integration("expand_includes", process_html_includes);
-after_integration("load_configuration", load_callprefix);
-after_integration("get_old_message", get_old_message);
+before_integration("expand_includes", process_html_includes);
+before_integration("load_configuration", load_callprefix);
+before_integration("get_old_message", get_old_message);

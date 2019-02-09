@@ -23,8 +23,8 @@
       };
       var icsHeaderNote = // It would be awkward to write this in JSON inside HTML.
           '<b>To: </b>SCCo ARES/RACES/ACS Mutual Aid Coordinator (SCCo CRO)';
-      after_integration("after_load", function(next) {
-          ['4.severity', '5.handling'].forEach(function(name) {
+      before_integration("reveal_form", function(next) {
+          array_for_each(['4.severity', '5.handling'], function(name) {
               array_for_each(document.getElementsByName(name), function(element) {
                   element.disabled = 'true';
               });

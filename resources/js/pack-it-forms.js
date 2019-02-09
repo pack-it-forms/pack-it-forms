@@ -39,6 +39,7 @@ var callprefixes = {};     // Cached call prefixes for expansion
 var msgfields = {};        // Field names and values from a message from Outpost.
 var versions = {};         // Version information
 var formDefaultValues;     // Initial values for form inputs. May contain templates.
+var errorLog = [];         // Errors that occurred before there was a place to show them.
 var EOL = "\r\n";
 
 /* --- Registration for code to run after page loads
@@ -678,9 +679,7 @@ function opdirect_submit(e) {
     hide_form_data();
     e.preventDefault();
     if (check_the_form_validity()) {
-        integration.before_submit(function() {
-            document.querySelector("#form-data-form").submit();
-        });
+        integration.submit_to_outpost(function(){});
     }
     return false;
 }
@@ -1097,8 +1096,14 @@ function indicateError() {
 
 function logError(msg) {
     var el = document.querySelector("#error-log");
-    el.textContent = el.textContent + msg + "\n";
-    indicateError();
+    if (el) {
+        el.textContent = el.textContent + msg + "\n";
+        indicateError();
+    } else {
+        // The document isn't loaded yet.
+        errorLog.push(msg);
+        // integration.on_load will display it later.
+    }
 }
 
 window.addEventListener('error', function(event) {
@@ -1128,60 +1133,62 @@ function startup_delay(next) {
     }, 10000);
 }
 
-/** Customize integration[joinPoint] so it calls advice first.
-    advice must either call its first parameter (a function)
-    or throw an exception.
- */
-function before_integration(joinPoint, advice) {
-    if ((typeof advice) != "function") {
-        throw advice + " can't advise integration." + joinPoint + ".";
-    }
-    var oldFunction = integration[joinPoint];
+function advice_is_valid(advice, oldFunction, joinPoint) {
     if ((typeof oldFunction) != "function") {
-        throw jointPoint + " is not an integration function.";
+        logError(joinPoint + " is not a customizable function.");
+    } else if ((typeof advice) != "function") {
+        logError(JSON.stringify(advice) + " can't customize " + joinPoint + ".");
+    } else {
+        return true;
     }
-    integration[joinPoint] = function(next) {
-        advice(function() {
-            oldFunction(next);
-        });
-    };
+    return false;
 }
 
-/** Customize integration[joinPoint] so it calls advice afterward.
-    advice must either call its first parameter (a function)
-    or throw an exception.
- */
-function after_integration(joinPoint, advice) {
-    if ((typeof advice) != "function") {
-        throw advice + " can't advise integration." + joinPoint + ".";
-    }
+/** Customize integration[joinPoint] so it calls advice(next) first.
+    The function advice(next) must either call next() or throw an exception.
+*/
+function before_integration(joinPoint, advice) {
     var oldFunction = integration[joinPoint];
-    if ((typeof oldFunction) != "function") {
-        throw jointPoint + " is not an integration function.";
+    if (advice_is_valid(advice, oldFunction, "integration." + joinPoint)) {
+        integration[joinPoint] = function(next) {
+            advice(function() {
+                oldFunction(next);
+            });
+        };
     }
-    integration[joinPoint] = function(next) {
-        oldFunction(function() {
-            advice(next);
-        });
+}
+
+/** Customize integration[joinPoint] so it calls advice(next) afterward.
+    The function advice(next) must either call next() or throw an exception.
+*/
+function after_integration(joinPoint, advice) {
+    var oldFunction = integration[joinPoint];
+    if (advice_is_valid(advice, oldFunction, "integration." + joinPoint)) {
+        integration[joinPoint] = function(next) {
+            oldFunction(function() {
+                advice(next);
+            });
+        };
+    }
+}
+
+function call_integration(joinPoint) {
+    return function(next) {
+        integration[joinPoint](next);
     };
+    // The purpose here is to read integration[joinPoint]
+    // *after* integration.js and forms have customized it;
+    // which they do after the startup_functions are initialized.
 }
 
 /* --- Registration of startup functions that run on page load */
 
-startup_functions.push(function(next) {
-    integration.on_load(next);
-});
+startup_functions.push(call_integration("on_load"));
 startup_functions.push(load_form_version);
-startup_functions.push(function(next) {
-    integration.expand_includes(next);
-});
+startup_functions.push(call_integration("expand_includes"));
 startup_functions.push(query_string_to_object);
-startup_functions.push(function(next) {
-    integration.load_configuration(next);
-});
-startup_functions.push(function(next) {
-    integration.get_old_message(next);
-});
+startup_functions.push(call_integration("load_configuration"));
+startup_functions.push(call_integration("get_old_message"));
 startup_functions.push(init_form);
 startup_functions.push(setup_input_elem_from_class);
 // This must come after query_string_to_object in the startup functions
@@ -1190,20 +1197,21 @@ startup_functions.push(setup_view_mode);
 //startup_functions.push(startup_delay);  // Uncomment to test loading overlay
 //startup_functions.push(test_error);  // Uncomment to test startup err report
 startup_functions.push(setup_error_indicator);
-startup_functions.push(function(next) {
-    integration.after_load(next);
-});
-startup_functions.push(remove_loading_overlay);
+startup_functions.push(call_integration("reveal_form"));
 
 /** Integration points.
     Each function must either call next() or throw an exception.
-    An integration will typically customize some of them,
-    using before_integration or after_integration.
+    An integration or form will typically customize some of them, with
+    Javascript code that calls before_integration or after_integration.
  */
 var integration = {
 
     /** Called shortly after window.onload. */
     on_load: function(next) {
+        array_for_each(errorLog, function(err) {
+            logError(err);
+        });
+        errorLog = [];
         next();
     },
 
@@ -1225,13 +1233,14 @@ var integration = {
         next();
     },
 
-    /** Called immediately before revealing the loaded page. */
-    after_load: function(next) {
-        next();
+    /** Reveal the form to the operator; that is take away the "loading" spinner. */
+    reveal_form: function(next) {
+        remove_loading_overlay(next);
     },
 
-    /** Called immediately before submitting a message to Outpost. */
-    before_submit: function(next) {
+    /** Submit a message to Outpost. */
+    submit_to_outpost: function(next) {
+        document.querySelector("#form-data-form").submit();
         next();
     }
 };

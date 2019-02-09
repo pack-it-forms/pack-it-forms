@@ -73,7 +73,7 @@
         next();
     };
 
-    var afterLoad = function(next) {
+    var customizeForm = function(next) {
         if (environment.submitURL) {
             document.querySelector('#form-data-form').action = environment.submitURL;
         }
@@ -95,6 +95,6 @@
         next();
     };
 
-    after_integration("get_old_message", getOldMessage);
-    after_integration("after_load", afterLoad);
+    before_integration("get_old_message", getOldMessage);
+    before_integration("reveal_form", customizeForm);
 })();
