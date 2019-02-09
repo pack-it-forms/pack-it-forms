@@ -610,13 +610,14 @@ function find_templated_text(selector, property) {
     var fields = document.querySelectorAll(selector);
     array_for_each(fields, function (field) {
         if (!field.classList.contains("no-load-init")) {
-            name = short_name(field.name);
-            if (formDefaultValues[name] == undefined) {
-                value = field[property];
-                if (value && value.length > 1 &&
-                    value.substr(0, 1) == "$" &&
-                    value.substr(0, 2) != "$$") {
-                    // It's a template.
+            var name = short_name(field.name || field.getAttribute("name"));
+            var value = field[property];
+            if (value && value.length > 1 && value.substr(0, 1) == "$") {
+                // It's a template.
+                if (!name) {
+                    logError(field + " can't be initialized to " + value
+                             + ", because it doesn't have a name.");
+                } else if (formDefaultValues[name] == undefined) {
                     formDefaultValues[name] = value;
                 }
             }
