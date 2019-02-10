@@ -47,14 +47,14 @@ td.label{
   white-space: nowrap;
 }
 
-table.layout {
+table.same-line-label-layout {
     border: none;
     border-collapse: collapse;
     margin: 0px;
     padding: 0px;
     width: 100%;
 }
-table.layout>tr>th, table.layout>tbody>tr>th {
+table.same-line-label-layout>tr>th, table.same-line-label-layout>tbody>tr>th {
     border: none;
     margin: 0px;
     padding-top: 0px;
@@ -63,7 +63,7 @@ table.layout>tr>th, table.layout>tbody>tr>th {
     white-space: nowrap;
     width: 1px;
 }
-table.layout>tr>td, table.layout>tbody>tr>td {
+table.same-line-label-layout>tr>td, table.same-line-label-layout>tbody>tr>td {
     border: none;
     margin: 0px;
     padding-top: 0px;
