@@ -65,6 +65,7 @@ form input {
     display: block;
 }
 form input[type="text"] {
+    font-weight: bold;
     font-size: 9pt;
     font-family: consolas,monaco,profont,monospace;
     width: 100%;
@@ -73,10 +74,12 @@ form select {
     border: 1px solid #cccccc;
     padding: 1px;
     background: #ffffff;
+    font-weight: bold;
     font-family: consolas,monaco,profont,monospace;
 }
 form textarea {
     display: block;
+    font-weight: bold;
     font-size: 9pt;
     font-family: consolas,monaco,profont,monospace;
     width: 100%;
@@ -91,7 +94,7 @@ form input:disabled,textarea:disabled {
     background-color: transparent;
     border: 1px solid #cccccc;
 }
-form label.label-sameline input {
+form label.label-sameline input, form label.label-sameline select {
     display: inline;;
     margin-left: 1em;
 }
@@ -389,6 +392,7 @@ form input.message-number {
     min-height: 3ex;
     display: block;
     unicode-bidi: embed;
+    font-weight: bold;
     font-family: consolas,monaco,profont,monospace;
     white-space: pre-wrap;
     width: 100%;
