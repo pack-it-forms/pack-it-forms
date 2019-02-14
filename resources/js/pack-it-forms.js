@@ -1062,10 +1062,10 @@ This is indicated by a mode=readonly query parameter. */
 function setup_view_mode(next) {
     if (query_object.mode && query_object.mode == "readonly") {
         document.querySelector("#button-header").classList.add("readonly");
-        document.querySelector("#opdirect-submit").hidden = "true";
-        document.querySelector("#email-submit").hidden = "true";
-        document.querySelector("#show-hide-data").hidden = "true";
-        document.querySelector("#clear-form").hidden = "true";
+        hide_element(document.querySelector("#opdirect-submit"));
+        hide_element(document.querySelector("#email-submit"));
+        hide_element(document.querySelector("#show-hide-data"));
+        hide_element(document.querySelector("#clear-form"));
         /* In view mode, we don't want to show the input control chrome.  This
            is difficult to do with textareas which might need scrollbars, etc.
            so insert a div with the same contents and use CSS to appropriately
@@ -1135,6 +1135,11 @@ function create_text_div(text, className) {
     var textelem = document.createTextNode(text);
     elem.appendChild(textelem);
     return elem;
+}
+
+function hide_element(element) {
+    element.hidden = "true";
+    element.classList.add("hidden");
 }
 
 /* Make forEach() & friends easier to use on Array-like objects
