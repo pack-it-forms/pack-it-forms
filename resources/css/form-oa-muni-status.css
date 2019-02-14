@@ -13,11 +13,17 @@
    See the License for the specific language governing permissions and
    limitations under the License. */
 
+table {
+    width: 100%;
+}
 #the-form {
     border: 1px solid #aaaaaa;
     padding: 0.5em;
 }
-
+#the-form fieldset table {
+    margin-left: 0px;
+    margin-right: auto;
+}
 #current-situation table th {
     text-align: left;
 }

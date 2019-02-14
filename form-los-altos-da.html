@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/form-los-altos-da.css"/>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
 
     <title>Los Altos Damage Assessment</title>
   </head>
@@ -33,7 +34,7 @@
             "7.": "Planning",
             "8.": "Planning",
             "9a.": "Los Altos EOC",
-            "9b.": "{{msgno|msgno2name}}"
+            "9b.": "{{envelope:sender_message_number|msgno2name}}"
         }
       </div>
       <table id="form-body" class="noborder border">
@@ -318,7 +319,6 @@
       </table>
       <div data-include-html="ics-footer"></div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>

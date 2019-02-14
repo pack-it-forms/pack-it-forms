@@ -2,27 +2,27 @@
   <div class="version">0.1.0</div>
   <table id="form-row-5" class="noborder">
     <tr>
-      <td class="block-caption">Action Taken
+      <td class="block-caption">Action Taken:
         <span class="field-number">13</span>
       </td>
     </tr><tr>
       <td>
-        <textarea name="13.action-taken" rows="3" cols="80" wrap="hard"></textarea>
+        <textarea name="13.action-taken" rows="3" cols="80" wrap="hard" tabindex="500"></textarea>
       </td>
     </tr><tr>
       <td>
         <fieldset class="horizontal">
-          <legend>CC:</legend>
-          <label>
-            <input name="CCMgt" type="checkbox" value="Yes"/>Management
+          <label class="bold">CC: 
           </label><label>
-            <input name="CCOps" type="checkbox" value="Yes"/> Operations
+            <input name="CCMgt" type="checkbox" value="Yes" tabindex="501"/>Management
           </label><label>
-            <input name="CCPlan" type="checkbox" value="Yes"/> Planning
+            <input name="CCOps" type="checkbox" value="Yes" tabindex="502"/> Operations
           </label><label>
-            <input name="CCLog" type="checkbox" value="Yes"/> Logistics
+            <input name="CCPlan" type="checkbox" value="Yes" tabindex="503"/> Planning
           </label><label>
-            <input name="CCFin" type="checkbox" value="Yes"/> Finance
+            <input name="CCLog" type="checkbox" value="Yes" tabindex="504"/> Logistics
+          </label><label>
+            <input name="CCFin" type="checkbox" value="Yes" tabindex="505"/> Finance
           </label>
         </fieldset>
       </td>
@@ -30,7 +30,7 @@
   </table>
   <table id="form-row-six" class="noborder">
     <tr>
-      <td colspan="5" class="block-caption">Operator Use Only
+      <td colspan="5" class="block-caption">Operator Use Only:
         <span class="field-number">14</span>
       </td>
     </tr><tr class="horizontal">
@@ -38,73 +38,79 @@
         <span class="bold">
           How
           <label class="intext">
-            Received <input name="Rec-Sent" type="radio" value="Received"/>
+            Received <input name="Rec-Sent" value="Received" type="radio" tabindex="506"
+                            class="no-msg-init" disabled="disabled"
+                            data-default-value="{{expand-while-null:{{value:Sent|view-by:sender}},{{value:Received|view-by:receiver}}}}"/>
           </label>
           or
           <label class="intext">
-            Sent <input name="Rec-Sent" type="radio" value="Sent"/>
+            Sent <input name="Rec-Sent" value="Sent" type="radio" tabindex="506"
+                        class="no-msg-init" disabled="disabled"/>
           </label>
         </span>
       </td><td colspan="2" class="border-left">
         <label class="label-sameline">Operator Call Sign:
-          <input class="call-sign no-msg-init" name="OpCall" type="text"
-                 value="{{expand-while-null:{{envelope:ocall}},{{query-string:ocall}}}}"/>
+          <input class="call-sign no-msg-init" name="OpCall" type="text" tabindex="508"
+                 value="{{envelope:viewer_operator_call_sign}}"/>
         </label>
       </td>
     </tr><tr class="horizontal">
       <td>
         <label>
-          <input name="Method" type="radio" value="Telephone"/> Telephone
+          <input name="Method" type="radio" value="Telephone" tabindex="507"/> Telephone
         </label>
       </td>
       <td colspan="2">
         <label>
-          <input name="Method" type="radio" value="Dispatch Center"/> Dispatch Center
+          <input name="Method" type="radio" value="Dispatch Center" tabindex="507"/> Dispatch Center
         </label>
       </td>
       <td colspan="2" class="border-left">
         <label class="label-sameline">Operator Name:
-          <input class="no-msg-init" name="OpName" type="text"
-                 value="{{expand-while-null:{{envelope:oname}},{{query-string:oname}}}}"/>
+          <input class="no-msg-init" name="OpName" type="text" tabindex="509"
+                 value="{{envelope:viewer_operator_name}}"/>
         </label>
       </td>
     </tr><tr class="horizontal">
       <td>
         <label>
-          <input name="Method" type="radio" value="EOC Radio"/> EOC Radio
+          <input name="Method" type="radio" value="EOC Radio" tabindex="507"/> EOC Radio
         </label>
       </td><td>
         <label>
-          <input name="Method" type="radio" value="FAX"/> FAX
+          <input name="Method" type="radio" value="FAX" tabindex="507"/> FAX
         </label>
       </td><td>
         <label>
-          <input name="Method" type="radio" value="Courier"/> Courier<br/>
+          <input name="Method" type="radio" value="Courier" tabindex="507"/> Courier
         </label>
-      </td><td class="border-left">
-        <label class="label-sameline">Date:
-          <input name="OpDate" class="no-msg-init init-on-submit" type="text"
-                 value="{{expand-while-null:{{envelope:ordate}},{{open-tmpl}}date{{close-tmpl}}}}" disabled="disabled"/>
-        </label>
-      </td><td>
-        <label class="label-sameline">Time:
-          <input name="OpTime" class="no-msg-init init-on-submit" type="text"
-                 value="{{expand-while-null:{{envelope:ortime}},{{open-tmpl}}time{{close-tmpl}}}}" disabled="disabled"/>
-        </label>
+      </td><td colspan="2" class="border-left">
       </td>
     </tr><tr class="horizontal">
       <td>
         <label>
-          <input name="Method" type="radio" value="Amateur Radio"/> Amateur Radio
+          <input name="Method" type="radio" value="Amateur Radio" tabindex="507"/> Amateur Radio
         </label>
       </td><td colspan="2">
         <label>
-          <input name="Method" type="radio" value="Other" checked="checked"/> Other:
+          <input name="Method" type="radio" value="Other" checked="checked" tabindex="507"/> Other:
         </label>
         <label>
-          <input name="Other" type="text" value="Packet"/>
+          <input name="Other" type="text" value="Packet" tabindex="-1"/>
         </label>
-      </td><td colspan="2" class="border-left"></td>
+      </td><td class="border-left">
+        <label class="label-sameline">Date:
+          <input name="OpDate" type="text" tabindex="510"
+                 class="date no-msg-init" disabled="disabled"
+                 value="{{expand-while-null:{{envelope:viewer_date}},{{open-tmpl}}date{{close-tmpl}}}}"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">Time:
+          <input name="OpTime" type="text" tabindex="511"
+                 class="time no-msg-init" disabled="disabled"
+                 value="{{expand-while-null:{{envelope:viewer_time}},{{open-tmpl}}time{{close-tmpl}}}}"/>
+        </label>
+      </td>
     </tr>
   </table>
 </div>

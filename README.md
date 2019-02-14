@@ -90,10 +90,7 @@ the mouse pointer and standard keyboard shortcuts.
 Some form fields may be disabled with contents that looks like one or
 more words surrounded by curly braces.  For example `"{{date}}"`.  These
 are placeholders that indicate values that will be automatically
-substituted when the form is submitted.  If you show the data message
-content you will see that the placeholders are replaced in this output
-and continuously as you change the form.  In this way the data message
-text always matches what you'd expect to see in OutPost.
+substituted when the message is sent.
 
 
 Viewing Previously Entered Forms
@@ -194,6 +191,7 @@ by adding one of these classes to its class attribute:
 * phone-number
 * cardinal-number
 * real-number
+* call-sign
 
 You can override the standard style, pattern and/or placeholder with
 HTML attributes, as usual.
@@ -239,18 +237,19 @@ makes this easy to do: it is possible to include fragments of HTML
 from files in the resources/html directory.  If you create a `div`
 element that has a `data-include-html` attribute in it, the element
 will be replaced with the contents of the first `div` element in the
-file resources/html/<attribute value>.html where <attribute value>
+file resources/html/\<attribute value\>.html where \<attribute value\>
 signifies the value of the `data-include-html` attribute.
 
 One thing that you may want to do with included HTML files is set the
 default values of included elements.  You can do that by putting a
 JSON object that maps form field names to default values for those
-fields inside the <div> that will be replaced with the included
-content.  The values are in the same format as the PacFORMS field
-values:  a checkbox should have a value of CHECKED if it should be
-checked, and a collection of radiobuttons should have a value that
-matches one of the `name` attributes.  Text fields can be set to a
-template, which will be expanded (see the next section).
+fields inside the \<div\> that will be replaced with the included content.
+Most default values are in the same format as HTML.
+For a \<select\>, the value should match one of the option values.
+For a collection of radio buttons, the value should match
+the value of one of the buttons.
+For a checkbox, the value should be "false" for not checked, or
+anything else for checked.
 
 If an input element represents a field that should have different
 values in a receiver's copy of a form than the senders, give the field
@@ -265,25 +264,19 @@ fragments provide good examples of this.
 Setup Default and On-submit Behavior on Fields
 ----------------------------------------------
 
-Default field values can be specified using the normal HTML form
-mechanisms.  For text fields, however, there a template system
-provides additional flexibility in establishing the defaults.
+Some fields have a normal value which the operator rarely edits,
+and some fields have a value that cannot be edited.
+These default values can be specified in HTML, as usual.
+Also, a `<select>` may have a `data-default-value` attribute,
+whose value matches the value of the default `<option>`.
+A collection of radio buttons may have a data-default-value
+attribute on any one of the buttons, whose value matches
+the value of the default button.
+A checkbox may have a data-default-value, in which case it will
+be checked by default if and only if the data-default-value is
+not "false" or an empty string.
 
-Template expansion will be performed on the `value` attribute of all
-input elements with a `type` attribute value of "text" when the
-document is loaded.  This will establish default values for form
-fields that the user can later edit.
-
-The one exception to the expansion when the document is loaded is
-those elements with the class `no-load-init`, which prevents the
-expansion.  Typically, these elements also have the class
-`init-on-submit`, which indicates that template expansion should occur
-at the time the form is submitted.  In this case, when the form is
-initially displayed the template value will be shown in the field to
-provide an indication that something will be filled in later.  Since
-these fields aren't usually intended to be edited by the user they
-usually have their `disabled` attribute set to "true".
-
+Any of these default values may be a template.
 Regular text in templates is copied from the template to the resulting
 string.  The difference comes when placeholder values that are
 surrounded by double curly braces are encountered.  To give an
@@ -293,23 +286,23 @@ example, on January 1st, 2020, the template:
 
 will result in the output text:
 
-        The date is 01/20/2020.
+        The date is: 01/20/2020.
 
 This is the simplest possible template value, with just the name of
 the template to use.  Some template types require additional
 information, in which case it can be supplied after the template name,
-separated by a colon.  For example, if the query string of the
-document contains a `msgno` parameter with the value `ABC001`, then:
+separated by a colon. For example,
+if the form has a field named "foo" whose current value is "bar",
 
-        The msgno is {{query-string:msgno}}.
+        That is {{field:foo}}.
 
 will result in the output text:
 
-        The msgno is ABC001.
+        That is bar.
 
 Finally, the output of template expansion can be further modified by
 filters.  Filters are separated from the template type by a vertical
-bar character.  Filters can also take an argument separated by a
+bar character "|".  Filters can also take an argument separated by a
 colon.  Assuming again that the date is January 1st, 2020, an example
 of a filter is:
 
@@ -329,16 +322,14 @@ The following template types are available:
 |-------------------|------------|-------------------------------------------------|
 | date              | none       | Current date string in "mm/dd/yyyy" format      |
 | time              | none       | Current local time string in hh:mm:ss format    |
-| msgno             | none       | Message number for this message as a string     |
 | selected-fields   | css-sel    | Get list of field values returned by `css-sel`  |
 | field             | field name | Value of a field in the form                    |
 | msg-field         | field name | Value of a field in the received message        |
-| query-string      | key        | Value of query string parameter with name 'key' |
-| envelope          | field name | Value of !OUTPOST! envelope field               |
-| div-id            | id value   | Text content of the named `div` element         |
-| filename          | none       | Filename of the form (final name in URI path)   |
+| envelope          | see below  | Information about the sender or receiver        |
+| filename          | none       | Final name in URI path of the form              |
 | title             | none       | Title of the HTML document                      |
 | expand-while-null | templates  | Comma separated templates (\, escapes)          |
+| value             | any        | Insert the argument                             |
 | open-brace        | none       | Insert a single '{' character                   |
 | close-brace       | none       | Insert a single '}' character                   |
 | open-tmpl         | none       | Insert a template open string ('{{')            |
@@ -354,6 +345,25 @@ will have a value that is the empty string.  This distinction is
 important because some form fields have different values in the sender
 and receiver version of the form.
 
+The argument to the `envelope` template should start with either
+"sender_", "receiver_" or "viewer_". This selects whether it will expand to
+information relating to the sender of the message, the receiver of the message
+or the current operator, respectively.
+The rest of the argument may be any one of:
+
+| Name                | Description                                           |
+|---------------------|-------------------------------------------------------|
+| message_number      | assigned message number                               |
+| operator_call_sign  | FCC call sign of the operator                         |
+| operator_name       | Personal name of the operator                         |
+| date                | calendar date when the message was sent or received   |
+| time                | time of day when the message was sent or received     |
+
+For example, {{envelope:viewer_operator_name}} expands to the personal name of
+the operator who is viewing the form, and
+{{envelope:sender_message_number}} expands to the message number that was
+assigned at the sender's station.
+
 The following filters are available:
 
 | Name       | Argument  | Description                                        |
@@ -368,6 +378,19 @@ The following filters are available:
 | trim       | none      | Remove whitespace at start and end of string       |
 | msgno2name | msgno     | Expand message number to station                   |
 | expandtmpl | none      | Apply another layer of template expansion          |
+| view-by    | role      | Expands to an empty string, unless arg == the operator's role (either sender or receiver) |
+
+When the form is loaded, template expansion will be performed on
+the `value` property of input elements with `type="text"`,
+the `innerHTML` property of \<span\> and \<div\> elements with a `templated` class,
+and any data-default-value.
+However, templates in elements with the class `no-load-init` will not be expanded.
+The same templates will be expanded when the form is reset.
+
+If a form field has the class `init-on-submit`, its value is expanded as
+a template immediately before submitting it to Outpost.
+Such a field usually also has the class no-load-init, so the template will
+be shown to the operator, to suggest that something will be filled in later.
 
 You might also want to add some amount of validation to your custom
 form fields.  *pack-it-forms* uses normal HTML5 form validation for
@@ -377,7 +400,7 @@ whether or not the form is fully valid.  Here are a few tips to get
 you started with HTML5 form validation of this type:
 
    * If you have a field that must have some input in it, add the
-     attribute `required="true"`
+     attribute `required`.
    * If the contents of the field has to be in a certain format, add a
      `pattern` attribute: the value should be a regular expression
      that will match values of the desired format.
@@ -388,8 +411,28 @@ Adjust Layout and Styling
 Forms written using the above guidelines should be styled to look like
 paper forms, and to have a fairly responsive layout that will work
 with a large variety of screen sizes.  However, if your form requires
-some specific styling, create the file resources/css/<form name>.css
+some specific styling, create the file resources/css/\<form name\>.css
 and put any form-specific styling in it.
+
+Customize
+---------
+
+To link from the form to a PDF version (suitable for printing),
+add the PDF file into the resources/pdf folder and
+add a tag like this inside the HTML \<head\>:
+
+    <meta name="pack-it-forms-pdf-URL" content="resources/pdf/File_Name.pdf"/>
+
+By default, the subject of the message submitted to Outpost is
+Santa Clara County's standard for an ICS-213 message; that is
+(message number)\_(severity)/(handling)\_(form name)\_(subject).
+For example, "XND-123P_O/R_ICS 213_Advice to Cities".
+To customize the part following (severity)/(handling),
+you can add a tag like this inside your form's HTML \<head\>:
+
+    <meta name="pack-it-forms-subject-suffix" content="_Advice_{{field:27.city}}"/>
+
+This content attribute may be a template.
 
 Explanation of the Form Boilerplate
 -----------------------------------
@@ -423,9 +466,10 @@ that are likely to be useful in more than one form.  This is highly
 recommended.
 
         <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
-
-Javascript file that contains the Javascript code to implement the
-form behavior.  This is required to have a functioning form.
+        <script type="text/javascript" src="resources/integration/integration.js"></script>
+ 
+Javascript files that contain code to implement the form's behavior.
+These are required to have a functioning form.
 
         <title>ICS213: Message Form</title>
       </head>
@@ -457,12 +501,6 @@ execution so that they can be presented to the user appropriately.
 
 The actual from itself replaces the ellipses here.  The Javascript
 requires that the id of the form have the value "the-form".
-
-        <div data-include-html="outpost_message_header"></div>
-
-An include reference that is replaced with data used to format the
-outpost message header.  This is required for the Javascript to work
-properly.  It should come after the form.
 
         <div data-include-html="submit-buttons"></div>
 

@@ -27,6 +27,11 @@ h1 {
     vertical-align: top;
     margin-top: 0
 }
+footer {
+    display: none;
+    font-weight: bold;
+    text-align: center;
+}
 table {
     border-collapse: collapse;
     width: 90%;
@@ -98,6 +103,7 @@ form select {
     padding: 1px;
     background: #ffffff;
     font-weight: bold;
+    font-size: 9pt;
     font-family: consolas,monaco,profont,monospace;
 }
 form textarea {
@@ -204,10 +210,6 @@ table ~ table :first-child:first-child > td {
 }
 
 .version {
-    display: none;
-}
-
-#message-header {
     display: none;
 }
 
@@ -481,8 +483,11 @@ td.rotated:not(.not-rotated) > div > div::after, th.rotated:not(.not-rotated) > 
        border: 0px;
        padding: 0px;
    }
-   #loading,#message-header,#button-header,#form-data-form {
+   #loading,#button-header,#form-data-form {
        display: none;
+   }
+   footer {
+       display: block;
    }
    table {
       width: 100%;

@@ -3,12 +3,14 @@
   <head>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
     <link rel="stylesheet" type="text/css" href="resources/css/loading.css"/>
-    <link rel="stylesheet" type="text/css"
-          href="resources/css/pack-it-forms.css"/>
-    <link rel="stylesheet" type="text/css"
-          href="resources/css/form-oa-muni-status.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-header.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/form-oa-muni-status.css"/>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
-
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
+    <meta name="pack-it-forms-pdf-URL" content="resources/pdf/XSC_OA_MuniStatus_v20130101.pdf"/>
+    <meta name="pack-it-forms-subject-suffix" content="_Municipal Status_{{field:21.municipality}}"/>
     <title>Santa Clara OA Municipal Status</title>
   </head>
 
@@ -153,12 +155,12 @@
                           disabled="disabled">
                     Unknown
                   </option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </td>
-              <td class="label">
-                <label for="activation-level">Activation Level:</label>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </td>
+            <td class="label">
+              <label for="activation-level">Activation Level:</label>
               </td><td>
                 <select name="15.eoc-activation-level" required="required"
                         disabled="disabled">
@@ -515,7 +517,6 @@
         </fieldset>
       </form>
     </div>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>
