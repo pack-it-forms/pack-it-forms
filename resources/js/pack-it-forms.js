@@ -176,6 +176,16 @@ form data message, which is passed in as text.  It is implemented as a
 wrapper around init_form_from_fields. */
 function init_form_from_msg_data(text) {
     msgfields = parse_form_data_text(text);
+    if (msgfields.MsgNo) {
+        var status = query_object.message_status;
+        if (status == 'new' || status == 'draft' || status == 'ready' || status == 'sent') {
+            // I sent this message.
+            query_object.msgno = msgfields.MsgNo; // show My Msg #
+        } else {
+            // I received this message.
+            query_object.txmsgno = msgfields.MsgNo; // show the Sender's Msg #
+        }
+    }
     init_form_from_fields(msgfields, "name", "msg-value");
 }
 
