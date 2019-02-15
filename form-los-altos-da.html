@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/form-los-altos-da.css"/>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
 
     <title>Los Altos Damage Assessment</title>
   </head>
@@ -33,30 +34,40 @@
             "7.": "Planning",
             "8.": "Planning",
             "9a.": "Los Altos EOC",
-            "9b.": "{{msgno|msgno2name}}"
+            "9b.": "{{envelope:sender_message_number|msgno2name}}"
         }
       </div>
       <table id="form-body" class="noborder border">
         <tr>
           <td colspan="17">
-            <label class="label-sameline">Subject:
-              <span class="field-number">10</span>
-              <input name="10.subject" type="text"
-                     class="no-load-init init-on-submit"
-                     value="Damage Summary for BAT(s) {{selected-fields:[name$='batnum']|remove:|sort:num|join:, }}"
-                     required="required"
-                     pattern="Damage Summary for BAT\(s\) .*"
-                     title="This field must have a prefix of
-                            &quot;Damage Summary for BAT(s) &quot;"/>
-            </label>
+            <table class="same-line-label-layout">
+              <tr>
+                <th>Subject:
+                  <span class="field-number">10</span>
+                </th><td>
+                  <input name="10.subject" type="text"
+                         class="no-load-init init-on-submit"
+                         value="Damage Summary for BAT(s) {{selected-fields:[name$='batnum']|remove:|sort:num|join:, }}"
+                         required="required"
+                         pattern="Damage Summary for BAT\(s\) .*"
+                         title="This field must have a prefix of
+                                &quot;Damage Summary for BAT(s) &quot;"/>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr><tr>
           <td colspan="17">
-            <label class="label-sameline">
-              Reference (e.g. Number of earlier msg.)
-              <span class="field-number">11</span>
-              <input name="11.reference" type="text"/>
-            </label>
+            <table class="same-line-label-layout">
+              <tr>
+                <th>
+                  Reference (e.g. Number of earlier msg.)
+                  <span class="field-number">11</span>
+                </th><td>
+                  <input name="11.reference" type="text"/>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr><tr>
           <th rowspan="2" class="rowspanned-header">BAT</th>
@@ -308,7 +319,6 @@
       </table>
       <div data-include-html="ics-footer"></div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>

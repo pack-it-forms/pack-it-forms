@@ -6,8 +6,9 @@
     <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/ics-header.css"/>
     <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
-    <link rel="stylesheet" type="text/css" href="resources/css/form-ics213.css"/>
     <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
+    <meta name="pack-it-forms-pdf-URL" content="resources/pdf/ICS-213_SCC_Message_Form_06-28-07_Fillable.pdf"/>
     <title>ICS213: Message Form</title>
   </head>
 
@@ -26,18 +27,29 @@
       <table id="form-body" class="noborder border">
         <tr>
           <td>
-            <label class="label-sameline">Subject:
-              <span class="field-number">10</span>
-              <input name="10.subject" type="text" required/>
-            </label>
+            <table class="same-line-label-layout">
+              <tr>
+                <th>Subject:
+                  <span class="field-number">10</span>
+                </th>
+                <td>
+                  <input name="10.subject" type="text" required/>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr><tr>
           <td>
-            <label class="label-sameline">
-              Reference (e.g. Number of earlier msg.)
-              <span class="field-number">11</span>
-              <input name="11.reference" type="text"/>
-            </label>
+            <table class="same-line-label-layout">
+              <tr>
+                <th>
+                  Reference (e.g. Number of earlier msg.)
+                  <span class="field-number">11</span>
+                </th><td>
+                  <input name="11.reference" type="text"/>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr><tr>
           <td>
@@ -49,7 +61,6 @@
       </table>
       <div data-include-html="ics-footer"></div>
     </form>
-    <div data-include-html="outpost_message_header"></div>
     <div data-include-html="submit-buttons"></div>
   </body>
 </html>

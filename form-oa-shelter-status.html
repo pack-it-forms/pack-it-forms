@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="resources/css/loading.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-header.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/form-ics213.css"/>
+    <style>
+      table {
+          width: 100%;
+      }
+      #the-form fieldset table {
+          margin-left: 0px;
+          margin-right: auto;
+      }
+      #the-form table td.label {
+          text-align: right;
+      }
+      #the-form table td input[type="checkbox"] {
+          margin-left: 0px;
+          vertical-align:top;
+      }
+      form label.label-sameline {
+          display: inline;
+          margin-left: 1em;
+      }
+      form label.label-sameline input {
+          display: inline;
+          margin-left: 0px;
+      }
+    </style>
+    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
+    <meta name="pack-it-forms-pdf-URL" content="resources/pdf/XSC_OA_ShelterStatus_v20130814.pdf"/>
+    <meta name="pack-it-forms-subject-suffix" content="_Shelter Status_{{field:21.municipality}}"/>
+    <script type="text/javascript">
+      function compute_availability(element) {
+          var capacity = document.getElementById("shelter-capacity").value;
+          var occupancy = document.getElementById("shelter-occupancy").value;
+          var availability = document.getElementById("shelter-availability");
+          if (capacity && occupancy) {
+              availability.value = parseInt(capacity) - parseInt(occupancy);
+          } else {
+              availability.value = "";
+          }
+      }
+      function compute_repeater_output(element) {
+          var input = document.getElementById("repeater-input").value;
+          var offset = document.getElementById("repeater-offset").value;
+          var output = document.getElementById("repeater-output");
+          input = parseFloat(input || "0");
+          if (input) {
+              var standard_offset = // MHz
+                  (input < 50)  ? 0.1 :
+                  (input < 144) ? 0.5 :
+                  (input < 220) ? 0.6 :
+                  (input < 222) ? 1.0 :
+                  (input < 225) ? 1.6 :
+                  (input < 450) ? 5.0 :
+                  null;
+              var value = null;
+              if (!offset) {
+                  value = "" + input;
+              } else if (!standard_offset) {
+                  value = null;
+              } else if (offset == "+") {
+                  value = "" + (input + standard_offset);
+              } else if (offset == "-") {
+                  value = "" + (input - standard_offset);
+              }
+              if (value && value != output.value) {
+                  output.value = value;
+                  fireEvent(output, "input");
+                  check_the_form_validity();
+              }
+          }
+      }
+      function compute_repeater_offset(element) {
+          var input = document.getElementById("repeater-input").value;
+          var output = document.getElementById("repeater-output").value;;
+          var offset = document.getElementById("repeater-offset");
+          input = parseFloat(input || "0");
+          output = parseFloat(output || "0");
+          if (input && output) {
+              var value = null;
+              if (input > output) {
+                  value = "-";
+              } else if (input < output) {
+                  value = "+";
+              } else {
+                  value = "";
+              }
+              if (value != null && value != offset.value) {
+                  offset.value = value;
+                  fireEvent(offset, "input");
+                  check_the_form_validity();
+              }
+          }
+      }
+    </script>
+    <title>Santa Clara OA Shelter Status</title>
+  </head>
+
+  <body>
+    <div class="version">20130814</div>
+    <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
+    <div id="err">
+      <div>
+        <h1>Something went wrong.</h1>
+        The following log information may help resolve the problem.
+        <div id="error-log"></div>
+      </div>
+    </div>
+    <form id="the-form" name="the-form">
+      <div data-include-html="scco-header">
+        {
+            "header-title": "Santa Clara OA Shelter Status",
+            "header-version": "Version 20130814&lt;br/&gt;(PR-4.4-3.6, 08/29/18)",
+            "4.": "OTHER",
+            "5.": "ROUTINE"
+        }
+      </div>
+      <br/>
+      <fieldset>
+        <table>
+          <tr>
+            <td class="label" style="vertical-align:middle;">
+              <label class="bold">Incident Name:</label>
+            </td><td>
+              <input type="text" name="20.incident-name" required="required" tabindex="20"
+                     placeholder="or 'Incident independent'"/>
+            </td>
+          </tr><tr>
+            <td style="padding-top:0.5em;"></td>
+          </tr><tr>
+            <td class="label" style="vertical-align:middle;">
+              <label class="bold">Municipality:</label>
+            </td><td style="white-space:normal;">
+              <div data-include-html="select-municipality"></div>
+              <label class="label-sameline">Date:
+                <input type="text" name="1a.date" class="date" value="{{date}}" required="required"/>
+              </label>
+              <label class="label-sameline">Time:
+                <input type="text" name="1b.time" class="time" value="{{time}}" required="required"/>
+              </label>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <fieldset class="labeled-box">
+        <legend>Shelter</legend>
+        <table style="width:auto;">
+          <tr>
+            <td class="label">Shelter Type:</td>
+            <td>
+              <select name="30.shelter-type" tabindex="30">
+                <option value="Type 1">Type 1</option>
+                <option value="Type 2">Type 2</option>
+                <option value="Type 3">Type 3</option>
+                <option value="Type 4">Type 4</option>
+              </select>
+            </td>
+          </tr><tr>
+            <td class="label">Shelter Status:</td>
+            <td>
+              <select name="31.shelter-status" tabindex="31">
+                <option value="Closed">Closed</option>
+                <option value="Full">Full</option>
+                <option value="Open">Open</option>
+              </select>
+            </td>
+          </tr><tr>
+            <td class="label">Name:</td>
+            <td><input type="text" name="32.shelter-name" tabindex="32"/></td>
+          </tr><tr>
+            <td class="label">Address:</td>
+            <td><input type="text" name="33a.shelter-address" tabindex="33"/></td>
+          </tr><tr>
+            <td class="label">City:</td>
+            <td>
+              <input type="text" name="33b.shelter-city" style="width:15em;" tabindex="34"/>
+              <label class="label-sameline">State:
+                <input type="text" name="33c.shelter-state" style="width:2em;" tabindex="35"/>
+              </label>
+              <label class="label-sameline">Zip:
+                <input type="text" name="33d.shelter-zip" style="width:10em;" tabindex="36"/>
+              </label>
+            </td>
+          </tr><tr>
+            <td class="label">Latitude:</td>
+            <td>
+              <input type="text" name="37a.latitude" style="width:8em;" tabindex="37"/>
+              <label class="label-sameline">Longitude:
+                <input type="text" name="37b.longitude" style="width:8em;" tabindex="38"/>
+              </label>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <fieldset class="labeled-box">
+        <legend>Shelter Information</legend>
+        <table style="width:auto;">
+          <tr>
+            <td class="label">Capacity:</td>
+            <td>
+              <input type="text" class="cardinal-number" name="40a.capacity" tabindex="40"
+                     onchange="compute_availability(this)" id="shelter-capacity"/>
+              <label class="label-sameline">Occupancy:
+                <input type="text" class="cardinal-number" name="40b.occupancy" tabindex="41"
+                       onchange="compute_availability(this)" id="shelter-occupancy"/>
+              </label>
+              <label class="label-sameline">Availability:
+                <input type="text" class="cardinal-number" id="shelter-availability" tabindex="-1" disabled="disabled"/>
+              </label>
+            </td>
+          </tr><tr>
+            <td class="label">Meals Served:</td>
+            <td>
+              <input type="text" class="cardinal-number" name="41.meals" tabindex="42"/>
+              (last 24 hours)
+            </td>
+          </tr><tr>
+            <td class="label">NSS Number:</td>
+            <td><input type="text" name="42.NSS" tabindex="43"/></td>
+          </tr><tr>
+            <td class="label"><label for="pet-friendly">Pet Friendly:</label></td>
+            <td style="white-space:normal;">
+              <input type="checkbox" name="43a.pet-friendly" id="pet-friendly" tabindex="44"/>
+              <label class="label-sameline">Basic Safety Inspection:
+                <input type="checkbox" name="43b.basic-safety" tabindex="45"/>
+              </label>
+              <label class="label-sameline">ATC 20 Inspection:
+                <input type="checkbox" name="43c.ATC-20" tabindex="46"/>
+              </label>
+            </td>
+          </tr><tr>
+            <td class="label">Available Services:</td>
+            <td><textarea name="44.available-services" style="height:4em;" tabindex="47"></textarea></td>
+          </tr><tr>
+            <td class="label">MOU:</td>
+            <td><input type="text" name="45.MOU" tabindex="48"
+                       placeholder="Identify how submitted"/></td>
+          </tr><tr>
+            <td class="label">Floor Plan:</td>
+            <td><input type="text" name="46.floor-plan" tabindex="49"
+                       placeholder="Identify how submitted"/></td>
+          <tr>
+        </table>
+      </fieldset>
+      <fieldset class="labeled-box">
+        <legend>Contact Information</legend>
+        <table style="width:auto;">
+          <tr>
+            <td class="label">Managed By:</td>
+            <td>
+              <select name="50a.managed-by" tabindex="50">
+                <option value="American Red Cross">American Red Cross</option>
+                <option value="Private">Private</option>
+                <option value="Community">Community</option>
+                <option value="Government">Government</option>
+                <option value="Other">Other</option>
+              </select>
+            </td>
+          </tr><tr>
+            <td class="label">Managed By Detail:</td>
+            <td><input type="text" name="50b.managed-by-detail" tabindex="51"/></td>
+          </tr><tr>
+            <td class="label">Primary Contact:</td>
+            <td style="width:20em;">
+              <input type="text" name="51a.primary-contact" tabindex="52"/>
+            </td><td>
+              <label class="label-sameline">Phone:
+                <input type="text" name="51b.primary-phone" class="phone-number" tabindex="53"/>
+              </label>
+            </td>
+          </tr><tr>
+            <td class="label">Secondary Contact:</td>
+            <td style="width:20em;">
+              <input type="text" name="52a.secondary-contact" tabindex="54"/>
+            </td><td>
+              <label class="label-sameline">Phone:
+                <input type="text" name="52b.secondary-phone" class="phone-number" tabindex="55"/>
+              </label>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <fieldset class="labeled-box">
+        <legend>Amateur Radio Contact Information</legend>
+        <table style="width:auto;">
+          <tr>
+            <td class="label">Tactical Call Sign:</td>
+            <td><input type="text" name="60.tactical-call" class="call-sign" tabindex="60"/></td>
+          </tr><tr>
+            <td class="label">Repeater Call Sign:</td>
+            <td><input type="text" name="61.repeater-call" class="call-sign" tabindex="61"/></td>
+          </tr><tr>
+            <td class="label">Repeater Input:</td>
+            <td>
+              <input type="text" name="62a.repeater-input" tabindex="62"
+                     class="real-number" style="width:6em;"
+                     onchange="compute_repeater_output(this)" id="repeater-input"/> MHz
+              <label class="label-sameline">CTCSS tone:
+                <input type="text" name="62b.repeater-input-tone" tabindex="63"
+                       class="real-number" style="width:5em;" placeholder="=PL tone"/> Hz
+              </label>
+              <label class="label-sameline">Offset:
+                <input type="text" name="62c.repeater-offset" tabindex="64"
+                       style="width:1em;" pattern="[+-]"
+                       onchange="compute_repeater_output(this)" id="repeater-offset"/>
+              </label>
+            </td>
+          </tr><tr>
+            <td class="label">Repeater Output:</td>
+            <td>
+              <input type="text" name="63a.repeater-output" tabindex="65"
+                     class="real-number" style="width:6em;"
+                     onchange="compute_repeater_offset(this)" id="repeater-output"/> MHz
+              <label class="label-sameline">CTCSS tone:
+                <input type="text" name="63b.repeater-output-tone" tabindex="66"
+                       class="real-number" style="width:5em;" placeholder="=PL tone"/> Hz
+              </label>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <br/>
+      <table class="same-line-label-layout">
+        <tr>
+          <th style="padding-left:3em;">Comments:</th>
+          <td><textarea name="70.comments" style="height:2em;" tabindex="70"></textarea></td>
+        </tr><tr>
+          <td></td>
+          <td>
+            <label class="label-sameline" style="font-weight:normal;margin-left:0px;">
+              <input type="checkbox" name="71.remove-from-active-list" tabindex="71">
+              Remove this shelter from the active list of shelters.
+            </label>
+          </td>
+        </tr>
+      </table>
+      <br/>
+      <div data-include-html="ics-footer-short"></div>
+    </form>
+    <div data-include-html="submit-buttons"></div>
+  </body>
+</html>

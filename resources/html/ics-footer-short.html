@@ -1,0 +1,35 @@
+<div>
+  <div class="version">0.1.0</div>
+  <table class="noborder" style="width:auto;">
+    <tr class="horizontal">
+      <td>
+        <select disabled="disabled" tabindex="-1" data-default-value="{{envelope:viewer}}">
+          <option value="sender">Sent</option>
+          <option value="receiver">Received</option>
+        </select>
+        <label>via</label>
+        <select name="Method" tabindex="507">
+          <option value="Packet">Packet</option>
+          <option value="Voice">Voice</option>
+        </select>
+        <label class="label-sameline">by</label>
+        <input name="OpCall" type="text" tabindex="508"
+               class="call-sign no-msg-init"
+               placeholder="call sign"
+               value="{{envelope:viewer_operator_call_sign}}"/>
+        <input name="OpName" type="text" tabindex="509"
+               class="no-msg-init" style="width:12em;"
+               placeholder="operator name"
+               value="{{envelope:viewer_operator_name}}"/>
+        <label class="label-sameline">on</label>
+        <input name="OpDate" type="text"
+               class="date no-msg-init" disabled="disabled"
+               value="{{expand-while-null:{{envelope:viewer_date}},{{open-tmpl}}date{{close-tmpl}}}}"/>
+        <label class="label-sameline">at</label>
+        <input name="OpTime" type="text"
+               class="time no-msg-init" disabled="disabled"
+               value="{{expand-while-null:{{envelope:viewer_time}},{{open-tmpl}}time{{close-tmpl}}}}"/>
+      </td>
+    </tr>
+  </table>
+</div>

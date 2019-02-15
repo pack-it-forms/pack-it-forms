@@ -1,4 +1,5 @@
 *~
 /PacForms-Examples
 /msgs/
+/resources/integration/*.js
 /resources/scripts/*/build
