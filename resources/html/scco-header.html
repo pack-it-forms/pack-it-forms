@@ -1,0 +1,72 @@
+<div>
+  <div class="version">0.1.0</div>
+  <table class="block-caption noborder">
+    <tr>
+      <td width="20%" rowspan="2" style="border:none;"></td>
+      <td style="border:none;color:blue;font-weight:bold;text-align:center;">
+        County of Santa Clara Emergency Operations Center
+      </td>
+      <td width="20%" rowspan="2"
+          style="border:none;text-align:right;vertical-align:bottom;font-weight:normal;">
+        <span name="header-version" class="templated no-msg-init"></span>
+      </td>
+    </tr><tr>
+      <td style="border:none;color:blue;font-size:133%;font-weight:bold;text-align:center;">
+        <span name="header-title" class="templated no-msg-init"></span>
+      </td>
+    </tr>
+  </table>
+  <table id="form-row-1" class="noborder">
+    <tr>
+      <td>
+        <label class="label-sameline">Sender's Msg #
+          <input name="2.txmsgno" class="message-number no-msg-init" type="text" tabindex="-1"
+                 value="{{envelope:sender_message_number|view-by:receiver}}"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">My Msg #
+          <input name="MsgNo" class="message-number no-msg-init" type="text" tabindex="1"
+                 value="{{envelope:viewer_message_number}}"
+                 required="required"/>
+        </label>
+      </td><td>
+        <label class="label-sameline">Receiver's Msg #
+          <input name="3.rxmsgno" class="message-number no-msg-init" type="text" tabindex="-1"
+                 value="{{envelope:receiver_message_number|view-by:sender}}"/>
+        </label>
+      </td>
+    </tr>
+  </table><table id="form-row-2">
+    <tr>
+      <td>
+        <fieldset>
+          <legend>Situation Severity:</legend>
+          <select name="4.severity" tabindex="4"
+                  onchange="on_value(this, ['EMERGENCY'], {'5.handling': {onMatch: {value: 'IMMEDIATE'}}})">
+            <option value="EMERGENCY">Emergency (e.g. life threat)</option>
+            <option value="URGENT">Urgent (e.g. property threat)</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </fieldset>
+      </td><td>
+        <fieldset>
+          <legend>Msg Handling Order:</legend>
+          <select name="5.handling" tabindex="5">
+            <option value="IMMEDIATE">Immediate (as soon as possible)</option>
+            <option value="PRIORTY">Priority (less than one hour)</option>
+            <option value="ROUTINE">Routine (more than one hour)</option>
+          </select>
+        </fieldset>
+      </td><td style="white-space:normal;">
+        <label>Message Requests You to:
+          <fieldset>
+            <input name="6b.reply" type="checkbox" value="Yes" tabindex="-1"
+                   onchange="on_checked(this, {'6d.reply-by': {enable: true, otherwise: {value: ''}}})"/>
+            reply by:
+            <input name="6d.reply-by" type="text" style="width:10em;" disabled="disabled"/>
+          </fieldset>
+        </label>
+      </td>
+    </tr>
+  </table>
+</div>

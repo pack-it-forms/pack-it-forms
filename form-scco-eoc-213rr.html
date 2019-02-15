@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="resources/css/loading.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/pack-it-forms.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-header.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/ics-footer.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/form-ics213.css"/>
+    <style>
+      table {
+          width: 100%;
+      }
+      th {
+          text-align: left;
+          vertical-align: top;
+      }
+      form label.label-sameline {
+          display: inline;
+          margin-left: 1em;
+      }
+      form label.label-sameline input {
+          display: inline;
+          margin-left: 0px;
+      }
+    </style>
+    <script type="text/javascript" src="resources/js/pack-it-forms.js"></script>
+    <script type="text/javascript" src="resources/integration/integration.js"></script>
+    <meta name="pack-it-forms-pdf-URL" content="resources/pdf/XSC_EOC-213RR_v1706.pdf"/>
+    <meta name="pack-it-forms-subject-suffix" content="_Resource Request_{{field:21.incident-name}}"/>
+    <title>EOC Resource Request</title>
+  </head>
+
+  <body>
+    <div class="version">8.17</div>
+    <div id="loading"><div>Loading<div id="spin"><div id="spin_1" class="spin"></div></div></div></div>
+    <div id="err">
+      <div>
+        <h1>Something went wrong.</h1>
+        The following log information may help resolve the problem.
+        <div id="error-log"></div>
+      </div>
+    </div>
+    <form id="the-form" name="the-form">
+      <div data-include-html="scco-header">
+        {
+            "header-title": "Resource Request (EOC Form 213RR)",
+            "header-version": "Version 08/17&lt;br/&gt;(PR-4.4-2.98, 06/29/18)",
+            "4.": "OTHER",
+            "5.": "ROUTINE"
+        }
+      </div>
+      <table>
+        <tr>
+          <td style="width:45%;">
+            <label>Incident Name<span class="field-number">1</span>
+              <input type="text" name="21.incident-name" required="required" tabindex="20"/>
+            </label>
+          </td><td style="width:1px;">
+            <label>Date Initiated<span class="field-number">2</span>
+              <input type="text" name="1a.date" required="required" tabindex="-1"
+                     class="date" value="{{date}}"/>
+            </label>
+          </td><td style="width:1px;">
+            <label>Time Initiated<span class="field-number">3</span>
+              <input type="text" name="1b.time" required="required" tabindex="-1"
+                     class="time" value="{{time}}"/>
+            </label>
+          </td><td style="width:1px;">
+            <label>Tracking Number<span class="field-number">4</span>
+              <input type="text" name="24.tracking-number" disabled="disabled" tabindex="-1"
+                     style="width:15em;" placeholder="Completed by OA EOC"/>
+            </label>
+          </td>
+        </tr><tr>
+          <td>
+            <label>Requested by<span class="field-number">5</span>
+              <textarea name="25.requested-by" required="required" tabindex="22"
+                        rows="5" placeholder="name, agency, position, email, phone"></textarea>
+            </label>
+          </td><td colspan="3" rowspan="3">
+            <table class="same-line-label-layout">
+              <tr>
+                <td></td>
+                <td style="text-decoration:underline;font-weight:bold;">How to use EOC Form 213RR</td>
+              </tr><tr>
+                <th>Purpose</th>
+                <td>
+  	          To request non-mutual aid supplies,
+                  services, personnel, teams, equipment, utilities, fuel, facilities,
+                  or any other resource or incident management activity
+                  required from the Operational Area (OA.)
+                </td>
+              </tr><tr>
+                <th>When to use</th>
+                <td>
+	          Any time during any Operational Period.
+                  If the OA EOC is not activated the Duty Officer will serve to coordinate the request.
+                </td>
+              </tr><tr>
+                <th>Prepared by</th>
+	        <td>Any EOC position or agency requesting resources from the OA EOC.</td>
+              </tr><tr>
+                <th>Approved by</th>
+	        <td>Section Chief of the requesting EOC or Supervising Official at Requesting Agency</td>
+              </tr><tr>
+                <th>Routed to</th>
+                <td>
+	          Planning Section Resource Status Unit -> Logistics Section -> Finance/Admin Section
+                  -> EOC Director -> Planning -> Intelligence Section
+                </td>
+              </tr><tr>
+                <th>Filed with</th>
+                <td>Planning Section Documentation Unit.</td>
+              </tr><tr>
+                <th>User Notes</th>
+                <td>
+	          This is a two-sided form. Side one is completed by the requestor.
+                  Side two is completed by the OA EOC.
+                  <span style="font-weight:bold;">Please check that both sides are available.</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr><tr>
+          <td>
+            <label>Prepared by<span class="field-number">6</span>
+              <textarea name="26.prepared-by" tabindex="23"
+                        rows="4" placeholder="name, position, email, phone"></textarea>
+            </label>
+          </td>
+        </tr><tr>
+          <td>
+            <label>Approved By<span class="field-number">7</span>
+              <textarea name="27.approved-by" tabindex="24"
+                        rows="4" placeholder="name, position, email, phone"></textarea>
+            </label>
+          </td>
+        </tr>
+      </table>
+      <div style="page-break-inside:avoid;">
+        <table>
+          <tr>
+            <td colspan="5" class="block-caption" style="text-align:center;">
+              Requesting Agency / EOC Section
+              <br/><span style="font-size:133%">Requested Source Details</span>
+            </td>
+          </tr><tr>
+            <td style="width:6em;text-align:right;">
+              <label>Qty/Unit<span class="field-number">8</span>
+                <textarea name="28.qty-unit" required="required" tabindex="30"
+                          rows="4" style="text-align:right;"></textarea>
+              </label>
+            </td><td>
+              <label>Resource Description<span class="field-number">9</span>
+                <textarea name="29.resource-description" required="required" tabindex="31"
+                          rows="4" placeholder="Kind/Type if applicable"></textarea>
+              </label>
+            </td><td style="width:11em;">
+              <label>Arrival<span class="field-number">10</span>
+                <textarea name="30.resource-arrival" required="required" tabindex="32"
+                          rows="4" placeholder="date/time"></textarea>
+              </label>
+            </td><td style="width:1px;">
+              <label>Priority:<span class="field-number">11</span>
+                <select name="31.priority" required="required" tabindex="33"
+                        style="display:block;">
+                  <option value="Now">Now</option>
+                  <option value="High">High (0-4 hrs.)</option>
+                  <option value="Medium">Medium (5-12 hrs.)</option>
+                  <option value="Low" selected="selected">Low (12+ hrs.)</option>
+                </select>
+              </label>
+            </td><td style="width:9em;">
+              <label>Est'd Cost<span class="field-number">12</span>
+                <textarea name="32.resource-priority" tabindex="34"
+                          rows="4"></textarea>
+              </label>
+            </td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td style="width:50%;">
+              <label>Deliver to<span class="field-number">13</span>
+                <textarea name="33.deliver-to" required="required" tabindex="35"
+                          rows="5" placeholder="name, agency, position, email, phone"></textarea>
+              </label>
+            </td><td>
+              <label>Location<span class="field-number">14</span>
+                <textarea name="34.deliver-to-location" required="required" tabindex="36"
+                          rows="5" placeholder="address or lat/long, site type"></textarea>
+              </label>
+            </td>
+          </tr><tr>
+            <td colspan="2">
+              <label>Suitable Substitutes / Suggested Sources<span class="field-number">15</span>
+                <textarea name="35.substitutes" tabindex="37"
+                          rows="3" placeholder="name, source, website"></textarea>
+              </label>
+            </td>
+          </tr><tr>
+            <td>
+              <table class="same-line-label-layout">
+                <tr>
+                  <th colspan="2" style="padding-bottom:1ex;">
+                    Supplemental Requirements<span class="field-number">16</span>
+                    <span style="font-weight:normal;">(Include details in #17)</span>
+                  </th>
+                </tr><tr>
+                  <td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36a.equipment-operator" tabindex="-1"/>
+                      Equipment Operator
+                    </label>
+                  </td><td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36b.lodging" tabindex="-1"/>
+                      Lodging
+                    </label>
+                  </td>
+                </tr><tr>
+                  <td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36c.fuel" tabindex="-1"
+                             onchange="on_checked(this, {'36d.fuel-type':
+                                      {enable: true, require: true, otherwise: {value: ''}}})"/>
+                      Fuel
+                      <input type="text" name="36d.fuel-type" disabled="disabled" tabindex="-1"
+                             style="margin-left:1em;width:8em;" placeholder="type"/>
+                    </label>
+                  </td><td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36e.power" tabindex="-1"/>
+                      Power
+                    </label>
+                  </td>
+                </tr><tr>
+                  <td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36f.meals" tabindex="-1"/>
+                      Meals
+                    </label>
+                  </td><td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36g.maintenance" tabindex="-1"/>
+                      Maintenance
+                    </label>
+                  </td>
+                </tr><tr>
+                  <td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36h.water" tabindex="-1"/>
+                      Water
+                    </label>
+                  </td><td>
+                    <label class="label-sameline">
+                      <input type="checkbox" name="36i.other" tabindex="-1"
+                             onchange="set_properties({'37.instructions': {required: this.checked}})"/>
+                      Other <span style="font-weight:normal;">(see #17)</span>
+                    </label>
+                  </td>
+                </tr>
+              </table>
+            </td> 
+            <td>
+              <label>Special Instructions<span class="field-number">17</span>
+                <textarea name="37.instructions" rows="5" tabindex="39"></textarea>
+              </label>
+            </td>
+          </tr>
+        </table>
+        <br/>
+        <div data-include-html="ics-footer-short"></div>
+      </div>
+    </form>
+    <div data-include-html="submit-buttons"></div>
+  </body>
+</html>

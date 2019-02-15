@@ -1001,8 +1001,43 @@ function value_based_enabler(e, enabledValues, target_name, target_disabled_valu
 This is a callback function to be used in the onChange handler of a
 combobox; it will enable the relevant -other field if and only if the
 combobox is set to "Other". */
-function combobox_other_manager(e) {
-    value_based_enabler(e, ["Other"], e.name + "-other", "");
+function combobox_other_manager(source) {
+    var targetActions = {};
+    targetActions[source.name + "-other"] = {enable: true, require: true, otherwise: {value: ""}};
+    return on_value(source, ["Other"], targetActions);
+}
+
+function on_value(source, valuesToMatch, targetActions) {
+    return on_match(array_contains(valuesToMatch, source.value), targetActions);
+}
+
+function on_checked(checkbox, targetActions) {
+    return on_match(checkbox.checked, targetActions);
+}
+
+/** For each targetName in targetActions, call
+    set_properties(targetActions[targetName][match ? "onMatch" : "otherwise"].
+    Use (match XOR targetActions[targetName].require) as the default value of required.
+    Use !(match XOR targetActions[targetName].enable) as the default value of disabled.
+    @return match
+*/
+function on_match(match, targetActions) {
+    var targetProperties = {};
+    for (var targetName in targetActions) {
+        var actions = targetActions[targetName];
+        var properties = actions[match ? "onMatch" : "otherwise"] || {};
+        if (actions.enable !== undefined &&
+            properties.disabled === undefined) {
+            properties.disabled = !(match ? actions.enable : !actions.enable);
+        }
+        if (actions.require !== undefined &&
+            properties.required === undefined) {
+            properties.required = match ? actions.require : !actions.require;
+        }
+        targetProperties[targetName] = properties;
+    }
+    set_properties(targetProperties);
+    return match;
 }
 
 /** For each targetName in targetProperties,
@@ -1118,6 +1153,7 @@ function setup_view_mode(next) {
             if (el.placeholder) {
                 el.placeholder = '';
             }
+            el.tabIndex = "-1"; // Don't tab to this element.
             if (el.type == "radio"
                 || el.type == "checkbox"
                 || (el.type && el.type.substr(0, 6) == "select")) {
