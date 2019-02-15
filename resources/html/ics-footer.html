@@ -38,13 +38,13 @@
         <span class="bold">
           How
           <label class="intext">
-            Received <input name="Rec-Sent" value="Received" type="radio" tabindex="506"
+            Received <input name="Rec-Sent" value="receiver" type="radio" tabindex="506"
                             class="no-msg-init" disabled="disabled"
-                            data-default-value="{{expand-while-null:{{value:Sent|view-by:sender}},{{value:Received|view-by:receiver}}}}"/>
+                            data-default-value="{{envelope:viewer}}"/>
           </label>
           or
           <label class="intext">
-            Sent <input name="Rec-Sent" value="Sent" type="radio" tabindex="506"
+            Sent <input name="Rec-Sent" value="sender" type="radio" tabindex="506"
                         class="no-msg-init" disabled="disabled"/>
           </label>
         </span>

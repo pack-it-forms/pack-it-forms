@@ -345,10 +345,9 @@ will have a value that is the empty string.  This distinction is
 important because some form fields have different values in the sender
 and receiver version of the form.
 
-The argument to the `envelope` template should start with either
-"sender_", "receiver_" or "viewer_". This selects whether it will expand to
-information relating to the sender of the message, the receiver of the message
-or the current operator, respectively.
+The argument to the `envelope` template may start with either "sender_" or "receiver_",
+to say whether it expands to information relating to the sender of the message
+or the receiver of the message, respectively.
 The rest of the argument may be any one of:
 
 | Name                | Description                                           |
@@ -359,10 +358,17 @@ The rest of the argument may be any one of:
 | date                | calendar date when the message was sent or received   |
 | time                | time of day when the message was sent or received     |
 
-For example, {{envelope:viewer_operator_name}} expands to the personal name of
-the operator who is viewing the form, and
+For example, {{envelope:receiver_operator_name}} expands to the personal name
+of the operator who received the message, and
 {{envelope:sender_message_number}} expands to the message number that was
 assigned at the sender's station.
+
+The argument to the envelope template may also start with "viewer_",
+which says it expands to information relating to the current operator's role.
+So, it's equivalent to "sender_" when viewing a transmitted message, or
+"receiver_" when viewing a received message.
+And finally, if the argument to the envelope template is simply "viewer",
+it expands to either "sender" or "receiver".
 
 The following filters are available:
 
