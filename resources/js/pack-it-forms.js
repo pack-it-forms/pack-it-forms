@@ -181,7 +181,7 @@ function init_form_from_msg_data(text) {
 
 function parse_form_data_text(text) {
     var fields = {};
-    var field_name = "";
+    var field_name = null;
     var field_value = "";
     for_each_line(text, function (linenum, line) {
         if (line.charAt(0) == "#") {
@@ -199,20 +199,17 @@ function parse_form_data_text(text) {
             return;  // Ignore line as we don't need anything from it.
         }
         var idx = 0;
-        if (field_name == "") {
+        if (field_name == null) {
             idx = index_of_field_name_sep(linenum, line, idx);
             field_name = line.substring(0, idx);
-            idx = index_of_field_value_start(linenum, line, idx) + 1;
+            idx = index_of_field_value_start(linenum, line, idx);
         }
-        var end_idx = line.indexOf("]", idx);
-        if (end_idx == -1) {
-            // Field continues on next line
-            field_value += line.substring(idx);
-        } else {
+        field_value += line.substring(idx);
+        idx = field_value.length - 1;
+        if (idx > 0 && field_value.charAt(idx) == "]" && field_value.charAt(idx - 1) != "`") {
             // Field is complete on this line
-            field_value += line.substring(idx, end_idx);
-            fields[field_name] = field_value;
-            field_name = "";
+            fields[field_name] = unbracket_data(field_value);
+            field_name = null;
             field_value = "";
         }
     });
@@ -324,7 +321,7 @@ var init_from_msg_funcs = {
         return true;
     },
     "textarea": function(element, value) {
-        element.value = unescape_pacforms_string(value).trim();
+        element.value = unescape_pacforms_string(value);
         return true;
     },
     "radio": function(element, value) {
@@ -450,13 +447,16 @@ function escape_pacforms_string(string) {
 
 function bracket_data(data) {
     if (data) {
-        data = data.trim();
-        data = data.replace("`]", "``]");
-        data = data.replace(/([^`])]/, "$1`]");
+        data = data.replace(/`]/g, "``]");
+        data = data.replace(/([^`])]/g, "$1`]");
         return "[" + data + "]";
     } else {
         return null;
     }
+}
+
+function unbracket_data(data) {
+    return data.substring(1, data.length - 1).replace(/`]/g, "]");
 }
 
 function selected_field_values(css_selector) {
